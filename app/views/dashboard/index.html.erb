@@ -21,20 +21,20 @@
 <div class="stats-grid">
   <% @stats.each do |key, value| %>
     <%
-      icon, title, color = case key
+      icon_category, icon_name, title, color = case key
       when :total_users
-        ['👤', '總使用者數', 'primary']
+        ['people', 'group_discussion_meetingx3', '總使用者數', 'primary']
       when :active_sessions
-        ['🟢', '活躍連線數', 'success']
+        ['symbols', 'electricity', '活躍連線數', 'success']
       when :appointments
-        ['📅', '今日預約', 'info']
+        ['objects', 'calendar', '今日預約', 'info']
       when :messages
-        ['💬', '訊息數量', 'warning']
+        ['symbols', 'communication', '訊息數量', 'warning']
       end
     %>
     <div class="flexy-card stats-card">
       <div class="stats-icon <%= color %>">
-        <%= icon %>
+        <%= healthicon(icon_category, icon_name, style: 'filled', size: '48px', class: 'mx-auto') %>
       </div>
       <div class="stats-content">
         <p class="stats-label"><%= title %></p>
@@ -127,7 +127,7 @@
         <% @recent_activities.each do |activity| %>
           <div class="activity-item">
             <div class="activity-icon <%= activity[:type] %>">
-              <%= activity[:icon] %>
+              <%= healthicon(activity[:icon_category], activity[:icon_name], style: 'filled', size: '24px') %>
             </div>
             <div class="activity-content">
               <h4 class="activity-title"><%= activity[:title] %></h4>
@@ -224,19 +224,27 @@
   <h3 class="section-title">快速操作</h3>
   <div class="action-grid">
     <button class="action-card">
-      <span class="action-icon">📅</span>
+      <span class="action-icon">
+        <%= healthicon('objects', 'calendar', style: 'filled', size: '48px', class: 'text-line-green-500') %>
+      </span>
       <span class="action-label">新增預約</span>
     </button>
     <button class="action-card">
-      <span class="action-icon">👤</span>
+      <span class="action-icon">
+        <%= healthicon('people', 'person', style: 'filled', size: '48px', class: 'text-blue-500') %>
+      </span>
       <span class="action-label">新增患者</span>
     </button>
     <button class="action-card">
-      <span class="action-icon">📊</span>
+      <span class="action-icon">
+        <%= healthicon('graphs', 'chart_line_stacked', style: 'filled', size: '48px', class: 'text-purple-500') %>
+      </span>
       <span class="action-label">產生報表</span>
     </button>
     <button class="action-card">
-      <span class="action-icon">💬</span>
+      <span class="action-icon">
+        <%= healthicon('symbols', 'communication', style: 'filled', size: '48px', class: 'text-yellow-500') %>
+      </span>
       <span class="action-label">發送訊息</span>
     </button>
   </div>

@@ -25,3 +25,5 @@ When working on this project:
 - Keep models focused with single responsibilities
 - Extract complex business logic to service objects
 - Ensure proper database indexing for foreign keys and queries
+
+**Do not use EMOJI icons**

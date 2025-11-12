@@ -31,7 +31,9 @@
         <!-- Sidebar Header -->
         <div class="sidebar-header">
           <div class="sidebar-logo">
-            <span class="logo-icon">💚</span>
+            <span class="logo-icon">
+              <%= healthicon('body', 'heart_organ', style: 'filled', class: 'text-line-green-500', width: '32', height: '32') %>
+            </span>
             <div class="logo-text" data-sidebar-target="logoText">
               <h1>FHIR LINE Bot</h1>
               <span class="logo-subtitle">Healthcare Platform</span>
@@ -63,82 +65,15 @@
 
         <!-- Navigation Menu -->
         <nav class="sidebar-nav">
-          <!-- Dashboard Section -->
           <div class="nav-section">
-            <div class="nav-section-title" data-sidebar-target="sectionTitle">
-              <span>主要功能</span>
-            </div>
-
-            <%= link_to root_path, class: "nav-item #{'active' if current_page?(root_path)}" do %>
-              <span class="nav-icon">🏠</span>
-              <span class="nav-text" data-sidebar-target="navText">儀表板</span>
-            <% end %>
-
-            <%= link_to dashboard_path, class: "nav-item #{'active' if current_page?(dashboard_path)}" do %>
-              <span class="nav-icon">📊</span>
-              <span class="nav-text" data-sidebar-target="navText">數據分析</span>
-            <% end %>
-
-            <%= link_to profile_path, class: "nav-item #{'active' if current_page?(profile_path)}" do %>
-              <span class="nav-icon">👤</span>
-              <span class="nav-text" data-sidebar-target="navText">個人檔案</span>
-            <% end %>
-          </div>
-
-          <!-- Healthcare Section -->
-          <div class="nav-section">
-            <div class="nav-section-title" data-sidebar-target="sectionTitle">
-              <span>醫療服務</span>
-            </div>
-
-            <a href="#" class="nav-item">
-              <span class="nav-icon">🏥</span>
-              <span class="nav-text" data-sidebar-target="navText">醫療記錄</span>
-            </a>
-
-            <a href="#" class="nav-item">
-              <span class="nav-icon">💊</span>
-              <span class="nav-text" data-sidebar-target="navText">用藥管理</span>
-            </a>
-
-            <a href="#" class="nav-item">
-              <span class="nav-icon">📅</span>
-              <span class="nav-text" data-sidebar-target="navText">預約掛號</span>
-            </a>
-          </div>
-
-          <!-- Settings Section -->
-          <div class="nav-section">
-            <div class="nav-section-title" data-sidebar-target="sectionTitle">
-              <span>系統設定</span>
-            </div>
-
             <%= link_to setup_path, class: "nav-item #{'active' if current_page?(setup_path)}" do %>
-              <span class="nav-icon">⚙️</span>
+              <span class="nav-icon">
+                <%= healthicon('devices', 'mobile', style: 'outline', size: '24px', class: 'inline-block align-middle') %>
+              </span>
               <span class="nav-text" data-sidebar-target="navText">LINE 設定</span>
-            <% end %>
-
-            <%= link_to ui_demo_path, class: "nav-item #{'active' if current_page?(ui_demo_path)}" do %>
-              <span class="nav-icon">🎨</span>
-              <span class="nav-text" data-sidebar-target="navText">UI 元件</span>
-            <% end %>
-
-            <%= link_to healthicons_demo_path, class: "nav-item #{'active' if current_page?(healthicons_demo_path)}" do %>
-              <span class="nav-icon">🏥</span>
-              <span class="nav-text" data-sidebar-target="navText">醫療圖示</span>
             <% end %>
           </div>
         </nav>
-
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer" data-sidebar-target="footer">
-          <% if logged_in? %>
-            <%= button_to logout_path, method: :post, class: "nav-item nav-logout" do %>
-              <span class="nav-icon">🚪</span>
-              <span class="nav-text" data-sidebar-target="navText">登出</span>
-            <% end %>
-          <% end %>
-        </div>
       </aside>
 
       <!-- Main Content Area -->
@@ -232,20 +167,28 @@
           <% if flash[:notice] %>
             <div class="flexy-alert alert-success" data-controller="alert" data-alert-auto-dismiss-value="5000">
               <div class="alert-content">
-                <span class="alert-icon">✓</span>
+                <span class="alert-icon">
+                  <%= healthicon('symbols', 'yes', style: 'filled', size: '20px', class: 'inline-block') %>
+                </span>
                 <p><%= flash[:notice] %></p>
               </div>
-              <button data-action="click->alert#dismiss" class="alert-close">✕</button>
+              <button data-action="click->alert#dismiss" class="alert-close">
+                <%= healthicon('symbols', 'no', style: 'outline', size: '16px', class: 'inline-block') %>
+              </button>
             </div>
           <% end %>
 
           <% if flash[:alert] %>
             <div class="flexy-alert alert-error" data-controller="alert" data-alert-auto-dismiss-value="5000">
               <div class="alert-content">
-                <span class="alert-icon">⚠</span>
+                <span class="alert-icon">
+                  <%= healthicon('symbols', 'alert_triangle', style: 'filled', size: '20px', class: 'inline-block') %>
+                </span>
                 <p><%= flash[:alert] %></p>
               </div>
-              <button data-action="click->alert#dismiss" class="alert-close">✕</button>
+              <button data-action="click->alert#dismiss" class="alert-close">
+                <%= healthicon('symbols', 'no', style: 'outline', size: '16px', class: 'inline-block') %>
+              </button>
             </div>
           <% end %>
 
@@ -262,16 +205,6 @@
         </footer>
       </div>
     </div>
-
-    <!-- Floating Action Button (FAB) -->
-    <% if logged_in? %>
-      <button class="flexy-fab" title="快速操作">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
-    <% end %>
 
     <!-- Initialize LINE Login (for non-logged-in users) -->
     <% unless logged_in? %>

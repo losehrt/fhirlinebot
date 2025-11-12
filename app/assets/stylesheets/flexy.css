@@ -247,6 +247,18 @@
 .nav-icon {
   font-size: 1.25rem;
   flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.nav-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .nav-text {

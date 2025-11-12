@@ -24,15 +24,14 @@ Rails.application.routes.draw do
   # Pages routes
   get "/", to: "pages#home", as: :home
   root "pages#home"
-  get "/dashboard", to: "pages#dashboard", as: :dashboard
   get "/profile", to: "pages#profile", as: :profile
+
+  # Dashboard route (using new controller)
+  get "/dashboard", to: "dashboard#index", as: :dashboard
 
   # UI Demo route
   get "/ui-demo", to: "ui_demo#index", as: :ui_demo
 
   # Healthicons Demo route
   get "/healthicons", to: "healthicons_demo#index", as: :healthicons_demo
-
-  # Dashboard route (using new controller)
-  get "/dashboard", to: "dashboard#index", as: :dashboard_new
 end

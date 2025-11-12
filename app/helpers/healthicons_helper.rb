@@ -32,6 +32,15 @@ module HealthiconsHelper
       style_path, category, "#{name}.svg"
     )
 
+    # If 24px version doesn't exist, fallback to default size
+    if size == '24px' && !File.exist?(svg_path)
+      style_path = style
+      svg_path = Rails.root.join(
+        'app', 'assets', 'images', 'healthicons', 'svg',
+        style_path, category, "#{name}.svg"
+      )
+    end
+
     # Check if file exists
     unless File.exist?(svg_path)
       Rails.logger.warn "Healthicon not found: #{svg_path}"
@@ -64,6 +73,7 @@ module HealthiconsHelper
 
       # Default size if not specified
       unless svg_element['width'] || svg_element['height']
+        # Always set to 24px if requested, even if using fallback
         default_size = size == '24px' ? '24' : '48'
         svg_element['width'] = default_size
         svg_element['height'] = default_size
