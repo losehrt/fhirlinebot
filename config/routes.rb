@@ -29,4 +29,10 @@ Rails.application.routes.draw do
 
   # UI Demo route
   get "/ui-demo", to: "ui_demo#index", as: :ui_demo
+
+  # Healthicons Demo route
+  get "/healthicons", to: "healthicons_demo#index", as: :healthicons_demo
+
+  # Dashboard route (using new controller)
+  get "/dashboard", to: "dashboard#index", as: :dashboard_new
 end

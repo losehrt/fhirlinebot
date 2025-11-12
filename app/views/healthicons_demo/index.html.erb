@@ -1,0 +1,236 @@
+<!-- Page Header -->
+<div class="page-header">
+  <h1 class="page-title">Healthicons 圖示庫</h1>
+  <div class="page-subtitle">開源醫療健康圖示系統 - 為您的醫療應用提供專業圖示</div>
+</div>
+
+<!-- Introduction Card -->
+<div class="flexy-card">
+  <div class="card-body">
+    <div class="flex items-center gap-4">
+      <%= healthicon('devices', 'stethoscope', style: 'filled', class: 'text-line-green-500') %>
+      <div>
+        <h3 class="text-lg font-semibold">關於 Healthicons</h3>
+        <p class="text-gray-600 mt-1">
+          Healthicons 是一套專為醫療健康領域設計的開源圖示庫，提供超過 1,500 個精心設計的圖示，
+          涵蓋身體器官、醫療設備、藥品、症狀等各個類別。所有圖示都採用 CC0 授權，可自由使用。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Style Comparison -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">圖示風格</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-2 gap-6">
+      <div class="text-center">
+        <h4 class="font-medium mb-3">線框風格 (Outline)</h4>
+        <div class="flex justify-center gap-4">
+          <%= healthicon('body', 'heart', style: 'outline', class: 'text-red-500') %>
+          <%= healthicon('devices', 'stethoscope', style: 'outline', class: 'text-blue-500') %>
+          <%= healthicon('medications', 'medicines', style: 'outline', class: 'text-green-500') %>
+        </div>
+      </div>
+      <div class="text-center">
+        <h4 class="font-medium mb-3">實心風格 (Filled)</h4>
+        <div class="flex justify-center gap-4">
+          <%= healthicon('body', 'heart', style: 'filled', class: 'text-red-500') %>
+          <%= healthicon('devices', 'stethoscope', style: 'filled', class: 'text-blue-500') %>
+          <%= healthicon('medications', 'medicines', style: 'filled', class: 'text-green-500') %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Size Options -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">圖示尺寸</h3>
+  </div>
+  <div class="card-body">
+    <div class="flex items-end justify-center gap-8">
+      <div class="text-center">
+        <p class="text-sm text-gray-600 mb-2">24px</p>
+        <%= healthicon('body', 'heart', size: '24px', style: 'filled', class: 'text-line-green-500') %>
+      </div>
+      <div class="text-center">
+        <p class="text-sm text-gray-600 mb-2">48px (預設)</p>
+        <%= healthicon('body', 'heart', size: 'default', style: 'filled', class: 'text-line-green-500') %>
+      </div>
+      <div class="text-center">
+        <p class="text-sm text-gray-600 mb-2">自訂 (64px)</p>
+        <%= healthicon('body', 'heart', style: 'filled', class: 'text-line-green-500', width: '64', height: '64') %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Common Medical Icons -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">常用醫療圖示</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-5 gap-4">
+      <% @common_icons.each do |icon| %>
+        <div class="text-center p-4 rounded-lg hover:bg-gray-50 transition-colors">
+          <%= healthicon(icon[:category], icon[:name], style: 'outline', class: 'mx-auto text-line-green-500') %>
+          <p class="text-sm mt-2"><%= icon[:label] %></p>
+          <p class="text-xs text-gray-500"><%= icon[:name] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Blood Type Icons -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">血型圖示</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-8 gap-4">
+      <% @blood_icons.each do |icon| %>
+        <div class="text-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <%= healthicon(icon[:category], icon[:name], style: 'filled', class: 'mx-auto text-red-600') %>
+          <p class="text-sm font-bold mt-2"><%= icon[:label] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Emotion Icons -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">情緒圖示</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-6 gap-4">
+      <% @emotion_icons.each do |icon| %>
+        <div class="text-center p-4 rounded-lg hover:bg-gray-50 transition-colors">
+          <%= healthicon(icon[:category], icon[:name], style: 'filled', class: 'mx-auto text-yellow-500') %>
+          <p class="text-sm mt-2"><%= icon[:label] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Usage Examples -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">使用範例</h3>
+  </div>
+  <div class="card-body">
+    <div class="space-y-4">
+      <!-- With Labels -->
+      <div>
+        <h4 class="font-medium mb-3">帶標籤的圖示</h4>
+        <div class="flex gap-6">
+          <%= healthicon_with_label('places', 'hospital', '醫院', style: 'filled', class: 'text-blue-500') %>
+          <%= healthicon_with_label('devices', 'blood_pressure_monitor', '血壓監測', style: 'filled', class: 'text-purple-500') %>
+          <%= healthicon_with_label('medications', 'syringe', '疫苗接種', style: 'filled', class: 'text-green-500') %>
+        </div>
+      </div>
+
+      <!-- In Buttons -->
+      <div>
+        <h4 class="font-medium mb-3">按鈕中的圖示</h4>
+        <div class="flex gap-3">
+          <button class="flexy-btn btn-primary">
+            <%= healthicon('places', 'emergency', size: '24px', style: 'filled', class: 'inline-block mr-2') %>
+            緊急求助
+          </button>
+          <button class="flexy-btn btn-success">
+            <%= healthicon('diagnostics', 'results', size: '24px', style: 'filled', class: 'inline-block mr-2') %>
+            檢查報告
+          </button>
+          <button class="flexy-btn btn-info">
+            <%= healthicon('medications', 'medicines', size: '24px', style: 'filled', class: 'inline-block mr-2') %>
+            用藥提醒
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Indicators -->
+      <div>
+        <h4 class="font-medium mb-3">狀態指示器</h4>
+        <div class="flex gap-6">
+          <div class="flex items-center gap-2">
+            <%= healthicon('symbols', 'yes', size: '24px', style: 'filled', class: 'text-green-500') %>
+            <span>正常</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <%= healthicon('symbols', 'alert_triangle', size: '24px', style: 'filled', class: 'text-yellow-500') %>
+            <span>警告</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <%= healthicon('symbols', 'no', size: '24px', style: 'filled', class: 'text-red-500') %>
+            <span>異常</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Code Examples -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">程式碼範例</h3>
+  </div>
+  <div class="card-body">
+    <div class="space-y-4">
+      <div>
+        <h4 class="font-medium mb-2">基本使用</h4>
+        <pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>&lt;%= healthicon('body', 'heart') %&gt;</code></pre>
+      </div>
+
+      <div>
+        <h4 class="font-medium mb-2">指定風格與尺寸</h4>
+        <pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>&lt;%= healthicon('devices', 'stethoscope', style: 'filled', size: '24px') %&gt;</code></pre>
+      </div>
+
+      <div>
+        <h4 class="font-medium mb-2">自訂樣式</h4>
+        <pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>&lt;%= healthicon('blood', 'blood_a_p', class: 'text-red-500', width: '64', height: '64') %&gt;</code></pre>
+      </div>
+
+      <div>
+        <h4 class="font-medium mb-2">帶標籤</h4>
+        <pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>&lt;%= healthicon_with_label('places', 'hospital', '醫院', style: 'filled') %&gt;</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Available Categories -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">圖示分類</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-4 gap-3">
+      <% @categories.each do |category| %>
+        <div class="p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <% sample_icon = healthicon_list(category).first %>
+            <% if sample_icon %>
+              <%= healthicon(category, sample_icon, size: '24px', style: 'filled', class: 'text-line-green-500') %>
+            <% end %>
+            <span class="font-medium capitalize"><%= category.gsub('_', ' ') %></span>
+            <span class="text-sm text-gray-500">
+              (<%= healthicon_list(category).count %> 個)
+            </span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

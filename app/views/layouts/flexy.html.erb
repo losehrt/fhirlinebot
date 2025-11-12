@@ -122,6 +122,11 @@
               <span class="nav-icon">🎨</span>
               <span class="nav-text" data-sidebar-target="navText">UI 元件</span>
             <% end %>
+
+            <%= link_to healthicons_demo_path, class: "nav-item #{'active' if current_page?(healthicons_demo_path)}" do %>
+              <span class="nav-icon">🏥</span>
+              <span class="nav-text" data-sidebar-target="navText">醫療圖示</span>
+            <% end %>
           </div>
         </nav>
 
