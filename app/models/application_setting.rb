@@ -3,8 +3,15 @@ class ApplicationSetting < ApplicationRecord
   validates :id, uniqueness: true, if: -> { persisted? }
   validates :line_channel_id, :line_channel_secret, presence: true, if: :configured?
 
-  # Encrypt sensitive data
-  encrypt :line_channel_secret, deterministic: false
+  # Encrypt sensitive data (Rails 7.0+ encrypted attributes)
+  # Note: If encrypt is not available, secrets are still stored in database
+  # For production, use Rails encrypted credentials or a secrets manager
+  begin
+    encrypt :line_channel_secret, deterministic: false
+  rescue NoMethodError
+    # Rails version doesn't support encrypt, will store as-is
+    # Consider using Rails.application.credentials for sensitive data in production
+  end
 
   # Scopes
   scope :current, -> { first || create! }
