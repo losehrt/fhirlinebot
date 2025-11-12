@@ -1,411 +1,469 @@
-<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-  <!-- Header with Breadcrumb -->
-  <div class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="max-w-4xl mx-auto px-4 py-4">
-      <!-- Breadcrumb -->
-      <nav class="rb-breadcrumb mb-4">
-        <a href="/" class="rb-breadcrumb-item">首頁</a>
-        <span class="rb-breadcrumb-separator">/</span>
-        <span class="rb-breadcrumb-item text-gray-900">設定</span>
-      </nav>
+<div class="flex min-h-screen bg-slate-50">
+  <!-- Left Sidebar - Fixed Position (Flexy Style) -->
+  <div class="w-80 bg-white fixed left-0 top-0 h-screen border-r border-gray-200 overflow-y-auto flex flex-col">
+    <!-- Top Section: Logo & Navigation -->
+    <div class="flex-1 overflow-y-auto">
+      <!-- Logo Section -->
+      <div class="p-6 border-b border-gray-200">
+        <a href="/" class="flex items-center space-x-2 mb-8">
+          <span class="text-2xl">💚</span>
+          <div>
+            <h2 class="text-sm font-bold text-gray-900">FHIR LINE Bot</h2>
+            <p class="text-xs text-gray-500">Healthcare Platform</p>
+          </div>
+        </a>
 
-      <!-- Header Content -->
-      <div class="flex items-center space-x-3">
-        <div class="text-4xl">⚙️</div>
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">FHIR LINE Bot Setup</h1>
-          <p class="text-gray-600 mt-1">設定您的 LINE OAuth 憑證</p>
+        <!-- Navigation Menu -->
+        <nav class="space-y-1">
+          <a href="/" class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition text-sm">
+            <span class="text-lg">🏠</span>
+            <span>首頁</span>
+          </a>
+          <a href="/setup" class="flex items-center space-x-3 px-4 py-2 text-gray-900 bg-blue-50 rounded-lg transition text-sm font-semibold border-l-4 border-blue-600">
+            <span class="text-lg">⚙️</span>
+            <span>設定</span>
+          </a>
+          <a href="/dashboard" class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition text-sm">
+            <span class="text-lg">📊</span>
+            <span>儀表板</span>
+          </a>
+          <a href="/users" class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition text-sm">
+            <span class="text-lg">👥</span>
+            <span>用戶管理</span>
+          </a>
+          <a href="/settings" class="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition text-sm">
+            <span class="text-lg">🔧</span>
+            <span>系統設置</span>
+          </a>
+        </nav>
+      </div>
+
+    </div>
+
+    <!-- Bottom Section: User Profile -->
+    <div class="border-t border-gray-200 p-6 mt-auto">
+      <div class="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+          A
         </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-gray-900">Administrator</p>
+          <p class="text-xs text-gray-500 truncate">admin@example.com</p>
+        </div>
+        <span class="text-lg">⋮</span>
       </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="max-w-4xl mx-auto px-4 py-12">
-    <!-- Status Card using Rails Block -->
-    <div class="rb-card mb-8">
-      <div class="rb-card-body">
-        <div class="flex items-center space-x-4">
-          <div class="flex-shrink-0">
-            <% if @configured %>
-              <span class="rb-badge rb-badge-success" style="width: 48px; height: 48px; font-size: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                ✓
-              </span>
-            <% else %>
-              <span class="rb-badge rb-badge-warning" style="width: 48px; height: 48px; font-size: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                !
-              </span>
-            <% end %>
-          </div>
-          <div class="flex-1">
-            <h2 class="text-lg font-bold text-gray-900">
-              <% if @configured %>
-                ✓ LINE 憑證已設定
-              <% else %>
-                ⚠ LINE 憑證尚未設定
-              <% end %>
-            </h2>
-            <p class="text-gray-600 text-sm">
-              <% if @configured %>
-                您的 LINE 憑證已設定並驗證。最後驗證時間：<%= @setting.last_validated_at.strftime("%Y-%m-%d %H:%M") %>
-              <% else %>
-                請設定您的 LINE OAuth 憑證以使用此應用程式。
-              <% end %>
-            </p>
-          </div>
-          <% if @configured %>
-            <button type="button" id="test-btn" class="rb-btn rb-btn-primary">
-              測試連線
-            </button>
-          <% end %>
-        </div>
+  <!-- Right Content - Main Area (ml-80 for fixed sidebar width) -->
+  <div class="flex-1 ml-80 overflow-y-auto">
+    <div class="max-w-5xl mx-auto px-6 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-1">FHIR LINE Bot Setup</h1>
+        <p class="text-gray-600">設定您的 LINE OAuth 憑證</p>
       </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Left Column: Instructions -->
-      <div class="md:col-span-1">
-        <div class="rb-card sticky top-4">
-          <div class="rb-card-header">
-            <h3 class="text-lg font-bold text-gray-900">📋 設定步驟</h3>
-          </div>
-          <div class="rb-card-body">
-            <ol class="space-y-3">
-              <li class="flex items-start space-x-3">
-                <span class="rb-badge rb-badge-success" style="min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">1</span>
-                <span class="text-sm text-gray-700">
-                  <a href="https://developers.line.biz/" target="_blank" class="text-blue-600 hover:underline">
-                    前往 LINE Developers Console
-                  </a>
-                </span>
-              </li>
-              <li class="flex items-start space-x-3">
-                <span class="rb-badge rb-badge-success" style="min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">2</span>
-                <span class="text-sm text-gray-700">建立新的 "Login" 服務頻道</span>
-              </li>
-              <li class="flex items-start space-x-3">
-                <span class="rb-badge rb-badge-success" style="min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">3</span>
-                <span class="text-sm text-gray-700">複製 Channel ID 和 Channel Secret</span>
-              </li>
-              <li class="flex items-start space-x-3">
-                <span class="rb-badge rb-badge-success" style="min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">4</span>
-                <span class="text-sm text-gray-700">貼到右側的表單中</span>
-              </li>
-              <li class="flex items-start space-x-3">
-                <span class="rb-badge rb-badge-success" style="min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">5</span>
-                <span class="text-sm text-gray-700">點擊「驗證並儲存」完成設定</span>
-              </li>
-            </ol>
+      <!-- Content Grid: Steps on left, Form on right -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left: Steps Guide -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow-sm p-6 sticky top-6">
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center space-x-2">
+              <span class="text-lg">📋</span>
+              <span>設定步驟</span>
+            </h3>
 
-            <div class="rb-alert rb-alert-info mt-6">
-              <p class="text-sm">
-                <strong>需要幫助？</strong> 查看我們的
-                <a href="/SETUP.md" class="text-blue-600 hover:underline">設定指南</a>
-                以獲得詳細說明。
-              </p>
+            <div class="space-y-4">
+              <!-- Step 1 -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">1</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-900">獲取 LINE 憑證</p>
+                  <p class="text-xs text-gray-500 mt-0.5">前往 LINE Developers Console</p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">2</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-900">建立 Login 頻道</p>
+                  <p class="text-xs text-gray-500 mt-0.5">建立新的服務頻道</p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">3</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-900">複製憑證</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Channel ID 和 Secret</p>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">4</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-900">驗證並儲存</p>
+                  <p class="text-xs text-gray-500 mt-0.5">完成設定</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Help Link -->
+            <div class="border-t border-gray-200 pt-4 mt-6">
+              <a href="https://developers.line.biz/" target="_blank" class="text-sm text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center space-x-1">
+                <span>📖 設定指南</span>
+                <span>→</span>
+              </a>
+            </div>
+
+            <!-- Status Section -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <h4 class="font-semibold text-gray-900 mb-3 text-sm">狀態</h4>
+              <% if @configured %>
+                <div class="flex items-start space-x-2">
+                  <span class="text-lg flex-shrink-0">✓</span>
+                  <div class="min-w-0">
+                    <p class="font-medium text-green-900 text-sm">已設定</p>
+                    <p class="text-xs text-green-700">驗證時間：<%= @setting.last_validated_at.strftime("%m/%d %H:%M") %></p>
+                  </div>
+                </div>
+              <% else %>
+                <div class="flex items-start space-x-2">
+                  <span class="text-lg flex-shrink-0">⏳</span>
+                  <div class="min-w-0">
+                    <p class="font-medium text-amber-900 text-sm">待設定</p>
+                    <p class="text-xs text-amber-700">請完成配置</p>
+                  </div>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Right Column: Configuration Form -->
-      <div class="md:col-span-2">
-        <div class="rb-card">
-          <div class="rb-card-header">
-            <h3 class="text-xl font-bold text-gray-900">輸入您的 LINE 憑證</h3>
-          </div>
-          <div class="rb-card-body">
-            <form id="setup-form" action="<%= update_setup_path %>" method="post">
-              <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <!-- Right: Form -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow-sm">
+            <!-- Form Header -->
+            <div class="border-b border-gray-200 px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <h2 class="text-2xl font-bold text-gray-900">輸入您的 LINE 憑證</h2>
+              <p class="text-sm text-gray-600 mt-1">在下方輸入您的 Channel ID 和 Channel Secret</p>
+            </div>
 
-              <!-- Channel ID Field -->
-              <div class="rb-form-group">
-                <label for="channel_id" class="rb-label">
-                  Channel ID <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="channel_id"
-                  name="line_channel_id"
-                  value="<%= @setting.line_channel_id %>"
-                  placeholder="您的 LINE Channel ID (數字)"
-                  class="rb-input"
-                  required
-                />
-                <p class="text-xs text-gray-500 mt-1">
-                  在 LINE Developers Console 的 Channel 設定中可找到
-                </p>
-              </div>
+        <!-- Form Body -->
+        <div class="px-6 py-6">
+          <form id="setup-form" action="<%= update_setup_path %>" method="post">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-              <!-- Channel Secret Field -->
-              <div class="rb-form-group">
-                <label for="channel_secret" class="rb-label">
-                  Channel Secret <span class="text-red-500">*</span>
-                </label>
+            <!-- Channel ID Field -->
+            <div class="mb-6">
+              <label for="channel_id" class="block text-sm font-semibold text-gray-900 mb-1.5">
+                Channel ID <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="channel_id"
+                name="line_channel_id"
+                value="<%= @setting.line_channel_id %>"
+                placeholder="1234567890"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                required
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                在 LINE Developers Console 的 Channel 設定中可找到
+              </p>
+            </div>
+
+            <!-- Channel Secret Field -->
+            <div class="mb-6">
+              <label for="channel_secret" class="block text-sm font-semibold text-gray-900 mb-1.5">
+                Channel Secret <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
                 <input
                   type="password"
                   id="channel_secret"
                   name="line_channel_secret"
                   value="<%= @setting.line_channel_secret %>"
-                  placeholder="您的 LINE Channel Secret"
-                  class="rb-input"
+                  placeholder="••••••••••••••••"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   required
                 />
-                <p class="text-xs text-gray-500 mt-1">
-                  敏感資料 - 為安全起見以點顯示
-                </p>
+                <button
+                  type="button"
+                  id="toggle-secret"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm"
+                  onclick="toggleSecretVisibility()"
+                >
+                  👁️
+                </button>
               </div>
+              <p class="text-xs text-gray-500 mt-1">
+                敏感資料 - 為安全起見以點顯示
+              </p>
+            </div>
 
-              <!-- Error Message -->
-              <% if @setting.validation_error.present? %>
-                <div class="rb-alert rb-alert-error" data-controller="alert">
-                  <div class="flex justify-between items-center">
-                    <p class="text-sm">
-                      <strong>驗證錯誤：</strong> <%= @setting.validation_error %>
-                    </p>
-                    <button data-action="click->alert#dismiss" class="text-red-600 hover:text-red-800">✕</button>
-                  </div>
+            <!-- Error Message -->
+            <% if @setting.validation_error.present? %>
+              <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
+                <span class="text-base flex-shrink-0 pt-0.5">✗</span>
+                <div class="flex-1">
+                  <p class="text-xs font-semibold text-red-900">驗證錯誤</p>
+                  <p class="text-xs text-red-700"><%= @setting.validation_error %></p>
                 </div>
-              <% end %>
-
-              <!-- Validation Status -->
-              <div id="validation-status" class="hidden">
-                <!-- 將會動態插入警告訊息 -->
               </div>
+            <% end %>
 
-              <!-- Action Buttons -->
-              <div class="flex space-x-4 pt-4">
-                <button
-                  type="button"
-                  id="validate-btn"
-                  class="rb-btn rb-btn-primary flex-1"
-                >
-                  ✓ 驗證憑證
-                </button>
-                <button
-                  type="submit"
-                  id="save-btn"
-                  class="rb-btn rb-btn-success flex-1"
-                  disabled
-                >
-                  💾 儲存並繼續
-                </button>
+            <!-- Validation Status -->
+            <div id="validation-status" class="mb-4 hidden">
+              <!-- 將會動態插入警告訊息 -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-2">
+              <button
+                type="button"
+                id="validate-btn"
+                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+              >
+                ✓ 驗證憑證
+              </button>
+              <button
+                type="submit"
+                id="save-btn"
+                class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                disabled
+              >
+                💾 儲存並繼續
+              </button>
+            </div>
+
+            <% if @configured %>
+              <button
+                type="button"
+                id="test-btn"
+                class="w-full mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-sm"
+              >
+                🧪 測試連線
+              </button>
+
+              <button
+                type="button"
+                id="clear-btn"
+                class="w-full mt-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+              >
+                🔄 重新設定憑證
+              </button>
+            <% end %>
+          </form>
+
+          <!-- Security Info -->
+          <div class="border-t border-gray-200 px-6 py-4 bg-gray-50">
+            <div class="flex items-start space-x-2">
+              <span class="text-lg flex-shrink-0">🔒</span>
+              <div>
+                <p class="text-xs font-semibold text-gray-900">安全性</p>
+                <p class="text-xs text-gray-600 mt-0.5">您的 Channel Secret 會被加密並安全地儲存。儲存後永遠不會以純文字顯示。</p>
               </div>
-
-              <% if @configured %>
-                <button
-                  type="button"
-                  id="clear-btn"
-                  class="rb-btn rb-btn-danger w-full mt-4"
-                >
-                  🔄 重新設定憑證
-                </button>
-              <% end %>
-            </form>
+            </div>
           </div>
-        </div>
-
-        <!-- Security Info Box -->
-        <div class="rb-alert rb-alert-success mt-6">
-          <p class="text-sm">
-            <strong>🔒 安全性：</strong> 您的 Channel Secret 會被加密並安全地儲存。儲存後永遠不會以純文字顯示。
-          </p>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- JavaScript for form handling -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('setup-form');
-      const validateBtn = document.getElementById('validate-btn');
-      const saveBtn = document.getElementById('save-btn');
-      const testBtn = document.getElementById('test-btn');
-      const clearBtn = document.getElementById('clear-btn');
-      const statusDiv = document.getElementById('validation-status');
+<!-- JavaScript for form handling -->
+<script>
+  // Toggle secret visibility
+  function toggleSecretVisibility() {
+    const secretInput = document.getElementById('channel_secret');
+    const isPassword = secretInput.type === 'password';
+    secretInput.type = isPassword ? 'text' : 'password';
+  }
 
-      let validationPassed = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('setup-form');
+    const validateBtn = document.getElementById('validate-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const testBtn = document.getElementById('test-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const statusDiv = document.getElementById('validation-status');
 
-      // 創建動態警告訊息的輔助函數
-      function showStatus(message, type = 'info') {
-        statusDiv.classList.remove('hidden');
+    let validationPassed = false;
 
-        let alertClass = 'rb-alert-info';
-        let iconColor = 'blue';
-        let icon = 'ℹ';
+    // 創建動態警告訊息的輔助函數
+    function showStatus(message, type = 'info') {
+      statusDiv.classList.remove('hidden');
 
-        switch(type) {
-          case 'success':
-            alertClass = 'rb-alert-success';
-            iconColor = 'green';
-            icon = '✓';
-            break;
-          case 'error':
-            alertClass = 'rb-alert-error';
-            iconColor = 'red';
-            icon = '✗';
-            break;
-          case 'loading':
-            alertClass = 'rb-alert-info';
-            iconColor = 'blue';
-            icon = '<div class="rb-spinner text-blue-600" style="width: 16px; height: 16px;"></div>';
-            break;
-        }
+      let bgClass = 'bg-blue-50';
+      let borderClass = 'border-blue-200';
+      let textClass = 'text-blue-900';
+      let icon = 'ℹ️';
 
-        statusDiv.innerHTML = `
-          <div class="rb-alert ${alertClass}" data-controller="alert">
-            <div class="flex items-center space-x-2">
-              ${type === 'loading' ? icon : `<span>${icon}</span>`}
-              <span>${message}</span>
-            </div>
-          </div>
-        `;
+      switch(type) {
+        case 'success':
+          bgClass = 'bg-green-50';
+          borderClass = 'border-green-200';
+          textClass = 'text-green-900';
+          icon = '✓';
+          break;
+        case 'error':
+          bgClass = 'bg-red-50';
+          borderClass = 'border-red-200';
+          textClass = 'text-red-900';
+          icon = '✗';
+          break;
+        case 'loading':
+          bgClass = 'bg-blue-50';
+          borderClass = 'border-blue-200';
+          textClass = 'text-blue-900';
+          icon = '⏳';
+          break;
       }
 
-      // 驗證憑證
-      validateBtn?.addEventListener('click', async function() {
-        const channelId = document.getElementById('channel_id').value;
-        const channelSecret = document.getElementById('channel_secret').value;
+      statusDiv.innerHTML = `
+        <div class="${bgClass} border ${borderClass} rounded-lg p-3 flex items-start space-x-2">
+          <span class="text-base flex-shrink-0">${icon}</span>
+          <div class="flex-1">
+            <p class="text-xs ${textClass} font-medium">${message}</p>
+          </div>
+        </div>
+      `;
+    }
 
-        if (!channelId || !channelSecret) {
-          showStatus('請填寫 Channel ID 和 Channel Secret', 'error');
-          return;
-        }
+    // 驗證憑證
+    validateBtn?.addEventListener('click', async function() {
+      const channelId = document.getElementById('channel_id').value;
+      const channelSecret = document.getElementById('channel_secret').value;
 
-        // 顯示載入狀態
-        showStatus('正在驗證憑證...', 'loading');
-        validateBtn.disabled = true;
-        validateBtn.classList.add('disabled:bg-gray-400');
+      if (!channelId || !channelSecret) {
+        showStatus('請填寫 Channel ID 和 Channel Secret', 'error');
+        return;
+      }
 
-        try {
-          const response = await fetch('<%= validate_line_credentials_path %>', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-              line_channel_id: channelId,
-              line_channel_secret: channelSecret
-            })
-          });
+      // 顯示載入狀態
+      showStatus('正在驗證憑證...', 'loading');
+      validateBtn.disabled = true;
 
-          const data = await response.json();
+      try {
+        const response = await fetch('<%= validate_line_credentials_path %>', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify({
+            line_channel_id: channelId,
+            line_channel_secret: channelSecret
+          })
+        });
 
-          if (data.success) {
-            showStatus('憑證驗證成功！', 'success');
-            saveBtn.disabled = false;
-            saveBtn.classList.remove('disabled:bg-gray-400');
-            validationPassed = true;
-          } else {
-            showStatus(data.message || '驗證失敗', 'error');
-            saveBtn.disabled = true;
-            saveBtn.classList.add('disabled:bg-gray-400');
-            validationPassed = false;
-          }
-        } catch (error) {
-          showStatus('網路錯誤：' + error.message, 'error');
+        const data = await response.json();
+
+        if (data.success) {
+          showStatus('憑證驗證成功！', 'success');
+          saveBtn.disabled = false;
+          validationPassed = true;
+        } else {
+          showStatus(data.message || '驗證失敗', 'error');
           saveBtn.disabled = true;
-          saveBtn.classList.add('disabled:bg-gray-400');
           validationPassed = false;
-        } finally {
-          validateBtn.disabled = false;
-          validateBtn.classList.remove('disabled:bg-gray-400');
         }
-      });
+      } catch (error) {
+        showStatus('網路錯誤：' + error.message, 'error');
+        saveBtn.disabled = true;
+        validationPassed = false;
+      } finally {
+        validateBtn.disabled = false;
+      }
+    });
 
-      // 儲存表單
-      form?.addEventListener('submit', function(e) {
-        if (!validationPassed) {
-          e.preventDefault();
-          showStatus('請先驗證憑證', 'error');
-          return;
-        }
-      });
+    // 儲存表單
+    form?.addEventListener('submit', function(e) {
+      if (!validationPassed) {
+        e.preventDefault();
+        showStatus('請先驗證憑證', 'error');
+        return;
+      }
+    });
 
-      // 測試現有設定的連線
-      testBtn?.addEventListener('click', async function() {
-        testBtn.disabled = true;
-        testBtn.classList.add('disabled:bg-gray-400');
-        const originalText = testBtn.textContent;
-        testBtn.innerHTML = '<span class="rb-spinner" style="width: 16px; height: 16px; display: inline-block; margin-right: 8px;"></span>測試中...';
+    // 測試現有設定的連線
+    testBtn?.addEventListener('click', async function() {
+      testBtn.disabled = true;
+      const originalText = testBtn.textContent;
+      testBtn.textContent = '🧪 測試中...';
 
-        try {
-          const response = await fetch('<%= test_setup_path %>', {
-            method: 'POST',
-            headers: {
-              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-            }
-          });
+      try {
+        const response = await fetch('<%= test_setup_path %>', {
+          method: 'POST',
+          headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+          }
+        });
 
-          const data = await response.json();
+        const data = await response.json();
 
-          // 創建模態框顯示結果
-          const modalHtml = `
-            <div data-controller="modal">
-              <div class="rb-modal-backdrop" data-modal-target="backdrop"></div>
-              <div class="rb-modal" data-modal-target="modal">
-                <div class="rb-modal-content">
-                  <div class="rb-modal-header">
-                    <h3 class="text-lg font-semibold">${data.success ? '✓ 連線成功' : '✗ 連線失敗'}</h3>
-                  </div>
-                  <div class="rb-modal-body">
-                    <p>${data.success ? '連線測試成功！' : '連線測試失敗'}</p>
-                    <p class="text-sm text-gray-600 mt-2">${data.success ? '最後驗證：' + data.last_validated : data.message}</p>
-                  </div>
-                  <div class="rb-modal-footer">
-                    <button class="rb-btn rb-btn-primary" onclick="this.closest('[data-controller=modal]').remove()">確定</button>
-                  </div>
-                </div>
+        // 創建模態框顯示結果
+        const modalHtml = `
+          <div id="test-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
+              <div class="border-b border-gray-200 px-6 py-4">
+                <h3 class="text-lg font-bold text-gray-900">${data.success ? '✓ 連線成功' : '✗ 連線失敗'}</h3>
               </div>
-            </div>
-          `;
-
-          document.body.insertAdjacentHTML('beforeend', modalHtml);
-        } catch (error) {
-          showStatus('錯誤：' + error.message, 'error');
-        } finally {
-          testBtn.disabled = false;
-          testBtn.classList.remove('disabled:bg-gray-400');
-          testBtn.textContent = originalText;
-        }
-      });
-
-      // 清除設定
-      clearBtn?.addEventListener('click', function() {
-        // 使用 Rails Block 的模態框確認
-        const confirmHtml = `
-          <div data-controller="modal" id="confirm-modal">
-            <div class="rb-modal-backdrop" data-modal-target="backdrop"></div>
-            <div class="rb-modal" data-modal-target="modal">
-              <div class="rb-modal-content">
-                <div class="rb-modal-header">
-                  <h3 class="text-lg font-semibold">確認重新設定</h3>
-                </div>
-                <div class="rb-modal-body">
-                  <p>您確定要清除設定嗎？您將需要重新設定。</p>
-                </div>
-                <div class="rb-modal-footer">
-                  <button class="rb-btn rb-btn-secondary" onclick="document.getElementById('confirm-modal').remove()">取消</button>
-                  <button class="rb-btn rb-btn-danger" id="confirm-clear">確認清除</button>
-                </div>
+              <div class="px-6 py-4">
+                <p class="text-sm text-gray-700 mb-2">${data.success ? '連線測試成功！' : '連線測試失敗'}</p>
+                <p class="text-xs text-gray-500">${data.success ? '最後驗證：' + data.last_validated : data.message}</p>
+              </div>
+              <div class="border-t border-gray-200 px-6 py-3 flex justify-end">
+                <button onclick="document.getElementById('test-modal').remove()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">確定</button>
               </div>
             </div>
           </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', confirmHtml);
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+      } catch (error) {
+        showStatus('錯誤：' + error.message, 'error');
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = originalText;
+      }
+    });
 
-        document.getElementById('confirm-clear').addEventListener('click', function() {
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = '<%= clear_setup_path %>';
-          form.innerHTML = '<input type="hidden" name="_method" value="DELETE" /><input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />';
-          document.body.appendChild(form);
-          form.submit();
-        });
+    // 清除設定
+    clearBtn?.addEventListener('click', function() {
+      // 創建確認模態框
+      const confirmHtml = `
+        <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div class="border-b border-gray-200 px-6 py-4">
+              <h3 class="text-lg font-bold text-gray-900">確認重新設定</h3>
+            </div>
+            <div class="px-6 py-4">
+              <p class="text-sm text-gray-700">您確定要清除設定嗎？您將需要重新設定。</p>
+            </div>
+            <div class="border-t border-gray-200 px-6 py-3 flex justify-end gap-2">
+              <button onclick="document.getElementById('confirm-modal').remove()" class="px-4 py-2 bg-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-400">取消</button>
+              <button id="confirm-clear" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700">確認清除</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', confirmHtml);
+
+      document.getElementById('confirm-clear').addEventListener('click', function() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<%= clear_setup_path %>';
+        form.innerHTML = '<input type="hidden" name="_method" value="DELETE" /><input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />';
+        document.body.appendChild(form);
+        form.submit();
       });
     });
-  </script>
-</div>
+  });
+</script>
