@@ -9,9 +9,9 @@
     </button>
 
     <!-- Mobile Logo (visible on mobile only) -->
-    <div class="md:hidden">
+    <%= link_to root_path, class: "md:hidden" do %>
       <%= image_tag "logo-sm.drawio.svg", alt: "FHIR LINE Bot", class: "w-[30px] h-[30px] object-contain" %>
-    </div>
+    <% end %>
 
     <!-- Search Bar -->
     <div class="relative hidden md:block" data-controller="search">
