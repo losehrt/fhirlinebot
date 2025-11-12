@@ -1,0 +1,460 @@
+<div class="max-w-7xl mx-auto py-6">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Rails Block UI 組件示範</h1>
+
+  <!-- 導航標籤 -->
+  <div data-controller="tabs" data-tabs-default-tab-value="0" class="mb-8">
+    <div class="rb-tabs">
+      <nav class="rb-tab-list">
+        <button class="rb-tab active" data-tabs-target="tab" data-action="click->tabs#select">表單組件</button>
+        <button class="rb-tab" data-tabs-target="tab" data-action="click->tabs#select">導航組件</button>
+        <button class="rb-tab" data-tabs-target="tab" data-action="click->tabs#select">展示組件</button>
+        <button class="rb-tab" data-tabs-target="tab" data-action="click->tabs#select">數據組件</button>
+      </nav>
+    </div>
+
+    <!-- 表單組件面板 -->
+    <div class="rb-tab-panel" data-tabs-target="panel">
+      <h2 class="text-2xl font-semibold mb-6">表單組件</h2>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- 輸入框示例 -->
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">輸入框組件</h3>
+          </div>
+          <div class="rb-card-body">
+            <div class="rb-form-group">
+              <label class="rb-label">姓名</label>
+              <input type="text" class="rb-input" placeholder="請輸入您的姓名">
+            </div>
+
+            <div class="rb-form-group">
+              <label class="rb-label">電子郵件</label>
+              <input type="email" class="rb-input" placeholder="example@email.com">
+              <p class="rb-error">請輸入有效的電子郵件地址</p>
+            </div>
+
+            <div class="rb-form-group">
+              <label class="rb-label">描述</label>
+              <textarea class="rb-textarea" rows="3" placeholder="請輸入描述..."></textarea>
+            </div>
+
+            <div class="rb-form-group">
+              <label class="rb-label">選擇類別</label>
+              <select class="rb-select">
+                <option>選項一</option>
+                <option>選項二</option>
+                <option>選項三</option>
+              </select>
+            </div>
+
+            <div class="rb-form-group">
+              <label class="flex items-center">
+                <input type="checkbox" class="rb-checkbox mr-2">
+                <span class="text-sm">我同意服務條款</span>
+              </label>
+            </div>
+
+            <div class="rb-form-group">
+              <div class="space-y-2">
+                <label class="flex items-center">
+                  <input type="radio" name="option" class="rb-radio mr-2">
+                  <span class="text-sm">選項 A</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="option" class="rb-radio mr-2">
+                  <span class="text-sm">選項 B</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 按鈕示例 -->
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">按鈕組件</h3>
+          </div>
+          <div class="rb-card-body space-y-4">
+            <div class="flex flex-wrap gap-2">
+              <button class="rb-btn rb-btn-primary">主要按鈕</button>
+              <button class="rb-btn rb-btn-secondary">次要按鈕</button>
+              <button class="rb-btn rb-btn-success">成功按鈕</button>
+              <button class="rb-btn rb-btn-danger">危險按鈕</button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button class="rb-btn rb-btn-primary rb-btn-sm">小按鈕</button>
+              <button class="rb-btn rb-btn-primary">預設按鈕</button>
+              <button class="rb-btn rb-btn-primary rb-btn-lg">大按鈕</button>
+            </div>
+
+            <!-- 切換開關 -->
+            <div class="mt-6">
+              <h4 class="font-medium mb-3">切換開關</h4>
+              <div class="space-y-3">
+                <div class="flex items-center" data-controller="toggle">
+                  <button class="rb-switch" data-toggle-target="switch" data-action="click->toggle#toggle">
+                    <span class="rb-switch-toggle"></span>
+                  </button>
+                  <input type="checkbox" class="hidden" data-toggle-target="input">
+                  <span class="ml-3 text-sm">啟用通知</span>
+                </div>
+
+                <div class="flex items-center" data-controller="toggle" data-toggle-checked-value="true">
+                  <button class="rb-switch checked" data-toggle-target="switch" data-action="click->toggle#toggle">
+                    <span class="rb-switch-toggle"></span>
+                  </button>
+                  <input type="checkbox" class="hidden" checked data-toggle-target="input">
+                  <span class="ml-3 text-sm">自動更新</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 導航組件面板 -->
+    <div class="rb-tab-panel hidden" data-tabs-target="panel">
+      <h2 class="text-2xl font-semibold mb-6">導航組件</h2>
+
+      <!-- 導航列示例 -->
+      <div class="rb-card mb-6">
+        <div class="rb-card-header">
+          <h3 class="font-semibold">導航列</h3>
+        </div>
+        <div class="rb-card-body">
+          <nav class="rb-navbar">
+            <div class="rb-navbar-container">
+              <div class="rb-navbar-content">
+                <div class="flex items-center space-x-6">
+                  <a href="#" class="rb-nav-link active">首頁</a>
+                  <a href="#" class="rb-nav-link">產品</a>
+                  <a href="#" class="rb-nav-link">服務</a>
+                  <a href="#" class="rb-nav-link">關於我們</a>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- 麵包屑示例 -->
+      <div class="rb-card mb-6">
+        <div class="rb-card-header">
+          <h3 class="font-semibold">麵包屑導航</h3>
+        </div>
+        <div class="rb-card-body">
+          <nav class="rb-breadcrumb">
+            <a href="#" class="rb-breadcrumb-item">首頁</a>
+            <span class="rb-breadcrumb-separator">/</span>
+            <a href="#" class="rb-breadcrumb-item">產品</a>
+            <span class="rb-breadcrumb-separator">/</span>
+            <span class="rb-breadcrumb-item text-gray-900">詳細頁面</span>
+          </nav>
+        </div>
+      </div>
+
+      <!-- 分頁示例 -->
+      <div class="rb-card">
+        <div class="rb-card-header">
+          <h3 class="font-semibold">分頁導航</h3>
+        </div>
+        <div class="rb-card-body">
+          <div class="rb-pagination">
+            <a href="#" class="rb-page-link">上一頁</a>
+            <a href="#" class="rb-page-link">1</a>
+            <a href="#" class="rb-page-link active">2</a>
+            <a href="#" class="rb-page-link">3</a>
+            <a href="#" class="rb-page-link">4</a>
+            <a href="#" class="rb-page-link">下一頁</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 展示組件面板 -->
+    <div class="rb-tab-panel hidden" data-tabs-target="panel">
+      <h2 class="text-2xl font-semibold mb-6">展示組件</h2>
+
+      <!-- 警告訊息示例 -->
+      <div class="mb-6">
+        <h3 class="font-semibold mb-4">警告訊息</h3>
+        <div class="space-y-3">
+          <div class="rb-alert rb-alert-success" data-controller="alert" data-alert-auto-dismiss-value="5000">
+            <div class="flex justify-between items-center">
+              <span>✓ 操作成功！您的更改已保存。</span>
+              <button data-action="click->alert#dismiss" class="text-green-600 hover:text-green-800">✕</button>
+            </div>
+          </div>
+
+          <div class="rb-alert rb-alert-info" data-controller="alert">
+            <div class="flex justify-between items-center">
+              <span>ℹ 這是一條資訊提示訊息。</span>
+              <button data-action="click->alert#dismiss" class="text-blue-600 hover:text-blue-800">✕</button>
+            </div>
+          </div>
+
+          <div class="rb-alert rb-alert-warning" data-controller="alert">
+            <div class="flex justify-between items-center">
+              <span>⚠ 請注意：這是一條警告訊息。</span>
+              <button data-action="click->alert#dismiss" class="text-yellow-600 hover:text-yellow-800">✕</button>
+            </div>
+          </div>
+
+          <div class="rb-alert rb-alert-error" data-controller="alert">
+            <div class="flex justify-between items-center">
+              <span>✕ 錯誤：無法完成操作。</span>
+              <button data-action="click->alert#dismiss" class="text-red-600 hover:text-red-800">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 徽章示例 -->
+      <div class="mb-6">
+        <h3 class="font-semibold mb-4">徽章</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="rb-badge rb-badge-primary">主要</span>
+          <span class="rb-badge rb-badge-success">成功</span>
+          <span class="rb-badge rb-badge-warning">警告</span>
+          <span class="rb-badge rb-badge-danger">危險</span>
+        </div>
+      </div>
+
+      <!-- 卡片示例 -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">基本卡片</h3>
+          </div>
+          <div class="rb-card-body">
+            <p class="text-gray-600">這是一個基本的卡片組件，可以用來展示各種內容。</p>
+          </div>
+          <div class="rb-card-footer">
+            <button class="rb-btn rb-btn-primary rb-btn-sm">了解更多</button>
+          </div>
+        </div>
+
+        <!-- 下拉選單示例 -->
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">下拉選單</h3>
+          </div>
+          <div class="rb-card-body">
+            <div class="rb-dropdown" data-controller="dropdown">
+              <button class="rb-btn rb-btn-secondary" data-dropdown-target="button" data-action="click->dropdown#toggle">
+                選項選單 ▼
+              </button>
+              <div class="rb-dropdown-menu hidden mt-2" data-dropdown-target="menu">
+                <a href="#" class="rb-dropdown-item">編輯</a>
+                <a href="#" class="rb-dropdown-item">複製</a>
+                <a href="#" class="rb-dropdown-item">刪除</a>
+                <hr class="my-1 border-gray-200">
+                <a href="#" class="rb-dropdown-item text-red-600">永久刪除</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模態框示例 -->
+      <div class="mt-6">
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">模態框</h3>
+          </div>
+          <div class="rb-card-body">
+            <div data-controller="modal">
+              <button class="rb-btn rb-btn-primary" data-action="click->modal#show">
+                開啟模態框
+              </button>
+
+              <!-- 模態框內容 -->
+              <div class="rb-modal-backdrop hidden" data-modal-target="backdrop" data-action="click->modal#hideOnBackdrop"></div>
+              <div class="rb-modal hidden" data-modal-target="modal" data-action="keydown.esc->modal#hideOnEscape">
+                <div class="rb-modal-content">
+                  <div class="rb-modal-header">
+                    <h3 class="text-lg font-semibold">模態框標題</h3>
+                  </div>
+                  <div class="rb-modal-body">
+                    <p>這是模態框的內容。您可以在這裡放置任何內容。</p>
+                  </div>
+                  <div class="rb-modal-footer">
+                    <button class="rb-btn rb-btn-secondary" data-action="click->modal#hide">取消</button>
+                    <button class="rb-btn rb-btn-primary">確認</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 數據組件面板 -->
+    <div class="rb-tab-panel hidden" data-tabs-target="panel">
+      <h2 class="text-2xl font-semibold mb-6">數據組件</h2>
+
+      <!-- 統計卡片示例 -->
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+        <div class="rb-stat-card">
+          <h3 class="rb-stat-title">總用戶數</h3>
+          <p class="rb-stat-value">1,234</p>
+          <div class="rb-stat-change positive">
+            <span>↑ 12% 較上月</span>
+          </div>
+        </div>
+
+        <div class="rb-stat-card">
+          <h3 class="rb-stat-title">銷售額</h3>
+          <p class="rb-stat-value">NT$ 45,678</p>
+          <div class="rb-stat-change positive">
+            <span>↑ 8.5% 較上月</span>
+          </div>
+        </div>
+
+        <div class="rb-stat-card">
+          <h3 class="rb-stat-title">轉換率</h3>
+          <p class="rb-stat-value">3.42%</p>
+          <div class="rb-stat-change negative">
+            <span>↓ 2.1% 較上月</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 進度條示例 -->
+      <div class="rb-card mb-6">
+        <div class="rb-card-header">
+          <h3 class="font-semibold">進度條</h3>
+        </div>
+        <div class="rb-card-body space-y-4">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm">任務進度</span>
+              <span class="text-sm">75%</span>
+            </div>
+            <div class="rb-progress">
+              <div class="rb-progress-bar" style="width: 75%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm">上傳進度</span>
+              <span class="text-sm">45%</span>
+            </div>
+            <div class="rb-progress">
+              <div class="rb-progress-bar bg-green-600" style="width: 45%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm">容量使用</span>
+              <span class="text-sm">90%</span>
+            </div>
+            <div class="rb-progress">
+              <div class="rb-progress-bar bg-red-600" style="width: 90%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格示例 -->
+      <div class="rb-card">
+        <div class="rb-card-header">
+          <h3 class="font-semibold">數據表格</h3>
+        </div>
+        <div class="rb-card-body">
+          <div class="overflow-x-auto">
+            <table class="rb-table">
+              <thead class="rb-table-header">
+                <tr>
+                  <th class="rb-table-cell">姓名</th>
+                  <th class="rb-table-cell">職位</th>
+                  <th class="rb-table-cell">部門</th>
+                  <th class="rb-table-cell">狀態</th>
+                  <th class="rb-table-cell">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="rb-table-row">
+                  <td class="rb-table-cell font-medium">張三</td>
+                  <td class="rb-table-cell">軟體工程師</td>
+                  <td class="rb-table-cell">技術部</td>
+                  <td class="rb-table-cell">
+                    <span class="rb-badge rb-badge-success">在職</span>
+                  </td>
+                  <td class="rb-table-cell">
+                    <button class="rb-btn rb-btn-primary rb-btn-sm">編輯</button>
+                  </td>
+                </tr>
+                <tr class="rb-table-row">
+                  <td class="rb-table-cell font-medium">李四</td>
+                  <td class="rb-table-cell">產品經理</td>
+                  <td class="rb-table-cell">產品部</td>
+                  <td class="rb-table-cell">
+                    <span class="rb-badge rb-badge-success">在職</span>
+                  </td>
+                  <td class="rb-table-cell">
+                    <button class="rb-btn rb-btn-primary rb-btn-sm">編輯</button>
+                  </td>
+                </tr>
+                <tr class="rb-table-row">
+                  <td class="rb-table-cell font-medium">王五</td>
+                  <td class="rb-table-cell">設計師</td>
+                  <td class="rb-table-cell">設計部</td>
+                  <td class="rb-table-cell">
+                    <span class="rb-badge rb-badge-warning">休假</span>
+                  </td>
+                  <td class="rb-table-cell">
+                    <button class="rb-btn rb-btn-primary rb-btn-sm">編輯</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 載入動畫示例 -->
+      <div class="mt-6">
+        <div class="rb-card">
+          <div class="rb-card-header">
+            <h3 class="font-semibold">載入動畫</h3>
+          </div>
+          <div class="rb-card-body">
+            <div class="flex items-center space-x-6">
+              <div class="rb-spinner text-blue-600"></div>
+              <div class="rb-spinner text-green-600" style="width: 2rem; height: 2rem;"></div>
+              <div class="rb-spinner text-red-600" style="width: 3rem; height: 3rem;"></div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="font-medium mb-3">骨架屏</h4>
+              <div class="space-y-3">
+                <div class="rb-skeleton h-4 w-3/4"></div>
+                <div class="rb-skeleton h-4 w-full"></div>
+                <div class="rb-skeleton h-4 w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部說明 -->
+  <div class="mt-12 p-6 bg-blue-50 rounded-lg">
+    <h3 class="text-lg font-semibold mb-3">Rails Block 整合說明</h3>
+    <ul class="space-y-2 text-sm text-gray-700">
+      <li>✓ 所有組件都使用 Tailwind CSS v4 構建</li>
+      <li>✓ 使用 Stimulus 控制器處理交互邏輯</li>
+      <li>✓ 樣式定義在 <code class="bg-white px-2 py-1 rounded">app/assets/stylesheets/rails_block.css</code></li>
+      <li>✓ Stimulus 控制器在 <code class="bg-white px-2 py-1 rounded">app/javascript/controllers/</code></li>
+      <li>✓ 第三方庫存放在 <code class="bg-white px-2 py-1 rounded">vendor/javascript/</code></li>
+    </ul>
+  </div>
+</div>

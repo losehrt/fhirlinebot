@@ -1,0 +1,243 @@
+<!-- Page Header -->
+<div class="page-header">
+  <h1 class="page-title">儀表板</h1>
+  <div class="page-actions">
+    <button class="flexy-btn btn-sm btn-outline">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18m-6-6v12"/>
+      </svg>
+      匯出報告
+    </button>
+    <button class="flexy-btn btn-sm btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      重新整理
+    </button>
+  </div>
+</div>
+
+<!-- Stats Cards Grid -->
+<div class="stats-grid">
+  <% @stats.each do |key, value| %>
+    <%
+      icon, title, color = case key
+      when :total_users
+        ['👤', '總使用者數', 'primary']
+      when :active_sessions
+        ['🟢', '活躍連線數', 'success']
+      when :appointments
+        ['📅', '今日預約', 'info']
+      when :messages
+        ['💬', '訊息數量', 'warning']
+      end
+    %>
+    <div class="flexy-card stats-card">
+      <div class="stats-icon <%= color %>">
+        <%= icon %>
+      </div>
+      <div class="stats-content">
+        <p class="stats-label"><%= title %></p>
+        <h3 class="stats-value"><%= number_with_delimiter(value) %></h3>
+        <p class="stats-change">
+          <span class="<%= ['primary', 'success'].include?(color) ? 'text-green' : 'text-gray' %>">
+            <%= ['primary', 'success'].include?(color) ? '↑' : '→' %>
+            <%= rand(5..25) %>%
+          </span>
+          <span class="text-muted">較上週</span>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Main Content Grid -->
+<div class="dashboard-grid">
+  <!-- Chart Section -->
+  <div class="flexy-card">
+    <div class="card-header">
+      <h3 class="card-title">使用趨勢</h3>
+      <div class="card-actions">
+        <select class="flexy-select select-sm">
+          <option>最近 7 天</option>
+          <option>最近 30 天</option>
+          <option>最近 90 天</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Chart Placeholder -->
+      <div class="chart-placeholder">
+        <svg viewBox="0 0 400 200" style="width: 100%; height: 250px;">
+          <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:var(--line-green-500);stop-opacity:0.3" />
+              <stop offset="100%" style="stop-color:var(--line-green-500);stop-opacity:0" />
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <g stroke="#e5e7eb" stroke-width="0.5">
+            <line x1="40" y1="20" x2="380" y2="20" />
+            <line x1="40" y1="60" x2="380" y2="60" />
+            <line x1="40" y1="100" x2="380" y2="100" />
+            <line x1="40" y1="140" x2="380" y2="140" />
+            <line x1="40" y1="180" x2="380" y2="180" />
+          </g>
+          <!-- Area fill -->
+          <path d="M 40 120 Q 100 100, 160 110 T 280 90 Q 340 80, 380 70 L 380 180 L 40 180 Z"
+                fill="url(#lineGradient)" />
+          <!-- Line -->
+          <path d="M 40 120 Q 100 100, 160 110 T 280 90 Q 340 80, 380 70"
+                stroke="var(--line-green-500)"
+                stroke-width="2"
+                fill="none" />
+          <!-- Data points -->
+          <g fill="var(--line-green-500)">
+            <circle cx="40" cy="120" r="4" />
+            <circle cx="130" cy="105" r="4" />
+            <circle cx="220" cy="100" r="4" />
+            <circle cx="310" cy="85" r="4" />
+            <circle cx="380" cy="70" r="4" />
+          </g>
+        </svg>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--line-green-500);"></span>
+          <span>使用者活動</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--line-green-300);"></span>
+          <span>系統互動</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activities -->
+  <div class="flexy-card">
+    <div class="card-header">
+      <h3 class="card-title">最近活動</h3>
+      <button class="card-action-btn">
+        查看全部
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="activity-list">
+        <% @recent_activities.each do |activity| %>
+          <div class="activity-item">
+            <div class="activity-icon <%= activity[:type] %>">
+              <%= activity[:icon] %>
+            </div>
+            <div class="activity-content">
+              <h4 class="activity-title"><%= activity[:title] %></h4>
+              <p class="activity-description"><%= activity[:description] %></p>
+              <span class="activity-time"><%= activity[:time] %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Table Section -->
+<div class="flexy-card">
+  <div class="card-header">
+    <h3 class="card-title">最近預約</h3>
+    <div class="card-actions">
+      <button class="flexy-btn btn-sm btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        篩選
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="flexy-table">
+        <thead>
+          <tr>
+            <th>患者姓名</th>
+            <th>科別</th>
+            <th>醫師</th>
+            <th>預約時間</th>
+            <th>狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">王</div>
+                <span>王小明</span>
+              </div>
+            </td>
+            <td>心臟科</td>
+            <td>李醫師</td>
+            <td>2025-01-15 14:30</td>
+            <td><span class="badge badge-success">已確認</span></td>
+            <td>
+              <button class="flexy-btn btn-xs btn-ghost">詳情</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">張</div>
+                <span>張美華</span>
+              </div>
+            </td>
+            <td>皮膚科</td>
+            <td>陳醫師</td>
+            <td>2025-01-15 15:00</td>
+            <td><span class="badge badge-warning">待確認</span></td>
+            <td>
+              <button class="flexy-btn btn-xs btn-ghost">詳情</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">林</div>
+                <span>林志偉</span>
+              </div>
+            </td>
+            <td>骨科</td>
+            <td>黃醫師</td>
+            <td>2025-01-16 09:30</td>
+            <td><span class="badge badge-success">已確認</span></td>
+            <td>
+              <button class="flexy-btn btn-xs btn-ghost">詳情</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+  <h3 class="section-title">快速操作</h3>
+  <div class="action-grid">
+    <button class="action-card">
+      <span class="action-icon">📅</span>
+      <span class="action-label">新增預約</span>
+    </button>
+    <button class="action-card">
+      <span class="action-icon">👤</span>
+      <span class="action-label">新增患者</span>
+    </button>
+    <button class="action-card">
+      <span class="action-icon">📊</span>
+      <span class="action-label">產生報表</span>
+    </button>
+    <button class="action-card">
+      <span class="action-icon">💬</span>
+      <span class="action-label">發送訊息</span>
+    </button>
+  </div>
+</div>

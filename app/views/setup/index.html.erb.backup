@@ -1,0 +1,324 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      <div class="flex items-center space-x-3">
+        <div class="text-4xl">⚙️</div>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">FHIR LINE Bot Setup</h1>
+          <p class="text-gray-600 mt-1">Configure your LINE OAuth credentials</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Status Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex items-center space-x-4">
+        <div class="flex-shrink-0">
+          <% if @configured %>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-2xl">
+              ✓
+            </div>
+          <% else %>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-2xl">
+              !
+            </div>
+          <% end %>
+        </div>
+        <div class="flex-1">
+          <h2 class="text-lg font-bold text-gray-900">
+            <% if @configured %>
+              ✓ LINE Credentials Configured
+            <% else %>
+              ⚠ LINE Credentials Not Configured
+            <% end %>
+          </h2>
+          <p class="text-gray-600 text-sm">
+            <% if @configured %>
+              Your LINE credentials are configured and verified. Last validated: <%= @setting.last_validated_at.strftime("%Y-%m-%d %H:%M") %>
+            <% else %>
+              Please configure your LINE OAuth credentials to use this application.
+            <% end %>
+          </p>
+        </div>
+        <% if @configured %>
+          <button type="button" id="test-btn" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
+            Test Connection
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Left Column: Instructions -->
+      <div class="md:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">📋 Setup Steps</h3>
+          <ol class="space-y-3">
+            <li class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              <span class="text-sm text-gray-700">
+                <a href="https://developers.line.biz/" target="_blank" class="text-blue-600 hover:underline">
+                  Go to LINE Developers Console
+                </a>
+              </span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              <span class="text-sm text-gray-700">Create a new Channel with "Login" service</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <span class="text-sm text-gray-700">Copy Channel ID and Channel Secret</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              <span class="text-sm text-gray-700">Paste them into the form on the right</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
+              <span class="text-sm text-gray-700">Click "Validate & Save" to complete setup</span>
+            </li>
+          </ol>
+
+          <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-700">
+              <strong>Need help?</strong> Check our
+              <a href="/SETUP.md" class="text-blue-600 hover:underline">setup guide</a>
+              for detailed instructions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Configuration Form -->
+      <div class="md:col-span-2">
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Enter Your LINE Credentials</h3>
+
+          <form id="setup-form" class="space-y-6">
+            <!-- Channel ID Field -->
+            <div>
+              <label for="channel_id" class="block text-sm font-medium text-gray-700 mb-2">
+                Channel ID
+                <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="channel_id"
+                name="line_channel_id"
+                value="<%= @setting.line_channel_id %>"
+                placeholder="Your LINE Channel ID (numeric)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Found in your LINE Developers Console under Channel settings
+              </p>
+            </div>
+
+            <!-- Channel Secret Field -->
+            <div>
+              <label for="channel_secret" class="block text-sm font-medium text-gray-700 mb-2">
+                Channel Secret
+                <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                id="channel_secret"
+                name="line_channel_secret"
+                value="<%= @setting.line_channel_secret %>"
+                placeholder="Your LINE Channel Secret"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Sensitive data - shown as dots for security
+              </p>
+            </div>
+
+            <!-- Error Message -->
+            <% if @setting.validation_error.present? %>
+              <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm text-red-700">
+                  <strong>Validation Error:</strong> <%= @setting.validation_error %>
+                </p>
+              </div>
+            <% end %>
+
+            <!-- Validation Status -->
+            <div id="validation-status" class="hidden p-4 rounded-lg">
+              <div class="flex items-center space-x-2">
+                <div class="w-4 h-4 bg-gray-300 rounded-full animate-spin"></div>
+                <span id="status-message">Validating credentials...</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-4 pt-4">
+              <button
+                type="button"
+                id="validate-btn"
+                class="flex-1 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+              >
+                ✓ Validate Credentials
+              </button>
+              <button
+                type="submit"
+                id="save-btn"
+                class="flex-1 px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400"
+                disabled
+              >
+                💾 Save & Continue
+              </button>
+            </div>
+
+            <% if @configured %>
+              <button
+                type="button"
+                id="clear-btn"
+                class="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-colors"
+              >
+                🔄 Reconfigure Credentials
+              </button>
+            <% end %>
+          </form>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p class="text-sm text-green-700">
+            <strong>🔒 Security:</strong> Your Channel Secret is encrypted and stored securely. It will never be displayed in plain text after saving.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for form handling -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('setup-form');
+      const validateBtn = document.getElementById('validate-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const testBtn = document.getElementById('test-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const statusDiv = document.getElementById('validation-status');
+      const statusMessage = document.getElementById('status-message');
+
+      let validationPassed = false;
+
+      // Validate credentials
+      validateBtn?.addEventListener('click', async function() {
+        const channelId = document.getElementById('channel_id').value;
+        const channelSecret = document.getElementById('channel_secret').value;
+
+        if (!channelId || !channelSecret) {
+          alert('Please fill in both Channel ID and Channel Secret');
+          return;
+        }
+
+        // Show loading state
+        statusDiv.classList.remove('hidden');
+        statusDiv.classList.add('bg-blue-50');
+        statusMessage.textContent = 'Validating credentials...';
+        validateBtn.disabled = true;
+
+        try {
+          const response = await fetch('<%= validate_line_credentials_path %>', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+              line_channel_id: channelId,
+              line_channel_secret: channelSecret
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            statusDiv.classList.remove('bg-blue-50');
+            statusDiv.classList.add('bg-green-50');
+            statusMessage.textContent = '✓ Credentials validated successfully!';
+            saveBtn.disabled = false;
+            validationPassed = true;
+          } else {
+            statusDiv.classList.remove('bg-blue-50');
+            statusDiv.classList.add('bg-red-50');
+            statusMessage.textContent = '✗ ' + (data.message || 'Validation failed');
+            saveBtn.disabled = true;
+            validationPassed = false;
+          }
+        } catch (error) {
+          statusDiv.classList.remove('bg-blue-50');
+          statusDiv.classList.add('bg-red-50');
+          statusMessage.textContent = '✗ Network error: ' + error.message;
+          saveBtn.disabled = true;
+          validationPassed = false;
+        } finally {
+          validateBtn.disabled = false;
+        }
+      });
+
+      // Save form
+      form?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!validationPassed) {
+          alert('Please validate credentials first');
+          return;
+        }
+
+        form.submit();
+      });
+
+      // Test connection for existing config
+      testBtn?.addEventListener('click', async function() {
+        testBtn.disabled = true;
+        testBtn.textContent = 'Testing...';
+
+        try {
+          const response = await fetch('<%= test_setup_path %>', {
+            method: 'POST',
+            headers: {
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            alert('✓ Connection successful!\nLast validated: ' + data.last_validated);
+          } else {
+            alert('✗ Connection failed:\n' + data.message);
+          }
+        } catch (error) {
+          alert('✗ Error: ' + error.message);
+        } finally {
+          testBtn.disabled = false;
+          testBtn.textContent = 'Test Connection';
+        }
+      });
+
+      // Clear configuration
+      clearBtn?.addEventListener('click', function() {
+        if (!confirm('Are you sure you want to clear the configuration? You will need to set up again.')) {
+          return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<%= clear_setup_path %>';
+        form.innerHTML = '<input type="hidden" name="_method" value="DELETE" /><input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />';
+        document.body.appendChild(form);
+        form.submit();
+      });
+    });
+  </script>
+</div>

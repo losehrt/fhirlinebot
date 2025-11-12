@@ -26,4 +26,7 @@ Rails.application.routes.draw do
   root "pages#home"
   get "/dashboard", to: "pages#dashboard", as: :dashboard
   get "/profile", to: "pages#profile", as: :profile
+
+  # UI Demo route
+  get "/ui-demo", to: "ui_demo#index", as: :ui_demo
 end

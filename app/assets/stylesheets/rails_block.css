@@ -1,0 +1,411 @@
+/* Rails Block Component Styles */
+/* 這個檔案包含所有 Rails Block 組件的基礎樣式 */
+
+/* ============================= */
+/* 1. 表單組件樣式 */
+/* ============================= */
+
+/* 基礎輸入框樣式 */
+.rb-input {
+  @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900
+         focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500
+         disabled:bg-gray-100 disabled:text-gray-500;
+}
+
+/* 選擇框樣式 */
+.rb-select {
+  @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900
+         focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500
+         disabled:bg-gray-100 disabled:text-gray-500;
+}
+
+/* 文字區域樣式 */
+.rb-textarea {
+  @apply block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900
+         focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500
+         disabled:bg-gray-100 disabled:text-gray-500 resize-y;
+}
+
+/* 核取方塊和單選按鈕 */
+.rb-checkbox, .rb-radio {
+  @apply h-4 w-4 rounded border-gray-300 text-blue-600
+         focus:ring-2 focus:ring-blue-500;
+}
+
+/* 標籤樣式 */
+.rb-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* 表單群組 */
+.rb-form-group {
+  @apply mb-4;
+}
+
+/* 錯誤訊息 */
+.rb-error {
+  @apply text-sm text-red-600 mt-1;
+}
+
+/* ============================= */
+/* 2. 導航組件樣式 */
+/* ============================= */
+
+/* 導航列 */
+.rb-navbar {
+  @apply bg-white shadow-sm border-b border-gray-200;
+}
+
+.rb-navbar-container {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.rb-navbar-content {
+  @apply flex h-16 items-center justify-between;
+}
+
+/* 導航連結 */
+.rb-nav-link {
+  @apply text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium
+         transition-colors duration-200;
+}
+
+.rb-nav-link.active {
+  @apply text-blue-600 bg-blue-50;
+}
+
+/* 側邊欄 */
+.rb-sidebar {
+  @apply w-64 bg-white shadow-lg h-full overflow-y-auto;
+}
+
+.rb-sidebar-item {
+  @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100
+         hover:text-gray-900 transition-colors duration-150;
+}
+
+/* 麵包屑 */
+.rb-breadcrumb {
+  @apply flex items-center space-x-2 text-sm;
+}
+
+.rb-breadcrumb-item {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+.rb-breadcrumb-separator {
+  @apply text-gray-400;
+}
+
+/* 分頁 */
+.rb-pagination {
+  @apply flex items-center justify-center space-x-1;
+}
+
+.rb-page-link {
+  @apply px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300
+         hover:bg-gray-100 hover:text-gray-700;
+}
+
+.rb-page-link.active {
+  @apply text-blue-600 bg-blue-50 border-blue-300;
+}
+
+/* ============================= */
+/* 3. 展示組件樣式 */
+/* ============================= */
+
+/* 卡片 */
+.rb-card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden;
+}
+
+.rb-card-header {
+  @apply px-6 py-4 border-b border-gray-200;
+}
+
+.rb-card-body {
+  @apply px-6 py-4;
+}
+
+.rb-card-footer {
+  @apply px-6 py-3 bg-gray-50 border-t border-gray-200;
+}
+
+/* 模態框 */
+.rb-modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+}
+
+.rb-modal {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+.rb-modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+}
+
+.rb-modal-header {
+  @apply px-6 py-4 border-b border-gray-200;
+}
+
+.rb-modal-body {
+  @apply px-6 py-4;
+}
+
+.rb-modal-footer {
+  @apply px-6 py-3 bg-gray-50 border-t border-gray-200 flex justify-end space-x-2;
+}
+
+/* 提示訊息 */
+.rb-alert {
+  @apply p-4 rounded-lg mb-4;
+}
+
+.rb-alert-success {
+  @apply bg-green-50 text-green-800 border border-green-200;
+}
+
+.rb-alert-info {
+  @apply bg-blue-50 text-blue-800 border border-blue-200;
+}
+
+.rb-alert-warning {
+  @apply bg-yellow-50 text-yellow-800 border border-yellow-200;
+}
+
+.rb-alert-error {
+  @apply bg-red-50 text-red-800 border border-red-200;
+}
+
+/* 徽章 */
+.rb-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.rb-badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.rb-badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.rb-badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.rb-badge-danger {
+  @apply bg-red-100 text-red-800;
+}
+
+/* 工具提示 */
+.rb-tooltip {
+  @apply absolute z-10 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg;
+}
+
+/* ============================= */
+/* 4. 數據組件樣式 */
+/* ============================= */
+
+/* 表格 */
+.rb-table {
+  @apply w-full text-sm text-left text-gray-500;
+}
+
+.rb-table-header {
+  @apply text-xs text-gray-700 uppercase bg-gray-50;
+}
+
+.rb-table-row {
+  @apply bg-white border-b hover:bg-gray-50;
+}
+
+.rb-table-cell {
+  @apply px-6 py-4;
+}
+
+/* 進度條 */
+.rb-progress {
+  @apply w-full bg-gray-200 rounded-full overflow-hidden;
+}
+
+.rb-progress-bar {
+  @apply h-2 bg-blue-600 rounded-full transition-all duration-300 ease-out;
+}
+
+/* 統計卡片 */
+.rb-stat-card {
+  @apply bg-white rounded-lg shadow p-6;
+}
+
+.rb-stat-title {
+  @apply text-sm font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.rb-stat-value {
+  @apply mt-2 text-3xl font-semibold text-gray-900;
+}
+
+.rb-stat-change {
+  @apply mt-2 flex items-center text-sm;
+}
+
+.rb-stat-change.positive {
+  @apply text-green-600;
+}
+
+.rb-stat-change.negative {
+  @apply text-red-600;
+}
+
+/* ============================= */
+/* 5. 按鈕樣式 */
+/* ============================= */
+
+.rb-btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border rounded-md
+         font-medium text-sm transition-colors duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.rb-btn-primary {
+  @apply bg-blue-600 text-white border-transparent
+         hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.rb-btn-secondary {
+  @apply bg-white text-gray-700 border-gray-300
+         hover:bg-gray-50 focus:ring-blue-500;
+}
+
+.rb-btn-success {
+  @apply bg-green-600 text-white border-transparent
+         hover:bg-green-700 focus:ring-green-500;
+}
+
+.rb-btn-danger {
+  @apply bg-red-600 text-white border-transparent
+         hover:bg-red-700 focus:ring-red-500;
+}
+
+.rb-btn-lg {
+  @apply px-6 py-3 text-base;
+}
+
+.rb-btn-sm {
+  @apply px-3 py-1.5 text-xs;
+}
+
+/* ============================= */
+/* 6. 下拉選單樣式 */
+/* ============================= */
+
+.rb-dropdown {
+  @apply relative inline-block text-left;
+}
+
+.rb-dropdown-menu {
+  @apply absolute z-10 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5;
+}
+
+.rb-dropdown-item {
+  @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900;
+}
+
+/* ============================= */
+/* 7. 載入動畫 */
+/* ============================= */
+
+.rb-spinner {
+  @apply inline-block h-8 w-8 animate-spin rounded-full
+         border-4 border-solid border-current border-r-transparent;
+}
+
+.rb-skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+/* ============================= */
+/* 8. 切換開關 */
+/* ============================= */
+
+.rb-switch {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full
+         bg-gray-200 transition-colors duration-200 ease-in-out
+         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.rb-switch.checked {
+  @apply bg-blue-600;
+}
+
+.rb-switch-toggle {
+  @apply inline-block h-4 w-4 transform rounded-full bg-white
+         transition duration-200 ease-in-out;
+}
+
+.rb-switch.checked .rb-switch-toggle {
+  @apply translate-x-6;
+}
+
+/* ============================= */
+/* 9. 標籤頁 */
+/* ============================= */
+
+.rb-tabs {
+  @apply border-b border-gray-200;
+}
+
+.rb-tab-list {
+  @apply -mb-px flex space-x-8;
+}
+
+.rb-tab {
+  @apply whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm
+         border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300;
+}
+
+.rb-tab.active {
+  @apply border-blue-500 text-blue-600;
+}
+
+.rb-tab-panel {
+  @apply py-4;
+}
+
+/* ============================= */
+/* 10. 日期選擇器樣式 (當使用 air-datepicker 時) */
+/* ============================= */
+
+.rb-datepicker {
+  @apply rb-input;
+}
+
+/* ============================= */
+/* 11. 輪播圖樣式 (當使用 embla-carousel 時) */
+/* ============================= */
+
+.rb-carousel {
+  @apply overflow-hidden rounded-lg;
+}
+
+.rb-carousel-container {
+  @apply display-flex;
+}
+
+.rb-carousel-slide {
+  @apply flex-none w-full;
+}
+
+.rb-carousel-dots {
+  @apply flex justify-center space-x-2 mt-4;
+}
+
+.rb-carousel-dot {
+  @apply w-2 h-2 rounded-full bg-gray-300 transition-colors duration-200;
+}
+
+.rb-carousel-dot.active {
+  @apply bg-blue-600;
+}
