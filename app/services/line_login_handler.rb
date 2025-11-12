@@ -1,7 +1,7 @@
 class LineLoginHandler
   def initialize(channel_id = nil, channel_secret = nil)
-    @channel_id = channel_id || ENV['LINE_CHANNEL_ID']
-    @channel_secret = channel_secret || ENV['LINE_CHANNEL_SECRET']
+    @channel_id = channel_id || ENV['LINE_LOGIN_CHANNEL_ID']
+    @channel_secret = channel_secret || ENV['LINE_LOGIN_CHANNEL_SECRET']
     @auth_service = LineAuthService.new(@channel_id, @channel_secret)
     validate_credentials!
   end

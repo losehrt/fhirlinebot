@@ -5,6 +5,16 @@ if ! gem list foreman -i --silent; then
   gem install foreman
 fi
 
+# Load environment variables from .env file if it exists
+if [ -f .env ]; then
+  set -a
+  . ./.env
+  set +a
+  echo "✓ Loaded environment variables from .env"
+else
+  echo "⚠ Warning: .env file not found. Copy .env.example to .env and configure it."
+fi
+
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
