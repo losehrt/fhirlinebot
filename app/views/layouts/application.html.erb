@@ -115,8 +115,21 @@
         document.addEventListener('DOMContentLoaded', function() {
           const container = document.getElementById('line-login-button');
           if (container) {
-            fetch('<%= request_line_login_path(format: :json) %>', { method: 'POST' })
-              .then(response => response.json())
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            fetch('<%= request_line_login_path(format: :json) %>', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+              },
+              credentials: 'same-origin'
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+              })
               .then(data => {
                 const button = document.createElement('a');
                 button.href = data.authorization_url;

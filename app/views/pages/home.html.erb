@@ -202,8 +202,21 @@
       document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('line-login-cta');
         if (container) {
-          fetch('<%= request_line_login_path(format: :json) %>', { method: 'POST' })
-            .then(response => response.json())
+          const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          fetch('<%= request_line_login_path(format: :json) %>', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': csrfToken
+            },
+            credentials: 'same-origin'
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
             .then(data => {
               const button = document.createElement('a');
               button.href = data.authorization_url;
@@ -216,7 +229,13 @@
               `;
               container.appendChild(button);
             })
-            .catch(error => console.error('Failed to load LINE login:', error));
+            .catch(error => {
+              console.error('Failed to load LINE login:', error);
+              const errorDiv = document.createElement('div');
+              errorDiv.className = 'text-red-600 text-sm';
+              errorDiv.textContent = 'Failed to load login button';
+              container.appendChild(errorDiv);
+            });
         }
       });
     </script>
