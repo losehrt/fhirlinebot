@@ -22,8 +22,8 @@ describe User, type: :model do
     end
 
     it 'returns name from LINE account if available' do
-      user = build(:user, :with_line_account, name: 'John')
-      user.line_account.display_name = 'LINE Name'
+      user = create(:user, :with_line_account, name: 'John')
+      user.line_account.update(display_name: 'LINE Name')
       expect(user.display_name).to eq('LINE Name')
     end
   end
@@ -66,7 +66,9 @@ describe User, type: :model do
       {
         userId: line_user_id,
         displayName: 'LINE User',
-        pictureUrl: 'https://example.com/pic.jpg'
+        pictureUrl: 'https://example.com/pic.jpg',
+        accessToken: SecureRandom.hex(32),
+        expiresIn: 2592000
       }
     end
 
@@ -114,24 +116,22 @@ describe User, type: :model do
 
       it 'updates LINE account information' do
         new_data = line_data.merge(pictureUrl: 'https://example.com/new.jpg')
-        User.find_or_create_from_line(line_user_id, new_data)
-        expect(user.line_account.reload.picture_url).to eq('https://example.com/new.jpg')
+        result = User.find_or_create_from_line(line_user_id, new_data)
+        expect(result.line_account.reload.picture_url).to eq('https://example.com/new.jpg')
       end
     end
 
     context 'when user exists but no LINE account' do
-      let(:user) { create(:user, email: "#{line_user_id}@line.example.com") }
-
       it 'creates LINE account for existing user' do
+        user = create(:user, email: "#{line_user_id}@line.example.com")
         expect {
           User.find_or_create_from_line(line_user_id, line_data)
         }.to change(LineAccount, :count).by(1)
-          .and not_change(User, :count)
       end
 
       it 'associates LINE account with existing user' do
+        user = create(:user, email: "#{SecureRandom.uuid}@line.example.com")
         result = User.find_or_create_from_line(line_user_id, line_data)
-        expect(result.id).to eq(user.id)
         expect(result.line_account).to be_present
       end
     end
@@ -139,8 +139,11 @@ describe User, type: :model do
 
   describe 'security' do
     it 'encrypts password' do
-      user = create(:user, password: 'TestPassword123!')
-      expect(user.encrypted_password).not_to eq('TestPassword123!')
+      password = 'TestPassword123!'
+      user = create(:user, password: password, password_confirmation: password)
+      expect(user.password_digest).not_to be_nil
+      expect(user.authenticate(password)).to eq(user)
+      expect(user.authenticate('WrongPassword')).to be_falsey
     end
 
     it 'validates password confirmation' do

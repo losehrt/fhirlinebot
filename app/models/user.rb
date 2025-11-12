@@ -25,7 +25,18 @@ class User < ApplicationRecord
   def self.find_or_create_from_line(line_user_id, line_data)
     # 首先嘗試找到已綁定此 LINE 帳號的使用者
     existing_account = LineAccount.find_by(line_user_id: line_user_id)
-    return existing_account.user if existing_account
+    if existing_account
+      user = existing_account.user
+      # 更新已存在的使用者和 LINE 帳號資訊
+      user.update(
+        name: line_data[:displayName] || user.name
+      )
+      existing_account.update(
+        display_name: line_data[:displayName],
+        picture_url: line_data[:pictureUrl]
+      )
+      return user
+    end
 
     # 嘗試找到相同電郵的使用者（假設 LINE 提供電郵）
     line_email = line_data[:email] || "#{line_user_id}@line.example.com"
@@ -33,11 +44,12 @@ class User < ApplicationRecord
 
     # 如果找不到則建立新使用者
     unless user
+      password = SecureRandom.hex(16)
       user = create!(
         email: line_email,
         name: line_data[:displayName] || 'LINE User',
-        password: SecureRandom.hex(16),
-        password_confirmation: user&.password
+        password: password,
+        password_confirmation: password
       )
     end
 
@@ -46,18 +58,20 @@ class User < ApplicationRecord
       name: line_data[:displayName] || user.name
     )
 
-    # 建立或更新 LINE 帳號
-    user.create_line_account!(
-      line_user_id: line_user_id,
-      display_name: line_data[:displayName],
-      picture_url: line_data[:pictureUrl]
-    ) unless user.line_account
+    # 建立 LINE 帳號（如果還沒有）
+    unless user.line_account
+      expires_at = if line_data[:expiresIn]
+                      (line_data[:expiresIn].to_i).seconds.from_now
+                    else
+                      30.days.from_now
+                    end
 
-    # 更新已存在的 LINE 帳號資訊
-    if user.line_account
-      user.line_account.update(
+      user.create_line_account!(
+        line_user_id: line_user_id,
+        access_token: line_data[:accessToken] || SecureRandom.hex(32),
         display_name: line_data[:displayName],
-        picture_url: line_data[:pictureUrl]
+        picture_url: line_data[:pictureUrl],
+        expires_at: expires_at
       )
     end
 

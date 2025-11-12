@@ -105,7 +105,7 @@ describe LineAccount, type: :model do
 
     it 'sets expiration to past' do
       line_account.invalidate!
-      expect(line_account.expires_at).to be_in_the_past
+      expect(line_account.expires_at).to be <= Time.current
     end
 
     it 'saves changes' do

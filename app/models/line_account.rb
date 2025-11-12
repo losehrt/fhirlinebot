@@ -3,7 +3,7 @@ class LineAccount < ApplicationRecord
 
   validates :user_id, presence: true
   validates :line_user_id, presence: true, uniqueness: true
-  validates :access_token, presence: true
+  validates :access_token, presence: true, on: :create
 
   # 檢查 access token 是否已過期或即將過期（1小時內）
   def access_token_expired?
