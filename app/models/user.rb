@@ -1,0 +1,66 @@
+class User < ApplicationRecord
+  has_secure_password
+  has_one :line_account, dependent: :destroy
+
+  validates :email, presence: true, uniqueness: true,
+            format: { with: URI::MailTo::EMAIL_REGEXP, message: 'must be a valid email' }
+  validates :name, presence: true
+  validates :password, length: { minimum: 8 }, if: -> { password.present? }
+  validates :password_confirmation, presence: true, if: -> { password.present? }
+
+  scope :with_line_account, -> { joins(:line_account) }
+  scope :without_line_account, -> { left_outer_joins(:line_account).where(line_accounts: { id: nil }) }
+
+  # 取得顯示名稱，優先使用 LINE 暱稱
+  def display_name
+    line_account&.display_name || name
+  end
+
+  # 檢查是否已綁定 LINE 帳號
+  def has_line_account?
+    line_account.present?
+  end
+
+  # 從 LINE 使用者資料建立或更新使用者
+  def self.find_or_create_from_line(line_user_id, line_data)
+    # 首先嘗試找到已綁定此 LINE 帳號的使用者
+    existing_account = LineAccount.find_by(line_user_id: line_user_id)
+    return existing_account.user if existing_account
+
+    # 嘗試找到相同電郵的使用者（假設 LINE 提供電郵）
+    line_email = line_data[:email] || "#{line_user_id}@line.example.com"
+    user = find_by(email: line_email)
+
+    # 如果找不到則建立新使用者
+    unless user
+      user = create!(
+        email: line_email,
+        name: line_data[:displayName] || 'LINE User',
+        password: SecureRandom.hex(16),
+        password_confirmation: user&.password
+      )
+    end
+
+    # 更新使用者資訊
+    user.update(
+      name: line_data[:displayName] || user.name
+    )
+
+    # 建立或更新 LINE 帳號
+    user.create_line_account!(
+      line_user_id: line_user_id,
+      display_name: line_data[:displayName],
+      picture_url: line_data[:pictureUrl]
+    ) unless user.line_account
+
+    # 更新已存在的 LINE 帳號資訊
+    if user.line_account
+      user.line_account.update(
+        display_name: line_data[:displayName],
+        picture_url: line_data[:pictureUrl]
+      )
+    end
+
+    user
+  end
+end

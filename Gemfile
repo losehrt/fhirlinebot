@@ -22,11 +22,13 @@ gem "jbuilder"
 # Authentication
 gem "bcrypt", "~> 3.1.7"
 gem "devise"
-gem "omniauth-rails_6plus"
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
 gem "omniauth-google-oauth2"
 
-# LINE integration
-gem "line-bot-sdk"
+# LINE integration & HTTP requests
+gem "line-bot-api"
+gem "httparty"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
