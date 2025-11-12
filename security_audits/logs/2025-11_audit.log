@@ -1,0 +1,109 @@
+[2025-11-12 10:19:26] 開始安全檢查
+[Notice] Using Prism parser
+Loading scanner...
+Processing application in /Users/nickle/projects/smart_on_fhir/fhirlinebot
+Processing gems...                      
+[Notice] Detected Rails 8 application
+Processing configuration...             
+[Notice] Escaping HTML by default
+Finding files...                        
+Parsing files...                        
+Detecting file types...                 
+Processing initializers...              
+ 0/2 files processed 1/2 files processedProcessing libs...                      
+ 0/9 files processed 1/9 files processed 2/9 files processed 3/9 files processed 4/9 files processed 5/9 files processed 6/9 files processed 7/9 files processed 8/9 files processedProcessing routes...                    
+Processing templates...                 
+ 0/2 templates processed 1/2 templates processedProcessing data flow in templates...    
+ 0/2 templates processed 1/2 templates processedProcessing models...                    
+ 0/1 files processedProcessing controllers...               
+ 0/1 files processedProcessing data flow in controllers...  
+ 0/1 controllers processedIndexing call sites...                  
+Running checks in parallel...
+ - CheckBasicAuth
+ - CheckBasicAuthTimingAttack
+ - CheckCrossSiteScripting
+ - CheckContentTag
+ - CheckCookieSerialization
+ - CheckCreateWith
+ - CheckCSRFTokenForgeryCVE
+ - CheckDefaultRoutes
+ - CheckDeserialize
+ - CheckDetailedExceptions
+ - CheckDigestDoS
+ - CheckDynamicFinders
+ - CheckEOLRails
+ - CheckEOLRuby
+ - CheckEscapeFunction
+ - CheckEvaluation
+ - CheckExecute
+ - CheckFileAccess
+ - CheckFileDisclosure
+ - CheckFilterSkipping
+ - CheckForgerySetting
+ - CheckHeaderDoS
+ - CheckI18nXSS
+ - CheckJRubyXML
+ - CheckJSONEncoding
+ - CheckJSONEntityEscape
+ - CheckJSONParsing
+ - CheckLinkTo
+ - CheckLinkToHref
+ - CheckMailTo
+ - CheckMassAssignment
+ - CheckMimeTypeDoS
+ - CheckModelAttrAccessible
+ - CheckModelAttributes
+ - CheckModelSerialize
+ - CheckNestedAttributes
+ - CheckNestedAttributesBypass
+ - CheckNumberToCurrency
+ - CheckPageCachingCVE
+ - CheckPathname
+ - CheckPermitAttributes
+ - CheckQuoteTableName
+ - CheckRansack
+ - CheckRedirect
+ - CheckRegexDoS
+ - CheckRender
+ - CheckRenderDoS
+ - CheckRenderInline
+ - CheckResponseSplitting
+ - CheckRouteDoS
+ - CheckSafeBufferManipulation
+ - CheckSanitizeConfigCve
+ - CheckSanitizeMethods
+ - CheckSelectTag
+ - CheckSelectVulnerability
+ - CheckSend
+ - CheckSendFile
+ - CheckSessionManipulation
+ - CheckSessionSettings
+ - CheckSimpleFormat
+ - CheckSingleQuotes
+ - CheckSkipBeforeFilter
+ - CheckSprocketsPathTraversal
+ - CheckSQL
+ - CheckSQLCVEs
+ - CheckSSLVerify
+ - CheckStripTags
+ - CheckSymbolDoSCVE
+ - CheckTemplateInjection
+ - CheckTranslateBug
+ - CheckUnsafeReflection
+ - CheckUnsafeReflectionMethods
+ - CheckValidationRegex
+ - CheckVerbConfusion
+ - CheckWeakRSAKey
+ - CheckWithoutProtection
+ - CheckXMLDoS
+ - CheckYAMLParsing
+Checks finished, collecting results...
+Generating report...
+Report saved in 'security_audits/scans/2025-11-12_brakeman_scan.txt'
+rbenv: bundler-audit: command not found
+
+The `bundler-audit' command exists in these Ruby versions:
+  3.3.7
+
+正在檢查最近 100 次提交...
+[2025-11-12 10:19:31] 安全檢查完成

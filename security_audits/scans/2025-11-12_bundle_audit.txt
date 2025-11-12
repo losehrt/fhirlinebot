@@ -1,0 +1,5 @@
+rbenv: bundler-audit: command not found
+
+The `bundler-audit' command exists in these Ruby versions:
+  3.3.7
+

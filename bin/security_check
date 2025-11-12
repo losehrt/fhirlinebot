@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# Security Check Script for FHIR LINE Bot
+# 執行各種安全掃描並將結果保存到 security_audits 目錄
+
+set -e
+
+# 顏色定義
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# 設定變數
+DATE=$(date +%Y-%m-%d)
+TIME=$(date +%H-%M-%S)
+SCAN_DIR="security_audits/scans"
+REPORT_DIR="security_audits/reports"
+LOG_DIR="security_audits/logs"
+
+# 確保目錄存在
+mkdir -p "$SCAN_DIR" "$REPORT_DIR" "$LOG_DIR"
+
+# 日誌檔案
+LOG_FILE="$LOG_DIR/$(date +%Y-%m)_audit.log"
+
+# 函數：記錄訊息
+log_message() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# 函數：顯示進度
+show_progress() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+# 函數：顯示警告
+show_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+# 函數：顯示錯誤
+show_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+# 開始安全檢查
+echo "================================================"
+echo "       FHIR LINE Bot 安全檢查"
+echo "       日期: $DATE $TIME"
+echo "================================================"
+echo
+
+log_message "開始安全檢查"
+
+# 1. Brakeman 掃描
+echo "1. 執行 Brakeman 靜態安全分析..."
+if command -v brakeman &> /dev/null; then
+    brakeman --no-pager --no-color -o "$SCAN_DIR/${DATE}_brakeman_scan.txt" 2>&1 | tee -a "$LOG_FILE"
+
+    # 檢查是否有警告
+    if brakeman --no-pager --no-color -q 2>/dev/null; then
+        show_progress "Brakeman 掃描完成 - 無安全警告"
+    else
+        show_warning "Brakeman 掃描完成 - 發現潛在問題，請查看報告"
+    fi
+else
+    show_error "Brakeman 未安裝"
+fi
+echo
+
+# 2. Bundle Audit 檢查
+echo "2. 檢查 Gem 依賴漏洞..."
+if command -v bundle-audit &> /dev/null; then
+    bundle audit check --update 2>&1 | tee "$SCAN_DIR/${DATE}_bundle_audit.txt" | tee -a "$LOG_FILE"
+    if [ $? -eq 0 ]; then
+        show_progress "依賴檢查完成 - 無已知漏洞"
+    else
+        show_warning "依賴檢查完成 - 發現漏洞，請查看報告"
+    fi
+else
+    show_warning "bundler-audit 未安裝，跳過依賴漏洞檢查"
+    echo "  建議安裝: gem install bundler-audit"
+fi
+echo
+
+# 3. 檢查敏感檔案權限
+echo "3. 檢查敏感檔案權限..."
+SENSITIVE_FILES=(
+    "config/master.key"
+    "config/credentials.yml.enc"
+    ".env"
+    ".env.production"
+)
+
+for file in "${SENSITIVE_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        perms=$(stat -f "%A" "$file" 2>/dev/null || stat -c "%a" "$file" 2>/dev/null)
+        if [ "$perms" -le "600" ]; then
+            show_progress "$file - 權限安全 ($perms)"
+        else
+            show_warning "$file - 權限過於寬鬆 ($perms)，建議設為 600"
+        fi
+    fi
+done
+echo
+
+# 4. 檢查 Git 中的敏感資訊
+echo "4. 掃描 Git 歷史中的敏感資訊..."
+PATTERNS=(
+    "password"
+    "secret"
+    "api_key"
+    "private_key"
+    "token"
+)
+
+echo "正在檢查最近 100 次提交..." | tee -a "$LOG_FILE"
+sensitive_found=false
+for pattern in "${PATTERNS[@]}"; do
+    if git log -100 -p -i --grep="$pattern" --all 2>/dev/null | grep -qi "$pattern"; then
+        show_warning "發現可能包含 '$pattern' 的提交"
+        sensitive_found=true
+    fi
+done
+
+if [ "$sensitive_found" = false ]; then
+    show_progress "Git 歷史檢查完成 - 未發現明顯的敏感資訊"
+fi
+echo
+
+# 5. 檢查過期的 Gems
+echo "5. 檢查過期的 Gem 套件..."
+outdated_count=$(bundle outdated --parseable 2>/dev/null | wc -l)
+if [ "$outdated_count" -gt 0 ]; then
+    show_warning "發現 $outdated_count 個可更新的套件"
+    bundle outdated --parseable | head -5 > "$SCAN_DIR/${DATE}_outdated_gems.txt"
+    echo "  詳細清單已保存至 $SCAN_DIR/${DATE}_outdated_gems.txt"
+else
+    show_progress "所有 Gem 套件都是最新版本"
+fi
+echo
+
+# 6. 檢查 Rails 安全配置
+echo "6. 檢查 Rails 安全配置..."
+config_checks=0
+
+# 檢查 force_ssl
+if grep -q "config.force_ssl = true" config/environments/production.rb 2>/dev/null; then
+    show_progress "生產環境已啟用 SSL"
+    ((config_checks++))
+else
+    show_warning "生產環境未強制使用 SSL"
+fi
+
+# 檢查 CSP
+if grep -q "^[^#]*config.content_security_policy" config/initializers/content_security_policy.rb 2>/dev/null; then
+    show_progress "已配置 Content Security Policy"
+    ((config_checks++))
+else
+    show_warning "Content Security Policy 未啟用"
+fi
+
+# 檢查參數過濾
+if [ -f "config/initializers/filter_parameter_logging.rb" ]; then
+    show_progress "參數過濾已配置"
+    ((config_checks++))
+else
+    show_warning "未找到參數過濾配置"
+fi
+
+echo "  安全配置檢查: $config_checks/3 通過"
+echo
+
+# 生成摘要報告
+echo "================================================"
+echo "              檢查摘要"
+echo "================================================"
+
+SUMMARY_FILE="$REPORT_DIR/${DATE}_summary.txt"
+{
+    echo "安全檢查摘要 - $DATE $TIME"
+    echo "=============================="
+    echo
+    echo "掃描結果檔案:"
+    echo "- Brakeman: $SCAN_DIR/${DATE}_brakeman_scan.txt"
+    echo "- Bundle Audit: $SCAN_DIR/${DATE}_bundle_audit.txt"
+    echo "- 過期套件: $SCAN_DIR/${DATE}_outdated_gems.txt"
+    echo
+    echo "下一步行動:"
+    echo "1. 查看掃描報告中的詳細資訊"
+    echo "2. 修復發現的安全問題"
+    echo "3. 更新過期的依賴套件"
+    echo "4. 考慮實作缺失的安全功能"
+} | tee "$SUMMARY_FILE"
+
+log_message "安全檢查完成"
+
+echo
+show_progress "安全檢查完成！"
+echo "詳細報告已保存至 security_audits/ 目錄"
+echo
+
+# 提示下一步
+echo "建議的下一步行動:"
+echo "1. 查看完整報告: cat $SUMMARY_FILE"
+echo "2. 檢查 Brakeman 詳細結果: cat $SCAN_DIR/${DATE}_brakeman_scan.txt"
+echo "3. 更新依賴: bundle update"
+echo "4. 實作身份驗證: bundle add devise"
+
+exit 0
