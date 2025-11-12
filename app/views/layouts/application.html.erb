@@ -2,124 +2,50 @@
 <html lang="zh-TW">
   <head>
     <meta charset="utf-8">
-    <title><%= content_for(:title) || "FHIR LINE Bot - Healthcare Communication Platform" %></title>
+    <title><%= content_for(:title) || "FHIR LINE Bot - Healthcare Platform" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="FHIR LINE Bot - Healthcare Communication Platform connecting medical institutions and patients">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <!-- Google Fonts - DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "rails_block", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flexy", "data-turbo-track": "reload" if File.exist?(Rails.root.join('app/assets/stylesheets/flexy.css')) %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50">
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <!-- Logo -->
-          <div class="flex items-center space-x-3">
-            <div class="text-2xl font-bold text-green-600">
-              💚
-            </div>
-            <div class="flex flex-col">
-              <h1 class="text-lg font-bold text-gray-900">FHIR LINE Bot</h1>
-              <p class="text-xs text-gray-500">Healthcare Platform</p>
-            </div>
-          </div>
+  <body class="font-sans bg-gray-50 text-gray-900 m-0 p-0 min-h-screen">
+    <div class="flex relative min-h-screen" data-controller="sidebar" data-sidebar-expanded-value="true">
+      <!-- Sidebar -->
+      <%= render 'shared/sidebar' %>
 
+      <!-- Main Content Area -->
+      <div class="flex-1 ml-[270px] min-h-screen flex flex-col transition-all duration-300">
+        <!-- Top Bar -->
+        <%= render 'shared/navbar' %>
 
-        </div>
+        <!-- Page Content -->
+        <main class="flex-1 p-8">
+          <!-- Flash Messages -->
+          <%= render 'shared/flash' %>
+
+          <!-- Dynamic Page Content -->
+          <%= yield %>
+        </main>
+
+        <!-- Footer -->
+        <%= render 'shared/footer' %>
       </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Flash Messages -->
-      <% if flash[:notice] %>
-        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-3">
-          <span class="text-green-600 text-xl">✓</span>
-          <p class="text-green-700"><%= flash[:notice] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:alert] %>
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
-          <span class="text-red-600 text-xl">⚠</span>
-          <p class="text-red-700"><%= flash[:alert] %></p>
-        </div>
-      <% end %>
-
-      <!-- Page Content -->
-      <%= yield %>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-100 border-t border-gray-200 mt-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="text-center text-gray-600">
-          <p>&copy; 2025 FHIR LINE Bot. All rights reserved.</p>
-          <p class="text-xs mt-2">Healthcare Communication Platform | Powered by Rails 8 + LINE Login</p>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Initialize LINE Login Button (for non-logged-in users) -->
-    <% unless logged_in? %>
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const container = document.getElementById('line-login-button');
-          if (container) {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-            fetch('<%= request_line_login_path(format: :json) %>', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken
-              },
-              credentials: 'same-origin'
-            })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-              })
-              .then(data => {
-                const button = document.createElement('a');
-                button.href = data.authorization_url;
-                button.className = 'inline-flex items-center space-x-2 px-6 py-2 bg-[#00b900] hover:bg-[#009900] text-white font-bold rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md';
-                button.innerHTML = `
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  </svg>
-                  <span>Login with LINE</span>
-                `;
-                container.appendChild(button);
-              })
-              .catch(error => {
-                console.error('Failed to load LINE login:', error);
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'text-red-600 text-sm';
-                errorDiv.textContent = 'Failed to load login button';
-                container.appendChild(errorDiv);
-              });
-          }
-        });
-      </script>
-    <% end %>
+    </div>
   </body>
 </html>

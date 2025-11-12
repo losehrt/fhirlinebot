@@ -1,0 +1,47 @@
+<!-- Sidebar -->
+<aside class="sidebar-panel fixed left-0 top-0 h-screen w-[270px] bg-white shadow-md z-[1000] flex flex-col transition-all duration-300 overflow-hidden"
+       data-sidebar-target="sidebar">
+  <!-- Sidebar Header -->
+  <div class="sidebar-header h-[70px] px-4 bg-white shadow-sm flex items-center justify-center relative z-10">
+    <%= link_to root_path, class: "flex items-center justify-center w-full" do %>
+      <!-- Large logo for expanded state -->
+      <div class="logo-expanded" data-sidebar-target="logoExpanded">
+        <%= image_tag "logo.drawio.svg", alt: "FHIR LINE Bot", class: "w-[100px] h-[60px] object-contain" %>
+      </div>
+      <!-- Small logo for collapsed state -->
+      <div class="logo-collapsed" data-sidebar-target="logoCollapsed" style="display: none;">
+        <%= image_tag "logo-sm.drawio.svg", alt: "FHIR LINE Bot", class: "w-[40px] h-[40px] object-contain" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- User Profile Section -->
+  <% if logged_in? %>
+    <div class="sidebar-profile px-4 py-4 bg-white shadow-sm flex items-center gap-3 relative z-10 transition-all" data-sidebar-target="profile">
+      <% if current_user&.line_account&.picture_url %>
+        <img src="<%= current_user.line_account.picture_url %>" alt="<%= current_user.name %>" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+      <% else %>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center font-semibold flex-shrink-0">
+          <%= current_user.name.chars.first.upcase %>
+        </div>
+      <% end %>
+      <div class="profile-info flex-1 min-w-0 transition-all" data-sidebar-target="profileInfo">
+        <span class="block font-semibold text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis"><%= current_user.name %></span>
+        <span class="block text-xs text-gray-500">使用者</span>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 py-4 overflow-y-auto overflow-x-hidden">
+    <div class="mb-4">
+      <%= link_to setup_path,
+                  class: "nav-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all relative #{'bg-orange-50 text-orange-600 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500' if current_page?(setup_path)}" do %>
+        <span class="nav-icon w-6 h-6 inline-flex items-center justify-center flex-shrink-0">
+          <%= healthicon('devices', 'mobile', style: 'outline', size: '24px', class: 'inline-block') %>
+        </span>
+        <span class="nav-text text-sm font-medium transition-all" data-sidebar-target="navText">LINE 設定</span>
+      <% end %>
+    </div>
+  </nav>
+</aside>

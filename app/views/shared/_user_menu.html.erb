@@ -1,0 +1,43 @@
+<!-- User Menu -->
+<div class="relative" data-controller="dropdown">
+  <button class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+          data-dropdown-target="button"
+          data-action="click->dropdown#toggle">
+    <% if logged_in? %>
+      <% if current_user&.line_account&.picture_url %>
+        <img src="<%= current_user.line_account.picture_url %>" alt="<%= current_user.name %>" class="w-8 h-8 rounded-full object-cover">
+      <% else %>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center text-sm font-semibold">
+          <%= current_user.name.chars.first.upcase %>
+        </div>
+      <% end %>
+      <span class="font-medium text-gray-700 hidden md:block"><%= current_user.name %></span>
+    <% else %>
+      <span class="font-medium text-gray-700">訪客</span>
+    <% end %>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </button>
+
+  <!-- Dropdown Menu -->
+  <div class="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg min-w-[200px] z-[1000] hidden"
+       data-dropdown-target="menu">
+    <% if logged_in? %>
+      <%= link_to profile_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+        <span>個人檔案</span>
+      <% end %>
+      <%= link_to "#", class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+        <span>設定</span>
+      <% end %>
+      <div class="h-px bg-gray-200 my-2"></div>
+      <%= button_to logout_path, method: :post, class: "block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+        <span>登出</span>
+      <% end %>
+    <% else %>
+      <%= link_to "#", class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors", data: { action: "click->auth#requestLogin" } do %>
+        <span>使用 LINE 登入</span>
+      <% end %>
+    <% end %>
+  </div>
+</div>

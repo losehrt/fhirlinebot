@@ -9,80 +9,80 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left: Steps Guide -->
         <div class="lg:col-span-1">
-          <div class="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-            <h3 class="font-bold text-gray-900 mb-4">設定步驟</h3>
+          <div class="bg-white rounded-lg border border-gray-200 p-5 sticky top-6">
+            <h3 class="font-semibold text-gray-800 mb-4 text-sm">設定步驟</h3>
 
-            <div class="space-y-4">
+            <div class="space-y-3">
               <!-- Step 1 -->
               <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">1</div>
+                <div class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-xs">1</div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900">獲取 LINE 憑證</p>
+                  <p class="text-sm font-medium text-gray-800">獲取 LINE 憑證</p>
                   <p class="text-xs text-gray-500 mt-0.5">前往 LINE Developers Console</p>
                 </div>
               </div>
 
               <!-- Step 2 -->
               <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">2</div>
+                <div class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-xs">2</div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900">建立 Login 頻道</p>
+                  <p class="text-sm font-medium text-gray-800">建立 Login 頻道</p>
                   <p class="text-xs text-gray-500 mt-0.5">建立新的服務頻道</p>
                 </div>
               </div>
 
               <!-- Step 3 -->
               <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">3</div>
+                <div class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-xs">3</div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900">複製憑證</p>
+                  <p class="text-sm font-medium text-gray-800">複製憑證</p>
                   <p class="text-xs text-gray-500 mt-0.5">Channel ID 和 Secret</p>
                 </div>
               </div>
 
               <!-- Step 4 -->
               <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">4</div>
+                <div class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-xs">4</div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900">驗證並儲存</p>
+                  <p class="text-sm font-medium text-gray-800">驗證並儲存</p>
                   <p class="text-xs text-gray-500 mt-0.5">完成設定</p>
                 </div>
               </div>
             </div>
 
             <!-- Help Link -->
-            <div class="border-t border-gray-200 pt-4 mt-6">
-              <a href="https://developers.line.biz/" target="_blank" class="text-sm text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center space-x-1">
+            <div class="border-t border-gray-100 pt-4 mt-5">
+              <a href="https://developers.line.biz/" target="_blank" class="text-xs text-gray-600 hover:text-gray-900 font-medium inline-flex items-center space-x-1">
                 <span>設定指南</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="7" y1="17" x2="17" y2="7"/>
+                  <polyline points="7 7 17 7 17 17"/>
                 </svg>
               </a>
             </div>
 
             <!-- Status Section -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-              <h4 class="font-semibold text-gray-900 mb-3 text-sm">狀態</h4>
+            <div class="mt-5 pt-5 border-t border-gray-100">
+              <h4 class="font-medium text-gray-800 mb-3 text-xs">狀態</h4>
               <% if @configured %>
                 <div class="flex items-start space-x-2">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600 flex-shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600 flex-shrink-0 mt-0.5">
                     <path d="M20 6L9 17l-5-5"/>
                   </svg>
                   <div class="min-w-0">
-                    <p class="font-medium text-green-900 text-sm">已設定</p>
-                    <p class="text-xs text-green-700">驗證時間：<%= @setting.last_validated_at.strftime("%m/%d %H:%M") %></p>
+                    <p class="font-medium text-gray-700 text-xs">已設定</p>
+                    <p class="text-xs text-gray-500">驗證時間：<%= @setting.last_validated_at.strftime("%m/%d %H:%M") %></p>
                   </div>
                 </div>
               <% else %>
                 <div class="flex items-start space-x-2">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600 flex-shrink-0 mt-0.5 animate-pulse">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-500 flex-shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
                   </svg>
                   <div class="min-w-0">
-                    <p class="font-medium text-amber-900 text-sm">待設定</p>
-                    <p class="text-xs text-amber-700">請完成配置</p>
+                    <p class="font-medium text-gray-700 text-xs">待設定</p>
+                    <p class="text-xs text-gray-500">請完成配置</p>
                   </div>
                 </div>
               <% end %>
@@ -92,11 +92,11 @@
 
         <!-- Right: Form -->
         <div class="lg:col-span-2">
-          <div class="bg-white rounded-lg shadow-sm">
+          <div class="bg-white rounded-lg border border-gray-200">
             <!-- Form Header -->
-            <div class="border-b border-gray-200 px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-              <h2 class="text-2xl font-bold text-gray-900">輸入您的 LINE 憑證</h2>
-              <p class="text-sm text-gray-600 mt-1">在下方輸入您的 Channel ID 和 Channel Secret</p>
+            <div class="border-b border-gray-100 px-6 py-5">
+              <h2 class="text-xl font-semibold text-gray-900">輸入您的 LINE 憑證</h2>
+              <p class="text-sm text-gray-500 mt-1">在下方輸入您的 Channel ID 和 Channel Secret</p>
             </div>
 
         <!-- Form Body -->
@@ -168,14 +168,14 @@
             <!-- Validation Status -->
             <div data-setup-target="validationStatus" class="mb-4 <%= @setting.validation_error.present? ? '' : 'hidden' %>">
               <% if @setting.validation_error.present? %>
-                <div class="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start space-x-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600 flex-shrink-0 mt-0.5">
+                <div class="bg-red-50 border border-red-200 rounded-md p-3 flex items-start space-x-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500 flex-shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="10"/>
-                    <line x1="15" y1="9" x2="9" y2="15"/>
-                    <line x1="9" y1="9" x2="15" y2="15"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12" y2="16"/>
                   </svg>
                   <div class="flex-1">
-                    <p class="text-xs text-red-900 font-medium"><%= @setting.validation_error %></p>
+                    <p class="text-xs text-red-700 font-medium"><%= @setting.validation_error %></p>
                   </div>
                 </div>
               <% end %>
@@ -187,14 +187,14 @@
                 type="button"
                 data-setup-target="validateBtn"
                 data-action="click->setup#validate"
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
               >
                 驗證憑證
               </button>
               <button
                 type="submit"
                 data-setup-target="saveBtn"
-                class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                class="flex-1 px-4 py-2.5 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
                 disabled
               >
                 儲存並繼續
@@ -206,7 +206,7 @@
                 type="button"
                 data-setup-target="testBtn"
                 data-action="click->setup#test"
-                class="w-full mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-sm"
+                class="w-full mt-3 px-4 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition text-sm"
               >
                 測試連線
               </button>
@@ -215,7 +215,7 @@
                 type="button"
                 data-setup-target="clearBtn"
                 data-action="click->setup#clear"
-                class="w-full mt-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+                class="w-full mt-2 px-4 py-2 border border-red-300 text-red-600 rounded-md font-medium hover:bg-red-50 transition text-sm"
               >
                 重新設定憑證
               </button>
@@ -223,15 +223,15 @@
           </form>
 
           <!-- Security Info -->
-          <div class="border-t border-gray-200 px-6 py-4 bg-gray-50">
+          <div class="border-t border-gray-100 px-6 py-4 bg-gray-50">
             <div class="flex items-start space-x-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-600 flex-shrink-0 mt-0.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400 flex-shrink-0 mt-0.5">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0110 0v4"/>
               </svg>
               <div>
-                <p class="text-xs font-semibold text-gray-900">安全性</p>
-                <p class="text-xs text-gray-600 mt-0.5">您的 Channel Secret 會被加密並安全地儲存。儲存後永遠不會以純文字顯示。</p>
+                <p class="text-xs font-medium text-gray-700">安全性</p>
+                <p class="text-xs text-gray-500 mt-0.5">您的 Channel Secret 會被加密並安全地儲存。儲存後永遠不會以純文字顯示。</p>
               </div>
             </div>
           </div>
