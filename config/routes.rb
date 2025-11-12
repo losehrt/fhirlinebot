@@ -9,6 +9,13 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Setup routes (initial configuration)
+  get "/setup", to: "setup#index", as: :setup
+  post "/setup/validate", to: "setup#validate_credentials", as: :validate_line_credentials
+  post "/setup/update", to: "setup#update", as: :update_setup
+  post "/setup/test", to: "setup#test", as: :test_setup
+  delete "/setup/clear", to: "setup#clear", as: :clear_setup
+
   # Authentication routes
   post "auth/request_login", to: "auth#request_login", as: :request_line_login
   get "auth/line/callback", to: "auth#callback", as: :line_callback

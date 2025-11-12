@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_12_034237) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_12_042114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "application_settings", force: :cascade do |t|
+    t.string "line_channel_id"
+    t.string "line_channel_secret"
+    t.string "line_channel_secret_encrypted"
+    t.boolean "configured"
+    t.datetime "last_validated_at"
+    t.text "validation_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "line_accounts", force: :cascade do |t|
     t.bigint "user_id", null: false

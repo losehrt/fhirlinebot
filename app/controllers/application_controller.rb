@@ -4,7 +4,26 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :logged_in?
 
+  before_action :require_setup_completion, unless: :skip_setup_check?
+
   private
+
+  # Check if setup is required
+  def require_setup_completion
+    # Skip check if already on setup page or health check
+    return if skip_setup_check?
+
+    # Check if LINE credentials are configured
+    unless ApplicationSetting.configured?
+      redirect_to setup_path, notice: 'Please configure LINE credentials to continue'
+    end
+  end
+
+  # Routes that don't require setup to be complete
+  def skip_setup_check?
+    %w[setup auth rails/health].include?(controller_name) ||
+      %w[health_check request_login callback].include?(action_name)
+  end
 
   # Get the currently logged in user
   # @return [User, nil] The logged in user or nil if not authenticated
