@@ -6,11 +6,11 @@
     <%= link_to root_path, class: "flex items-center justify-center w-full" do %>
       <!-- Large logo for expanded state -->
       <div class="logo-expanded" data-sidebar-target="logoExpanded">
-        <%= image_tag "logo.drawio.svg", alt: "FHIR LINE Bot", class: "w-[100px] h-[60px] object-contain" %>
+        <%= image_tag "logo.drawio.svg", alt: "FHIR LINE Bot", class: "max-w-[100px] max-h-[60px] w-auto h-auto object-contain" %>
       </div>
       <!-- Small logo for collapsed state -->
       <div class="logo-collapsed" data-sidebar-target="logoCollapsed" style="display: none;">
-        <%= image_tag "logo-sm.drawio.svg", alt: "FHIR LINE Bot", class: "w-[40px] h-[40px] object-contain" %>
+        <%= image_tag "logo-sm.drawio.svg", alt: "FHIR LINE Bot", class: "max-w-[40px] max-h-[40px] w-auto h-auto object-contain" %>
       </div>
     <% end %>
   </div>

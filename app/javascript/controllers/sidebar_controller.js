@@ -14,27 +14,57 @@ export default class extends Controller {
       this.expandedValue = savedState === 'true'
     }
 
-    // Only update sidebar state on desktop
-    if (window.innerWidth >= 768) {
-      this.updateSidebarState()
+    // Initialize based on screen size
+    this.handleResize()
+
+    // Add resize listener
+    this.resizeHandler = this.handleResize.bind(this)
+    window.addEventListener('resize', this.resizeHandler)
+  }
+
+  disconnect() {
+    // Clean up resize listener
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler)
+    }
+  }
+
+  handleResize() {
+    const isMobile = window.innerWidth < 768
+
+    if (isMobile) {
+      // On mobile, ensure sidebar is properly hidden
+      this.setupMobileState()
     } else {
-      // On mobile, hide text and show small logo by default
-      this.navTextTargets.forEach(el => el.classList.add('hidden'))
-      if (this.hasProfileInfoTarget) {
-        this.profileInfoTarget.classList.add('hidden')
-      }
+      // On desktop, apply saved state
+      this.updateSidebarState()
+    }
+  }
 
-      // Show collapsed logo on mobile
-      if (this.hasLogoExpandedTarget && this.hasLogoCollapsedTarget) {
-        this.logoExpandedTarget.style.display = 'none'
-        this.logoCollapsedTarget.style.display = 'block'
-      }
+  setupMobileState() {
+    const sidebar = this.hasSidebarTarget ? this.sidebarTarget : this.element.querySelector('.sidebar-panel')
+    if (!sidebar) return
 
-      // Ensure margin is reset
-      const mainContent = document.querySelector('main').parentElement
-      if (mainContent) {
-        mainContent.style.marginLeft = '0'
-      }
+    // Remove any desktop-specific classes
+    sidebar.classList.remove('w-20', 'w-[270px]')
+
+    // Hide text elements by default on mobile
+    this.navTextTargets.forEach(el => el.classList.add('hidden'))
+    if (this.hasProfileInfoTarget) {
+      this.profileInfoTarget.classList.add('hidden')
+    }
+
+    // Show mobile logo on navbar, hide sidebar logos
+    if (this.hasLogoExpandedTarget && this.hasLogoCollapsedTarget) {
+      this.logoExpandedTarget.style.display = 'none'
+      this.logoCollapsedTarget.style.display = 'none'
+    }
+
+    // Ensure margin is reset for mobile
+    const mainContent = document.querySelector('main')?.parentElement
+    if (mainContent) {
+      mainContent.style.marginLeft = '0'
+      mainContent.classList.remove('ml-20', 'ml-[270px]')
     }
   }
 
@@ -157,8 +187,19 @@ export default class extends Controller {
 
       sidebar.classList.toggle('mobile-open')
 
-      // Show text elements on mobile when toggled
+      // Show/hide elements when mobile sidebar toggles
       if (sidebar.classList.contains('mobile-open')) {
+        // Restore sidebar width for mobile
+        sidebar.classList.add('w-[270px]')
+
+        // Show expanded logo for mobile menu
+        if (this.hasLogoExpandedTarget) {
+          this.logoExpandedTarget.style.display = 'block'
+        }
+        if (this.hasLogoCollapsedTarget) {
+          this.logoCollapsedTarget.style.display = 'none'
+        }
+
         // Show all text when mobile menu is open
         this.navTextTargets.forEach(el => el.classList.remove('hidden'))
         if (this.hasProfileInfoTarget) {
@@ -171,6 +212,15 @@ export default class extends Controller {
         overlay.addEventListener('click', () => this.handleMobileToggle())
         document.body.appendChild(overlay)
       } else {
+        // Remove width class
+        sidebar.classList.remove('w-[270px]')
+
+        // Hide logos when mobile menu is closed
+        if (this.hasLogoExpandedTarget && this.hasLogoCollapsedTarget) {
+          this.logoExpandedTarget.style.display = 'none'
+          this.logoCollapsedTarget.style.display = 'none'
+        }
+
         // Hide text elements when mobile menu is closed
         this.navTextTargets.forEach(el => el.classList.add('hidden'))
         if (this.hasProfileInfoTarget) {
