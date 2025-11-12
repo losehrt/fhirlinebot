@@ -1,6 +1,5 @@
 class HealthiconsDemoController < ApplicationController
   skip_before_action :require_setup_completion  # Allow access without setup
-  layout 'flexy'  # Use Flexy layout
 
   def index
     # Load metadata for better organization

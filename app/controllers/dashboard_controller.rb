@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  layout 'flexy'  # 使用 Flexy 佈局
+  # Flexy layout is inherited from ApplicationController
 
   def index
     # 準備示範數據

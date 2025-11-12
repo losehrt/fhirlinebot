@@ -2,6 +2,9 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  # Use Flexy layout as default for all controllers
+  layout 'flexy'
+
   helper_method :current_user, :logged_in?
 
   before_action :require_setup_completion, unless: :skip_setup_check?
