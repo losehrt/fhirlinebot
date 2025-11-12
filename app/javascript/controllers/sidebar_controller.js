@@ -18,8 +18,20 @@ export default class extends Controller {
     if (window.innerWidth >= 768) {
       this.updateSidebarState()
     } else {
-      // On mobile, ensure margin is reset
-      const mainContent = document.querySelector('.flexy-main')
+      // On mobile, hide text and show small logo by default
+      this.navTextTargets.forEach(el => el.classList.add('hidden'))
+      if (this.hasProfileInfoTarget) {
+        this.profileInfoTarget.classList.add('hidden')
+      }
+
+      // Show collapsed logo on mobile
+      if (this.hasLogoExpandedTarget && this.hasLogoCollapsedTarget) {
+        this.logoExpandedTarget.style.display = 'none'
+        this.logoCollapsedTarget.style.display = 'block'
+      }
+
+      // Ensure margin is reset
+      const mainContent = document.querySelector('main').parentElement
       if (mainContent) {
         mainContent.style.marginLeft = '0'
       }
@@ -140,18 +152,32 @@ export default class extends Controller {
   // 處理行動裝置的側邊欄
   handleMobileToggle() {
     if (window.innerWidth < 768) {
-      const sidebar = this.hasSidebarTarget ? this.sidebarTarget : this.element.querySelector('.flexy-sidebar')
+      const sidebar = this.hasSidebarTarget ? this.sidebarTarget : this.element.querySelector('.sidebar-panel')
       if (!sidebar) return
 
       sidebar.classList.toggle('mobile-open')
 
-      // 創建遮罩層
+      // Show text elements on mobile when toggled
       if (sidebar.classList.contains('mobile-open')) {
+        // Show all text when mobile menu is open
+        this.navTextTargets.forEach(el => el.classList.remove('hidden'))
+        if (this.hasProfileInfoTarget) {
+          this.profileInfoTarget.classList.remove('hidden')
+        }
+
+        // Create overlay
         const overlay = document.createElement('div')
         overlay.className = 'sidebar-overlay'
         overlay.addEventListener('click', () => this.handleMobileToggle())
         document.body.appendChild(overlay)
       } else {
+        // Hide text elements when mobile menu is closed
+        this.navTextTargets.forEach(el => el.classList.add('hidden'))
+        if (this.hasProfileInfoTarget) {
+          this.profileInfoTarget.classList.add('hidden')
+        }
+
+        // Remove overlay
         const overlay = document.querySelector('.sidebar-overlay')
         if (overlay) overlay.remove()
       }

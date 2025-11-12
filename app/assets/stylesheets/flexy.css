@@ -751,12 +751,12 @@
 /* ============================= */
 
 @media (max-width: 768px) {
-  .flexy-sidebar {
+  .sidebar-panel {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
   }
 
-  .flexy-sidebar.mobile-open {
+  .sidebar-panel.mobile-open {
     transform: translateX(0);
   }
 
@@ -770,7 +770,7 @@
     z-index: 999;
   }
 
-  .flexy-main {
+  main {
     margin-left: 0 !important;
   }
 
