@@ -32,6 +32,8 @@ class User < ApplicationRecord
         name: line_data[:displayName] || user.name
       )
       existing_account.update(
+        access_token: line_data[:accessToken],
+        refresh_token: line_data[:refreshToken],
         display_name: line_data[:displayName],
         picture_url: line_data[:pictureUrl]
       )
@@ -69,6 +71,7 @@ class User < ApplicationRecord
       user.create_line_account!(
         line_user_id: line_user_id,
         access_token: line_data[:accessToken] || SecureRandom.hex(32),
+        refresh_token: line_data[:refreshToken],
         display_name: line_data[:displayName],
         picture_url: line_data[:pictureUrl],
         expires_at: expires_at
