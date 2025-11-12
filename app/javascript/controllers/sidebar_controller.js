@@ -125,6 +125,13 @@ export default class extends Controller {
       item.classList.add('gap-3')
     })
 
+    // Keep header left-aligned
+    const header = sidebar.querySelector('.sidebar-header')
+    if (header) {
+      header.classList.remove('justify-center')
+      header.classList.add('justify-start')
+    }
+
     // Update main content margin
     if (window.innerWidth >= 768) {
       const mainContent = document.querySelector('main').parentElement
@@ -156,7 +163,7 @@ export default class extends Controller {
       this.profileInfoTarget.classList.add('hidden')
     }
 
-    // Center profile and nav items when collapsed
+    // Center profile and nav items when collapsed (but keep header left-aligned)
     const profile = sidebar.querySelector('.sidebar-profile')
     if (profile) {
       profile.classList.add('justify-center')
@@ -168,6 +175,13 @@ export default class extends Controller {
       item.classList.add('justify-center')
       item.classList.remove('gap-3')
     })
+
+    // Keep header left-aligned even when collapsed
+    const header = sidebar.querySelector('.sidebar-header')
+    if (header) {
+      header.classList.remove('justify-center')
+      header.classList.add('justify-start')
+    }
 
     // Update main content margin
     if (window.innerWidth >= 768) {
