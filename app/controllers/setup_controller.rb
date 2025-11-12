@@ -1,8 +1,8 @@
 class SetupController < ApplicationController
-  skip_before_action :require_setup_completion, only: [:index, :update, :validate_credentials]
+  skip_before_action :require_setup_completion, only: [:show, :update, :validate_credentials]
 
   # GET /setup - Show setup wizard
-  def index
+  def show
     @setting = ApplicationSetting.current
     @configured = @setting.configured?
   end

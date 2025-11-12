@@ -102,13 +102,13 @@
         <!-- Form Body -->
         <div class="px-6 py-6"
              data-controller="setup"
-             data-setup-validate-path-value="<%= validate_line_credentials_path %>"
+             data-setup-validate-path-value="<%= validate_credentials_setup_path %>"
              data-setup-test-path-value="<%= test_setup_path %>"
              data-setup-clear-path-value="<%= clear_setup_path %>"
              data-setup-validated-value="false">
 
           <form data-setup-target="form"
-                action="<%= update_setup_path %>"
+                action="<%= setup_path %>"
                 method="post"
                 data-action="submit->setup#submit">
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>

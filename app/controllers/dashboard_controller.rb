@@ -2,7 +2,7 @@ class DashboardController < ApplicationController
   skip_before_action :require_setup_completion  # Allow access without setup
   # Flexy layout is inherited from ApplicationController
 
-  def index
+  def show
     # 準備示範數據
     @stats = {
       total_users: 1234,

@@ -78,7 +78,7 @@ class AuthController < ApplicationController
   # Get the callback URL for this environment
   # @return [String] Full callback URL
   def callback_url
-    line_callback_url
+    auth_line_callback_url
   end
 
   # Check if user is already logged in and redirect if so

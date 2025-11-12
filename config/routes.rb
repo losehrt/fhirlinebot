@@ -1,37 +1,34 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
+  # Root path
+  root "pages#home"
+
+  # Static pages
+  get "profile", to: "pages#profile"
+
+  # Dashboard
+  resource :dashboard, only: [:show], controller: 'dashboard'
+
+  # LINE Bot setup
+  resource :setup, only: [:show], controller: 'setup' do
+    member do
+      post :validate_credentials
+      post :update
+      post :test
+      delete :clear
+    end
+  end
+
+  # Authentication
+  namespace :auth do
+    post "request_login"
+    get "line/callback", action: :callback
+    post "logout"
+  end
+
+  # PWA support (commented out for now)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Setup routes (initial configuration)
-  get "/setup", to: "setup#index", as: :setup
-  post "/setup/validate", to: "setup#validate_credentials", as: :validate_line_credentials
-  post "/setup/update", to: "setup#update", as: :update_setup
-  post "/setup/test", to: "setup#test", as: :test_setup
-  delete "/setup/clear", to: "setup#clear", as: :clear_setup
-
-  # Authentication routes
-  post "auth/request_login", to: "auth#request_login", as: :request_line_login
-  get "auth/line/callback", to: "auth#callback", as: :line_callback
-  post "auth/logout", to: "auth#logout", as: :logout
-
-  # Pages routes
-  get "/", to: "pages#home", as: :home
-  root "pages#home"
-  get "/profile", to: "pages#profile", as: :profile
-
-  # Dashboard route (using new controller)
-  get "/dashboard", to: "dashboard#index", as: :dashboard
-
-  # UI Demo route
-  get "/ui-demo", to: "ui_demo#index", as: :ui_demo
-
-  # Healthicons Demo route
-  get "/healthicons", to: "healthicons_demo#index", as: :healthicons_demo
 end

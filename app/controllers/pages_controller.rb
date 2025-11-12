@@ -1,5 +1,6 @@
 class PagesController < ApplicationController
   # Flexy layout is inherited from ApplicationController
+  skip_before_action :require_setup_completion, only: [:home]
 
   def home
     # Home page - accessible to both logged in and non-logged in users

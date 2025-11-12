@@ -31,7 +31,7 @@
         <span>設定</span>
       <% end %>
       <div class="h-px bg-gray-200 my-2"></div>
-      <%= button_to logout_path, method: :post, class: "block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+      <%= button_to auth_logout_path, method: :post, class: "block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
         <span>登出</span>
       <% end %>
     <% else %>
