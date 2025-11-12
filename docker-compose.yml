@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fhirlinebot_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fhirlinebot_network
+
+  rails:
+    build: .
+    container_name: fhirlinebot_rails
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/fhirlinebot_development
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-development}
+      LINE_LOGIN_CHANNEL_ID: ${LINE_LOGIN_CHANNEL_ID}
+      LINE_LOGIN_CHANNEL_SECRET: ${LINE_LOGIN_CHANNEL_SECRET}
+      LINE_LOGIN_REDIRECT_URI: http://localhost:3000/auth/line/callback
+      APP_URL: http://localhost:3000
+    volumes:
+      - .:/rails
+      - rails_bundle:/usr/local/bundle
+    command: bin/dev
+    networks:
+      - fhirlinebot_network
+
+volumes:
+  postgres_data:
+  rails_bundle:
+
+networks:
+  fhirlinebot_network:
+    driver: bridge

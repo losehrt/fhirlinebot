@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   get "auth/line/callback", to: "auth#callback", as: :line_callback
   post "auth/logout", to: "auth#logout", as: :logout
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Pages routes
+  get "/", to: "pages#home", as: :home
+  root "pages#home"
+  get "/dashboard", to: "pages#dashboard", as: :dashboard
+  get "/profile", to: "pages#profile", as: :profile
 end
