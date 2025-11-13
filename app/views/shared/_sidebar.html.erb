@@ -37,20 +37,20 @@
     <div class="space-y-1">
       <!-- Home -->
       <%= link_to root_path,
-                  class: "nav-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all relative #{'bg-orange-50 text-orange-600 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500' if current_page?(root_path)}" do %>
+                  class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all relative #{'bg-orange-50 text-orange-600 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500' if current_page?(root_path)}" do %>
         <span class="nav-icon w-6 h-6 inline-flex items-center justify-center flex-shrink-0">
           <%= healthicon "places", "home", style: "outline", size: "24px", class: "w-6 h-6" %>
         </span>
-        <span class="nav-text text-sm font-medium transition-all" data-sidebar-target="navText">首頁</span>
+        <span class="text-sm lg:text-lg font-medium transition-all" data-sidebar-target="navText">首頁</span>
       <% end %>
 
       <!-- LINE Setup -->
       <%= link_to setup_path,
-                  class: "nav-item flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all relative #{'bg-orange-50 text-orange-600 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500' if current_page?(setup_path)}" do %>
+                  class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all relative #{'bg-orange-50 text-orange-600 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500' if current_page?(setup_path)}" do %>
         <span class="nav-icon w-6 h-6 inline-flex items-center justify-center flex-shrink-0">
           <%= healthicon "devices", "mobile", style: "outline", size: "24px", class: "w-6 h-6" %>
         </span>
-        <span class="nav-text text-sm font-medium transition-all" data-sidebar-target="navText">LINE 設定</span>
+        <span class="text-sm lg:text-lg font-medium transition-all" data-sidebar-target="navText">LINE 設定</span>
       <% end %>
     </div>
   </nav>
