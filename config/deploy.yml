@@ -7,10 +7,10 @@ image: fhirlinebot
 # Deploy to these servers.
 servers:
   web:
-    - fhirlinebot.turbos.tw
+    - 157.245.59.235
   job:
     hosts:
-      - fhirlinebot.turbos.tw
+      - 157.245.59.235
     cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -38,7 +38,6 @@ env:
     - RAILS_MASTER_KEY
     - POSTGRES_USER
     - POSTGRES_PASSWORD
-    - REDIS_URL
   clear:
     # Database Configuration
     RAILS_ENV: production
@@ -101,11 +100,6 @@ builder:
 # To enable debug mode:
 # - Add DEBUG=true to env.clear section below
 # - Or run: export KAMAL_VERBOSE=1 before kamal commands
-logging:
-  driver: json-file
-  options:
-    max-size: 10m
-    max-file: "3"
 
 # Use a different ssh user than root
 # ssh:
@@ -114,8 +108,8 @@ logging:
 # Use accessory services (secrets come from .kamal/secrets).
 accessories:
   db:
-    image: postgres:alpine
-    host: fhirlinebot.turbos.tw
+    image: postgres:16-alpine
+    host: 157.245.59.235
     port: "127.0.0.1:5432:5432"
     env:
       clear:
@@ -130,7 +124,7 @@ accessories:
       - config/postgres/production.conf:/etc/postgresql/postgresql.conf
   redis:
     image: redis:7-alpine
-    host: fhirlinebot.turbos.tw
+    host: 157.245.59.235
     port: "127.0.0.1:6379:6379"
     directories:
       - data:/data
