@@ -119,10 +119,12 @@ accessories:
     port: "127.0.0.1:5432:5432"
     env:
       clear:
-        POSTGRES_DB: fhirlinebot
+        DB_HOST: fhirlinebot-db
+        POSTGRES_DB: fhirlinebot_production
         POSTGRES_USER: fhirlinebot
       secret:
-        - DATABASE_PASSWORD
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
     directories:
       - data:/var/lib/postgresql/data
     # logging:

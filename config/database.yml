@@ -91,8 +91,10 @@ production:
   primary: &primary_production
     <<: *default
     database: fhirlinebot_production
-    username: fhirlinebot
-    password: <%= Rails.application.credentials.db.DATABASE_PASSWORD %>
+    username: <%= Rails.application.credentials.dig(:database, :username) %>
+    password: <%= Rails.application.credentials.dig(:database, :password) %>
+    host: <%= Rails.application.credentials.dig(:database, :host) %>
+    port: 5432
   cache:
     <<: *primary_production
     database: fhirlinebot_production_cache
