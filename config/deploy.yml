@@ -34,17 +34,17 @@ registry:
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
+  secret:
+    - RAILS_MASTER_KEY
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - REDIS_URL
   clear:
     # Database Configuration
     RAILS_ENV: production
     DB_HOST: fhirlinebot-db
     DB_NAME: fhirlinebot_production
     DB_PORT: 5432
-  secret:
-    - RAILS_MASTER_KEY
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - REDIS_URL
 
     # Solid Queue Configuration - Use Redis for job queuing
     SOLID_QUEUE_PROCESSES_BULK_INSERT_SIZE: 1000
