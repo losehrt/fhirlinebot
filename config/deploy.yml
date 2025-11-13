@@ -36,7 +36,8 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
-    - DATABASE_PASSWORD
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
     - REDIS_URL
   clear:
     # Database Configuration
@@ -121,21 +122,17 @@ accessories:
       clear:
         DB_HOST: fhirlinebot-db
         POSTGRES_DB: fhirlinebot_production
-        POSTGRES_USER: fhirlinebot
       secret:
         - POSTGRES_USER
         - POSTGRES_PASSWORD
     directories:
       - data:/var/lib/postgresql/data
-
+    files:
+      - config/postgres/production.conf:/etc/postgresql/postgresql.conf
   redis:
     image: redis:7-alpine
     host: fhirlinebot.turbos.tw
     port: "127.0.0.1:6379:6379"
     directories:
       - data:/data
-    options:
-      log-driver: json-file
-      log-opt:
-        max-size: 10m
-        max-file: "3"
+
