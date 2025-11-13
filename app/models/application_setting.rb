@@ -13,13 +13,17 @@ class ApplicationSetting < ApplicationRecord
     # Consider using Rails.application.credentials for sensitive data in production
   end
 
-  # Scopes
-  scope :current, -> { first || create! }
-
   # Check if LINE credentials are configured
   def self.configured?
     setting = current
     setting.configured? && setting.line_channel_id.present? && setting.line_channel_secret.present?
+  end
+
+  # Get current settings with caching to avoid repeated database queries
+  def self.current
+    Rails.cache.fetch("application_settings_current", expires_in: 24.hours) do
+      first || create!
+    end
   end
 
   # Validate LINE credentials by testing the API connection
@@ -45,11 +49,6 @@ class ApplicationSetting < ApplicationRecord
       update(validation_error: "Validation error: #{e.message}")
       false
     end
-  end
-
-  # Get current settings or create default
-  def self.current
-    first || create!
   end
 
   # Clear configuration

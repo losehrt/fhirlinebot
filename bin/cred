@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# This commend is an enhanced version of `rails:credentials`
+#
+# You can use it in `.kamal/secrets`
+# e.g.:
+#   Example of extracting secrets from rails credentials
+#   SECRETS=$(./bin/cred all)
+#   KAMAL_REGISTRY_PASSWORD=$(kamal secrets extract KAMAL_REGISTRY_PASSWORD ${SECRETS})
+#   RAILS_MASTER_KEY=$(kamal secrets extract RAILS_MASTER_KEY ${SECRETS})
+#
+
+require 'yaml'
+require 'json'
+
+argv = ARGV.dup
+options = ''
+ARGV.each do |arg|
+  if arg.start_with?('--') # e.g. --env=production
+    options += " #{arg}"
+    argv.delete(arg)
+  elsif arg.start_with?('-') # e.g. -e production
+    key = arg
+    value = ARGV[ARGV.index(arg) + 1]
+    options += " #{key} #{value}"
+    argv.delete(key)
+    argv.delete(value)
+  end
+end
+
+case argv[0]
+when 'show'
+  exec "rails credentials:show #{options}"
+
+when 'edit'
+  `rails credentials:edit #{options}`
+
+when 'all'
+  hash = YAML.load(`rails credentials:show #{options}`) || {}
+  puts hash=={} ? '*Not Found*' : JSON.dump(hash.to_json)
+
+when 'get'
+  return if argv[1].nil?
+  hash = YAML.load(`rails credentials:show #{options}`) || {}
+  hash = hash.dig(*argv[1].split('.')) || '*Not Found*'
+  puts hash.is_a?(String) ? hash : JSON.dump(hash.to_json)
+
+else
+  puts <<-TXT
+Usage:
+  bin/cred COMMAND [options]
+
+You must specify a command. The most common commands are:
+
+  show          shorthand of rails credentials:show
+  edit          shorthand of rails credentials:edit
+  all           get all json
+  get [KEY]     get the value of KEY (deep use '.')
+
+  TXT
+end
+

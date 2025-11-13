@@ -92,7 +92,7 @@ production:
     <<: *default
     database: fhirlinebot_production
     username: fhirlinebot
-    password: <%= ENV["FHIRLINEBOT_DATABASE_PASSWORD"] %>
+    password: <%= Rails.application.credentials.db.DATABASE_PASSWORD %>
   cache:
     <<: *primary_production
     database: fhirlinebot_production_cache
