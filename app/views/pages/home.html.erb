@@ -1,6 +1,17 @@
 <!-- Landing Page with Modern Design -->
-<div class="min-h-[calc(100vh-140px)]">
+<div>
   <% if !logged_in? %>
+    <!-- Announcement Marquee -->
+    <div class="w-full">
+      <%= render 'shared/marquee', announcements: [
+        { text: 'FHIR LINE Bot 平台正式上線' },
+        { text: '已整合超過 10 家醫療院所' },
+        { text: '符合 FHIR R4 國際標準' },
+        { text: '支援即時醫療資料查詢' },
+        { text: '提供安全可靠的醫療資訊服務' }
+      ], speed: 20, pause_on_hover: true %>
+    </div>
+
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-orange-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">

@@ -620,7 +620,7 @@
 
 .flexy-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem 1.5rem;
 }
 
 /* ============================= */
@@ -780,6 +780,10 @@
 
   .flexy-content {
     padding: 1rem;
+  }
+
+  .flexy-main {
+    margin-left: 0;
   }
 }
 
