@@ -1,5 +1,5 @@
 # LineConfig - Centralized configuration for LINE Login
-# Supports multiple sources with priority: ENV > DB > Defaults
+# Supports multiple sources with priority: Credentials > ENV > DB > Defaults
 # Now with multi-tenant support via organization_id parameter
 #
 # Usage:
@@ -13,21 +13,28 @@
 class LineConfig
   class << self
     # Get LINE Channel ID
-    # Priority: ENV > Database (org-specific) > Database (global) > Raise error
+    # Priority: Credentials > ENV > Database (org-specific) > Database (global) > Raise error
     #
     # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [String] Channel ID
     # @raise [StandardError] if no Channel ID configured
     def channel_id(organization_id: nil)
+      @config_cache ||= {}
       cache_key = "line_config_channel_id_#{organization_id}"
-      return @config_cache[cache_key] if @config_cache&.key?(cache_key)
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
 
-      # Priority 1: Environment variable (global default)
+      # Priority 1: Rails Credentials
+      cred_id = credentials_channel_id
+      if cred_id.present?
+        return @config_cache[cache_key] = cred_id
+      end
+
+      # Priority 2: Environment variable (global default)
       if ENV['LINE_LOGIN_CHANNEL_ID'].present?
         return @config_cache[cache_key] = ENV['LINE_LOGIN_CHANNEL_ID']
       end
 
-      # Priority 2: Database configuration (organization-specific or global)
+      # Priority 3: Database configuration (organization-specific or global)
       db_config = database_config(organization_id)
       if db_config&.channel_id.present?
         return @config_cache[cache_key] = db_config.channel_id
@@ -37,21 +44,28 @@ class LineConfig
     end
 
     # Get LINE Channel Secret
-    # Priority: ENV > Database (org-specific) > Database (global) > Raise error
+    # Priority: Credentials > ENV > Database (org-specific) > Database (global) > Raise error
     #
     # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [String] Channel Secret
     # @raise [StandardError] if no Channel Secret configured
     def channel_secret(organization_id: nil)
+      @config_cache ||= {}
       cache_key = "line_config_channel_secret_#{organization_id}"
-      return @config_cache[cache_key] if @config_cache&.key?(cache_key)
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
 
-      # Priority 1: Environment variable (global default)
+      # Priority 1: Rails Credentials
+      cred_secret = credentials_channel_secret
+      if cred_secret.present?
+        return @config_cache[cache_key] = cred_secret
+      end
+
+      # Priority 2: Environment variable (global default)
       if ENV['LINE_LOGIN_CHANNEL_SECRET'].present?
         return @config_cache[cache_key] = ENV['LINE_LOGIN_CHANNEL_SECRET']
       end
 
-      # Priority 2: Database configuration (organization-specific or global)
+      # Priority 3: Database configuration (organization-specific or global)
       db_config = database_config(organization_id)
       if db_config&.channel_secret.present?
         return @config_cache[cache_key] = db_config.channel_secret
@@ -67,7 +81,7 @@ class LineConfig
     # @return [String] Redirect URI
     def redirect_uri(organization_id: nil)
       ENV['LINE_LOGIN_REDIRECT_URI'] ||
-        Rails.application.config.line_login_redirect_uri ||
+        (Rails.application.config.respond_to?(:line_login_redirect_uri) && Rails.application.config.line_login_redirect_uri) ||
         default_redirect_uri
     end
 
@@ -108,6 +122,52 @@ class LineConfig
     end
 
     private
+
+    # Get LINE Channel ID from Rails credentials
+    # Supports both 'line_login' and 'line' keys for compatibility
+    # Only reads if credentials are fully loaded and available
+    #
+    # @return [String, nil] Channel ID from credentials or nil
+    def credentials_channel_id
+      return nil unless credentials_available?
+
+      # Try 'line_login' first, then fallback to 'line'
+      result = Rails.application.credentials&.dig(:line_login, :channel_id)
+      result ||= Rails.application.credentials&.dig(:line, :channel_id)
+      # Support typo variant 'cahnnel_id' for backward compatibility
+      result ||= Rails.application.credentials&.dig(:line, :cahnnel_id)
+      result
+    rescue => e
+      Rails.logger.debug("Could not load LINE channel_id from credentials: #{e.message}")
+      nil
+    end
+
+    # Get LINE Channel Secret from Rails credentials
+    # Supports both 'line_login' and 'line' keys for compatibility
+    # Only reads if credentials are fully loaded and available
+    #
+    # @return [String, nil] Channel Secret from credentials or nil
+    def credentials_channel_secret
+      return nil unless credentials_available?
+
+      # Try 'line_login' first, then fallback to 'line'
+      result = Rails.application.credentials&.dig(:line_login, :channel_secret)
+      result ||= Rails.application.credentials&.dig(:line, :channel_secret)
+      result
+    rescue => e
+      Rails.logger.debug("Could not load LINE channel_secret from credentials: #{e.message}")
+      nil
+    end
+
+    # Check if Rails credentials are available
+    #
+    # @return [Boolean] true if credentials are available
+    def credentials_available?
+      Rails.application.respond_to?(:credentials) && Rails.application.credentials.present?
+    rescue => e
+      Rails.logger.debug("Credentials not available: #{e.message}")
+      false
+    end
 
     # Get configuration from database
     # Supports both organization-specific and global defaults
