@@ -67,8 +67,7 @@ class LineFlexMessageBuilder
         }
       ],
       paddingAll: 'md',
-      backgroundColor: '#F5F5F5',
-      cornerRadius: 'md'
+      backgroundColor: '#F5F5F5'
     }
 
     # Add footer with timestamp
