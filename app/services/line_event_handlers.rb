@@ -41,7 +41,7 @@ class MessageHandler < LineEventHandler
     text = message['text'] || message[:text]
     log_event(:info, "Text message: '#{text}'")
 
-    # Queue jobs to store message and echo response asynchronously
+    # Store message in database asynchronously
     StoreMessageJob.perform_later(
       @user_id,
       'text',
@@ -49,7 +49,9 @@ class MessageHandler < LineEventHandler
       message['id'] || message[:id],
       @timestamp
     )
-    EchoJob.perform_later(@user_id, text)
+
+    # Reply with echo message immediately
+    send_reply(text)
 
     true
   end

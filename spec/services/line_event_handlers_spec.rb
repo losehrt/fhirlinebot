@@ -19,7 +19,7 @@ RSpec.describe 'LINE Event Handlers' do
 
   describe MessageHandler do
     describe 'text message' do
-      it 'handles text message and queues storage and echo jobs' do
+      it 'handles text message and queues storage job, replies directly' do
         text = 'Hello Bot'
         message_id = '100001'
         timestamp = 1462629479859
@@ -40,21 +40,17 @@ RSpec.describe 'LINE Event Handlers' do
 
         handler = MessageHandler.new(event, messaging_service)
 
+        # Should queue only the storage job
         expect {
           handler.call
-        }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(2)
+        }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
 
         jobs = ActiveJob::Base.queue_adapter.enqueued_jobs
 
-        # First job should be StoreMessageJob
-        store_job = jobs[-2]
+        # Should be StoreMessageJob
+        store_job = jobs[-1]
         expect(store_job[:job]).to eq(StoreMessageJob)
         expect(store_job[:args]).to eq([user_id, 'text', text, message_id, timestamp])
-
-        # Second job should be EchoJob
-        echo_job = jobs[-1]
-        expect(echo_job[:job]).to eq(EchoJob)
-        expect(echo_job[:args]).to eq([user_id, text])
       end
 
       it 'returns true when processing text message' do
@@ -73,10 +69,13 @@ RSpec.describe 'LINE Event Handlers' do
           }
         }
 
+        allow(messaging_service).to receive(:reply_message).and_return(true)
+
         handler = MessageHandler.new(event, messaging_service)
         result = handler.call
 
         expect(result).to be_truthy
+        expect(messaging_service).to have_received(:reply_message).with('nHuyWiB7yP5Zw52FIkcQT', 'Hello Bot')
       end
     end
 
