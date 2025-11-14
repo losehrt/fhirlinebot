@@ -1,100 +1,106 @@
-# FHIR LINE Bot
+# 火線超人 FHIRLineBot
 
-A healthcare communication platform MVP built with Rails 8, integrating FHIR standards and LINE Login OAuth for secure patient-provider communication.
+一個加到 LINE 裡就能用的就醫小幫手。民眾不用下載額外 App，只要綁定醫院就診資料，就能在手機上一鍵查詢看診進度、門診資訊與回診提醒。
 
-**一個基於 Rails 框架開發的 Smart on FHIR 應用 MVP，透過 LINE 登入提供安全的醫療溝通平台。**
+**FHIRLineBot – A pocket smart-on-FHIR visit tracker for everyone.**
 
-## Project Overview
+## 專案簡介
 
-FHIR LINE Bot is a healthcare communication platform that bridges patients and healthcare institutions through LINE's familiar interface. It implements FHIR standards for healthcare data interoperability while leveraging LINE's OAuth authentication for secure, convenient access.
+看診到底排到第幾號了？家人現在看完沒？
 
-## Key Features
+「火線超人」是一個加到 LINE 裡就能用的就醫小幫手。民眾不用下載額外 App，只要綁定醫院就診資料，就能在手機上一鍵查詢看診進度、門診資訊與回診提醒，減少在診間外焦慮乾等的時間。
 
-- **Smart on FHIR Integration**: Implements FHIR standards for healthcare data interoperability
-- **LINE Login OAuth**: Secure authentication via LINE platform
-- **Healthcare Communication Platform**: Real-time communication between patients and hospitals
-- **Secure Data Management**: Encrypted storage and transmission of medical information
-- **Responsive Web UI**: Modern, mobile-friendly interface with Tailwind CSS
+對家屬來說，也能即時掌握長輩或小孩目前看診到哪一步，讓照護更安心。火線超人希望把「排隊等待」變成「有準備地就醫」，讓醫院服務真正走進民眾日常生活。
 
-## Tech Stack
+## 核心功能
 
-| Component | Version |
-|-----------|---------|
-| Ruby      | 3.4.2   |
-| Rails     | 8.0.4   |
-| PostgreSQL| 12+     |
-| Node.js   | 18+     |
-| Tailwind CSS | Latest |
-| Hotwire (Turbo + Stimulus) | Built-in |
+- **實時看診進度查詢**: 一鍵查看您目前在看診隊伍中的位置
+- **LINE 官方帳號整合**: 無需下載 App，直接在 LINE 中使用
+- **Smart on FHIR 標準**: 實現醫療數據互操作性
+- **安全身份驗證**: 透過 LINE OAuth 提供安全便捷的登入
+- **家屬看護功能**: 家屬可即時掌握親人的就醫進度
+- **回診提醒**: 自動提醒下次掛號和預約資訊
+- **響應式設計**: 在所有裝置上提供流暢的使用體驗
 
-## Quick Start
+## 技術架構
 
-### Prerequisites
+| 元件 | 版本 |
+|------|------|
+| Ruby | 3.4.2 |
+| Rails | 8.0.4 |
+| PostgreSQL | 12+ |
+| Node.js | 18+ |
+| Tailwind CSS | 最新版 |
+| Hotwire (Turbo + Stimulus) | 內建 |
+
+## 快速開始
+
+### 系統要求
 
 - Ruby 3.4.2
 - PostgreSQL 12+
 - Node.js 18+
-- Docker & Docker Compose (optional)
+- Docker & Docker Compose（可選）
 
-### Setup Options
+### 安裝方式
 
-#### Option 1: Native Development
+#### 方式 1：本機開發環境
 
 ```bash
-# 1. Clone the repository
+# 1. 複製專案
 git clone <repository-url>
 cd fhirlinebot
 
-# 2. Install dependencies
+# 2. 安裝依賴
 bundle install
 npm install
 
-# 3. Setup database
+# 3. 建立資料庫
 rails db:create db:migrate
 
-# 4. Configure environment variables
+# 4. 配置環境變數
 cp .env.example .env
-# Edit .env with your LINE OAuth credentials
+# 編輯 .env 檔案，填入您的 LINE OAuth 認證資訊
 
-# 5. Start development server
+# 5. 啟動開發伺服器
 bin/dev
 ```
 
-Visit http://localhost:3000
+訪問 http://localhost:3000
 
-#### Option 2: Docker Compose
+#### 方式 2：Docker Compose
 
 ```bash
-# 1. Clone the repository
+# 1. 複製專案
 git clone <repository-url>
 cd fhirlinebot
 
-# 2. Setup environment
+# 2. 設定環境
 cp .env.example .env
-# Edit .env with your LINE OAuth credentials
+# 編輯 .env 檔案，填入您的 LINE OAuth 認證資訊
 
-# 3. Start with Docker Compose
+# 3. 使用 Docker Compose 啟動
 docker-compose up
 
-# 4. In another terminal, setup database
+# 4. 另開終端機，初始化資料庫
 docker-compose exec rails rails db:create db:migrate
 ```
 
-Visit http://localhost:3000
+訪問 http://localhost:3000
 
-## Configuration
+## 配置
 
-### Environment Variables
+### 環境變數
 
-See `.env.example` for all configuration options. Key variables:
+請參考 `.env.example` 取得所有配置選項。重要變數：
 
 ```bash
-# LINE Login OAuth
+# LINE Login OAuth 認證
 LINE_LOGIN_CHANNEL_ID=your_channel_id
 LINE_LOGIN_CHANNEL_SECRET=your_channel_secret
 LINE_LOGIN_REDIRECT_URI=http://localhost:3000/auth/line/callback
 
-# Database
+# 資料庫
 DATABASE_URL=postgres://user:password@localhost:5432/fhirlinebot_development
 
 # Rails
@@ -102,236 +108,236 @@ SECRET_KEY_BASE=your-secret-key-base
 RAILS_ENV=development
 ```
 
-### LINE Platform Setup
+### LINE 平台設定
 
-1. Go to [LINE Developers Console](https://developers.line.biz/)
-2. Create a new Channel with "Login" service
-3. Configure OAuth redirect URI
-4. Copy Channel ID and Channel Secret to `.env`
+1. 前往 [LINE Developers Console](https://developers.line.biz/)
+2. 建立新的 Channel，選擇 "Login" 服務
+3. 配置 OAuth 回調 URI
+4. 將 Channel ID 和 Channel Secret 複製到 `.env` 檔案
 
-## Development
+## 開發
 
-### Running Tests
+### 執行測試
 
 ```bash
-# Run all tests (unit, integration, system)
+# 執行所有測試（單元、整合、系統測試）
 rails test test:system
 
-# Run specific test file
+# 執行特定測試檔案
 rails test test/models/user_test.rb
 
-# Run with coverage
+# 執行並產生覆蓋率報告
 bundle exec simplecov
 
-# Run security checks
+# 執行安全檢查
 bin/brakeman
 bin/rubocop
 ```
 
-### Database Commands
+### 資料庫指令
 
 ```bash
-# Create databases
+# 建立資料庫
 rails db:create
 
-# Run migrations
+# 執行遷移
 rails db:migrate
 
-# Rollback last migration
+# 回滾上一個遷移
 rails db:rollback
 
-# Reset database (development only)
+# 重置資料庫（開發環境限制）
 rails db:reset
 
-# Seed sample data
+# 植入範例資料
 rails db:seed
 ```
 
-### Code Quality
+### 程式碼品質
 
 ```bash
-# Run linter
-bin/rubocop -a  # with auto-fix
+# 執行程式碼檢查
+bin/rubocop -a  # 自動修復
 
-# Security scan
+# 安全掃描
 bin/brakeman
 
-# JS dependencies audit
+# JavaScript 依賴項檢查
 bin/importmap audit
 
-# Run full CI suite locally
+# 執行完整的 CI 測試
 .github/workflows/ci.yml
 ```
 
-## Project Structure
+## 專案結構
 
 ```
 fhirlinebot/
 ├── app/
-│   ├── controllers/          # Rails controllers
-│   │   ├── auth_controller.rb       # LINE OAuth handling
-│   │   └── pages_controller.rb      # Page routes
-│   ├── models/               # ActiveRecord models
-│   │   ├── user.rb                  # User model
-│   │   └── line_account.rb          # LINE account integration
-│   ├── views/                # ERB templates
-│   │   ├── layouts/application.html.erb    # Main layout
-│   │   └── pages/                          # Page templates
-│   └── assets/               # CSS, JS, images
+│   ├── controllers/          # Rails 控制器
+│   │   ├── auth_controller.rb       # LINE OAuth 處理
+│   │   └── pages_controller.rb      # 頁面路由
+│   ├── models/               # ActiveRecord 模型
+│   │   ├── user.rb                  # 用戶模型
+│   │   └── line_account.rb          # LINE 帳號整合
+│   ├── views/                # ERB 範本
+│   │   ├── layouts/application.html.erb    # 主佈局
+│   │   └── pages/                          # 頁面範本
+│   └── assets/               # CSS, JS, 圖片
 ├── config/
-│   ├── deploy.yml            # Kamal deployment config
-│   ├── database.yml          # Database configuration
-│   └── routes.rb             # Route definitions
+│   ├── deploy.yml            # Kamal 部署配置
+│   ├── database.yml          # 資料庫配置
+│   └── routes.rb             # 路由定義
 ├── db/
-│   ├── migrate/              # Database migrations
-│   └── seeds.rb              # Sample data
-├── test/                     # Test suite
-├── Dockerfile                # Production Docker image
-├── docker-compose.yml        # Development Docker setup
-├── Gemfile                   # Ruby dependencies
-└── DEPLOYMENT.md             # Deployment guide
+│   ├── migrate/              # 資料庫遷移
+│   └── seeds.rb              # 範例資料
+├── test/                     # 測試套件
+├── Dockerfile                # 生產 Docker 映像
+├── docker-compose.yml        # 開發 Docker 設定
+├── Gemfile                   # Ruby 依賴項
+└── DEPLOYMENT.md             # 部署指南
 ```
 
-## Authentication Flow
+## 認證流程
 
 ```
-User visits app
+用戶訪問應用
     ↓
-Clicks "Login with LINE"
+點擊「使用 LINE 登入」
     ↓
-Redirected to LINE OAuth consent screen
+重定向到 LINE OAuth 同意畫面
     ↓
-User authorizes app
+用戶授予應用權限
     ↓
-LINE redirects to /auth/line/callback with code
+LINE 重定向回 /auth/line/callback，並附帶代碼
     ↓
-App exchanges code for access token
+應用使用代碼交換存取令牌
     ↓
-App creates/updates user with LINE info
+應用使用 LINE 資訊建立或更新用戶
     ↓
-User is logged in and redirected to dashboard
+用戶已登入，重定向到儀表板
 ```
 
-## API Endpoints
+## API 端點
 
-### Authentication
-- `POST /auth/request_login` - Request LINE login authorization URL
-- `GET /auth/line/callback` - LINE OAuth callback handler
-- `POST /auth/logout` - Logout current user
+### 認證
+- `POST /auth/request_login` - 請求 LINE 登入授權 URL
+- `GET /auth/line/callback` - LINE OAuth 回調處理程式
+- `POST /auth/logout` - 登出目前用戶
 
-### Pages
-- `GET /` - Home page (public/dashboard)
-- `GET /dashboard` - Dashboard (logged-in users only)
-- `GET /profile` - User profile page (logged-in users only)
+### 頁面
+- `GET /` - 首頁（公開/儀表板）
+- `GET /dashboard` - 儀表板（僅限登入用戶）
+- `GET /profile` - 用戶個人資料頁面（僅限登入用戶）
 
-### Health
-- `GET /up` - Health check endpoint (returns 200 if healthy)
+### 健康檢查
+- `GET /up` - 健康狀態檢查端點（正常時返回 200）
 
-## Deployment
+## 部署
 
-### Quick Deploy (Kamal)
+### 快速部署（Kamal）
 
 ```bash
-# Setup (first time)
+# 設定（首次執行）
 kamal setup
 
-# Deploy
+# 部署
 kamal deploy
 
-# View logs
+# 查看日誌
 kamal logs -f
 
-# SSH to server
+# SSH 連線到伺服器
 kamal app exec --interactive "bash"
 ```
 
-### Complete Guide
+### 完整指南
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive deployment instructions covering:
-- Docker containerization
-- Kamal deployment
-- Production checklist
-- SSL/HTTPS setup
-- Monitoring and maintenance
-- Troubleshooting
+請參考 [DEPLOYMENT.md](./DEPLOYMENT.md) 取得全面的部署說明，涵蓋：
+- Docker 容器化
+- Kamal 部署
+- 生產檢查清單
+- SSL/HTTPS 設定
+- 監控和維護
+- 故障排查
 
-### Supported Deployment Targets
-- Self-managed VPS (Ubuntu, Debian)
+### 支援的部署目標
+- 自管理 VPS（Ubuntu、Debian）
 - Kamal + Hetzner
-- Docker + any cloud provider
-- Heroku (with Procfile modifications)
+- Docker + 任何雲端提供商
+- Heroku（需修改 Procfile）
 
-## Testing
+## 測試
 
-### Test Coverage
-- Unit tests for models
-- Integration tests for authentication flow
-- System tests for user workflows
-- Security scanning (Brakeman, Rubocop)
+### 測試覆蓋範圍
+- 模型單元測試
+- 認證流程整合測試
+- 用戶工作流系統測試
+- 安全掃描（Brakeman、Rubocop）
 
-### Run Tests Locally
+### 本機執行測試
 
 ```bash
-# All tests
+# 執行所有測試
 rails test
 
-# System tests (requires Chrome)
+# 系統測試（需要 Chrome）
 rails test:system
 
-# Specific test
+# 特定測試
 rails test test/controllers/auth_controller_test.rb
 ```
 
-## Security
+## 安全性
 
-- **CSRF Protection**: All forms protected with CSRF tokens
-- **Secure Sessions**: HttpOnly, Secure, SameSite cookies
-- **Password Hashing**: bcrypt with salt
-- **OAuth2 Security**: State parameter validation
-- **Database Encryption**: Support for encrypted columns
-- **SQL Injection Prevention**: Parameterized queries via ActiveRecord
-- **HTTPS**: Enforced in production
+- **CSRF 保護**: 所有表單都使用 CSRF 令牌進行保護
+- **安全會話**: HttpOnly、Secure、SameSite cookies
+- **密碼雜湊**: 使用 bcrypt 和 salt
+- **OAuth2 安全**: 狀態參數驗證
+- **資料庫加密**: 支援加密列
+- **SQL 注入防防**: 透過 ActiveRecord 的參數化查詢
+- **HTTPS**: 在生產環境中強制執行
 
-### Security Scanning
+### 安全掃描
 
 ```bash
-# Run security checks
-bin/brakeman          # Rails security
-bin/rubocop -a        # Code quality
-bundle audit          # Dependency vulnerabilities
-bin/importmap audit   # JavaScript dependencies
+# 執行安全檢查
+bin/brakeman          # Rails 安全
+bin/rubocop -a        # 程式碼品質
+bundle audit          # 依賴項漏洞
+bin/importmap audit   # JavaScript 依賴項
 ```
 
-## Contributing
+## 貢獻
 
-1. Create a feature branch (`git checkout -b feature/amazing-feature`)
-2. Commit your changes (`git commit -m 'Add amazing feature'`)
-3. Push to the branch (`git push origin feature/amazing-feature`)
-4. Open a Pull Request
-5. Ensure all tests pass in CI
+1. 建立功能分支（`git checkout -b feature/amazing-feature`）
+2. 提交更改（`git commit -m 'Add amazing feature'`）
+3. 推送到分支（`git push origin feature/amazing-feature`）
+4. 開啟 Pull Request
+5. 確保所有測試在 CI 中通過
 
-## CI/CD Pipeline
+## CI/CD 管道
 
-GitHub Actions automatically runs on every push and PR:
-- **Security Scanning**: Brakeman, bundler-audit
-- **Code Linting**: Rubocop
-- **Tests**: Unit, integration, and system tests
-- **Database**: PostgreSQL service available during tests
+GitHub Actions 在每次推送和 PR 上自動執行：
+- **安全掃描**: Brakeman、bundler-audit
+- **程式碼檢查**: Rubocop
+- **測試**: 單元測試、整合測試和系統測試
+- **資料庫**: 測試期間可用 PostgreSQL 服務
 
-## License
+## 許可證
 
-[Specify your license here]
+[在此指定您的許可證]
 
-## Support
+## 支援
 
-For issues, questions, or contributions:
-- GitHub Issues: [Project Issues]
-- Documentation: See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment help
-- Security Issues: Please report privately to [security contact]
+如有問題、疑問或想貢獻：
+- GitHub Issues: [專案 Issues]
+- 文檔: 請參考 [DEPLOYMENT.md](./DEPLOYMENT.md) 獲得部署幫助
+- 安全問題: 請私下報告至 [安全聯絡人]
 
-## Acknowledgments
+## 致謝
 
-- Rails community and documentation
-- LINE Platform for OAuth services
-- FHIR standards community
-- Contributors and testers
+- Rails 社群和文檔
+- LINE 平台的 OAuth 服務
+- FHIR 標準社群
+- 貢獻者和測試人員
