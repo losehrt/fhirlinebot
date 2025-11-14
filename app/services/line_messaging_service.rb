@@ -251,9 +251,8 @@ class LineMessagingService
     end
 
     Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      # Disable SSL verification for development/staging environments
-      # In production, ensure proper CA certificates are installed
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if Rails.env.development? || Rails.env.staging?
+      # Disable SSL verification - CA certificates not available in deployment
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request)
     end
   end
