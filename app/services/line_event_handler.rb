@@ -40,7 +40,13 @@ class LineEventHandler
   def send_reply(text)
     return false unless @reply_token
 
-    @messaging_service.reply_message(@reply_token, text)
+    result = @messaging_service.reply_message(@reply_token, text)
+    Rails.logger.info("[LINE Webhook] Reply sent to #{@reply_token[0..10]}...: #{text[0..30]}...")
+    result
+  rescue StandardError => e
+    Rails.logger.error("[LINE Webhook] Failed to send reply: #{e.class} - #{e.message}")
+    Rails.logger.error(e.backtrace.join("\n"))
+    false
   end
 
   # Send a push message to the user

@@ -28,7 +28,15 @@ module Webhooks
       payload = JSON.parse(body, symbolize_names: true)
 
       # Process the webhook events
-      service = LineMessagingService.new
+      begin
+        service = LineMessagingService.new
+      rescue StandardError => e
+        Rails.logger.error("Failed to initialize LineMessagingService: #{e.class} - #{e.message}")
+        Rails.logger.error("Webhook payload received but LineMessagingService initialization failed")
+        render json: { success: true }, status: :ok
+        return
+      end
+
       result = service.handle_webhook(payload)
 
       # Always return 200 OK to LINE, regardless of processing result
@@ -39,6 +47,7 @@ module Webhooks
       render json: { error: 'Invalid JSON' }, status: :bad_request
     rescue StandardError => e
       Rails.logger.error("Webhook processing error: #{e.class} - #{e.message}")
+      Rails.logger.error("Backtrace:")
       Rails.logger.error(e.backtrace.join("\n"))
       # Still return 200 to LINE so they don't retry
       render json: { success: true }, status: :ok
