@@ -8,8 +8,6 @@
 
 require 'net/http'
 require 'json'
-require_relative 'line_event_handler'
-require_relative 'line_event_handlers'
 require 'openssl'
 require 'base64'
 
