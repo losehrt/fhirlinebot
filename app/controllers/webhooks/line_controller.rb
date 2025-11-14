@@ -3,9 +3,7 @@ module Webhooks
     skip_before_action :require_setup_completion
     skip_before_action :verify_authenticity_token
 
-    # Ensure event handlers are loaded
-    require_relative '../../services/line_event_handler'
-    require_relative '../../services/line_event_handlers'
+    before_action :ensure_event_handlers_loaded
 
     # POST /webhooks/line
     # Receive and process LINE webhook events
@@ -46,6 +44,24 @@ module Webhooks
     end
 
     private
+
+    def ensure_event_handlers_loaded
+      # Trigger Rails autoloader by referencing the handler classes
+      # This ensures they're loaded before webhook processing
+      return if @event_handlers_loaded
+
+      [
+        MessageHandler,
+        FollowEventHandler,
+        UnfollowEventHandler,
+        PostbackHandler,
+        JoinEventHandler,
+        LeaveEventHandler,
+        MemberJoinedEventHandler,
+        MemberLeftEventHandler
+      ]
+      @event_handlers_loaded = true
+    end
 
     def signature_valid?(body, signature)
       return false if signature.blank?
