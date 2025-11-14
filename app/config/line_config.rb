@@ -115,6 +115,68 @@ class LineConfig
       nil
     end
 
+    # Get LINE Messaging API Channel ID
+    # This is separate from LINE Login channel_id as they are independent channels
+    # Priority: Credentials > ENV > Database (org-specific) > Database (global)
+    #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
+    # @return [String, nil] Messaging API Channel ID or nil if not configured
+    def messaging_channel_id(organization_id: nil)
+      @config_cache ||= {}
+      cache_key = "line_config_messaging_channel_id_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
+
+      # Priority 1: Rails Credentials (line.messaging.channel_id)
+      cred_id = credentials_messaging_channel_id
+      if cred_id.present?
+        return @config_cache[cache_key] = cred_id
+      end
+
+      # Priority 2: Environment variable
+      if ENV['LINE_MESSAGING_CHANNEL_ID'].present?
+        return @config_cache[cache_key] = ENV['LINE_MESSAGING_CHANNEL_ID']
+      end
+
+      # Priority 3: Database configuration (fallback to channel_id if not specified)
+      db_config = database_config(organization_id)
+      if db_config&.access_token.present? && db_config.channel_id.present?
+        return @config_cache[cache_key] = db_config.channel_id
+      end
+
+      nil
+    end
+
+    # Get LINE Messaging API Channel Secret
+    # This is separate from LINE Login channel_secret as they are independent channels
+    # Priority: Credentials > ENV > Database (org-specific) > Database (global)
+    #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
+    # @return [String, nil] Messaging API Channel Secret or nil if not configured
+    def messaging_channel_secret(organization_id: nil)
+      @config_cache ||= {}
+      cache_key = "line_config_messaging_channel_secret_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
+
+      # Priority 1: Rails Credentials (line.messaging.channel_secret)
+      cred_secret = credentials_messaging_channel_secret
+      if cred_secret.present?
+        return @config_cache[cache_key] = cred_secret
+      end
+
+      # Priority 2: Environment variable
+      if ENV['LINE_MESSAGING_CHANNEL_SECRET'].present?
+        return @config_cache[cache_key] = ENV['LINE_MESSAGING_CHANNEL_SECRET']
+      end
+
+      # Priority 3: Database configuration (fallback to channel_secret if not specified)
+      db_config = database_config(organization_id)
+      if db_config&.access_token.present? && db_config.channel_secret.present?
+        return @config_cache[cache_key] = db_config.channel_secret
+      end
+
+      nil
+    end
+
     # Get all configuration as a hash
     #
     # @param organization_id [Integer, nil] Organization ID for multi-tenant support
@@ -154,17 +216,23 @@ class LineConfig
     private
 
     # Get LINE Channel ID from Rails credentials
-    # Supports both 'line_login' and 'line' keys for compatibility
-    # Only reads if credentials are fully loaded and available
+    # Supports multiple credential structures:
+    # - line_login.channel_id (LINE Login)
+    # - line.login.channel_id (LINE Login with nested structure)
+    # - line.channel_id (fallback)
     #
     # @return [String, nil] Channel ID from credentials or nil
     def credentials_channel_id
       return nil unless credentials_available?
 
-      # Try 'line_login' first, then fallback to 'line'
-      result = Rails.application.credentials&.dig(:line_login, :channel_id)
+      # Try different credential structures in order
+      # 1. line.login.channel_id (preferred nested structure)
+      result = Rails.application.credentials&.dig(:line, :login, :channel_id)
+      # 2. line_login.channel_id (legacy structure)
+      result ||= Rails.application.credentials&.dig(:line_login, :channel_id)
+      # 3. line.channel_id (flat structure)
       result ||= Rails.application.credentials&.dig(:line, :channel_id)
-      # Support typo variant 'cahnnel_id' for backward compatibility
+      # 4. Support typo variant 'cahnnel_id' for backward compatibility
       result ||= Rails.application.credentials&.dig(:line, :cahnnel_id)
       result
     rescue => e
@@ -173,15 +241,21 @@ class LineConfig
     end
 
     # Get LINE Channel Secret from Rails credentials
-    # Supports both 'line_login' and 'line' keys for compatibility
-    # Only reads if credentials are fully loaded and available
+    # Supports multiple credential structures:
+    # - line_login.channel_secret (LINE Login)
+    # - line.login.channel_secret (LINE Login with nested structure)
+    # - line.channel_secret (fallback)
     #
     # @return [String, nil] Channel Secret from credentials or nil
     def credentials_channel_secret
       return nil unless credentials_available?
 
-      # Try 'line_login' first, then fallback to 'line'
-      result = Rails.application.credentials&.dig(:line_login, :channel_secret)
+      # Try different credential structures in order
+      # 1. line.login.channel_secret (preferred nested structure)
+      result = Rails.application.credentials&.dig(:line, :login, :channel_secret)
+      # 2. line_login.channel_secret (legacy structure)
+      result ||= Rails.application.credentials&.dig(:line_login, :channel_secret)
+      # 3. line.channel_secret (flat structure)
       result ||= Rails.application.credentials&.dig(:line, :channel_secret)
       result
     rescue => e
@@ -190,19 +264,51 @@ class LineConfig
     end
 
     # Get LINE Channel Access Token from Rails credentials
-    # Supports both 'line_login' and 'line' keys for compatibility
-    # Only reads if credentials are fully loaded and available
+    # Supports multiple credential structures:
+    # - line.messaging.access_token (Messaging API with nested structure)
+    # - line_login.access_token (legacy)
+    # - line.access_token (fallback)
     #
     # @return [String, nil] Channel Access Token from credentials or nil
     def credentials_access_token
       return nil unless credentials_available?
 
-      # Try 'line_login' first, then fallback to 'line'
-      result = Rails.application.credentials&.dig(:line_login, :access_token)
+      # Try different credential structures in order
+      # 1. line.messaging.access_token (preferred nested structure for Messaging API)
+      result = Rails.application.credentials&.dig(:line, :messaging, :access_token)
+      # 2. line_login.access_token (legacy structure)
+      result ||= Rails.application.credentials&.dig(:line_login, :access_token)
+      # 3. line.access_token (flat structure)
       result ||= Rails.application.credentials&.dig(:line, :access_token)
       result
     rescue => e
       Rails.logger.debug("Could not load LINE access_token from credentials: #{e.message}")
+      nil
+    end
+
+    # Get LINE Messaging API Channel ID from Rails credentials
+    # Reads from line.messaging.channel_id structure
+    #
+    # @return [String, nil] Messaging API Channel ID from credentials or nil
+    def credentials_messaging_channel_id
+      return nil unless credentials_available?
+
+      Rails.application.credentials&.dig(:line, :messaging, :channel_id)
+    rescue => e
+      Rails.logger.debug("Could not load LINE messaging channel_id from credentials: #{e.message}")
+      nil
+    end
+
+    # Get LINE Messaging API Channel Secret from Rails credentials
+    # Reads from line.messaging.channel_secret structure
+    #
+    # @return [String, nil] Messaging API Channel Secret from credentials or nil
+    def credentials_messaging_channel_secret
+      return nil unless credentials_available?
+
+      Rails.application.credentials&.dig(:line, :messaging, :channel_secret)
+    rescue => e
+      Rails.logger.debug("Could not load LINE messaging channel_secret from credentials: #{e.message}")
       nil
     end
 

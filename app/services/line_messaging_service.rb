@@ -23,12 +23,17 @@ class LineMessagingService
   # Initialize messaging service with channel credentials
   # Priority: explicit params > LineConfig
   #
-  # @param channel_id [String, nil] LINE Channel ID
-  # @param channel_secret [String, nil] LINE Channel Secret
-  # @param access_token [String, nil] LINE Channel Access Token for Messaging API
+  # Uses Messaging API-specific credentials:
+  # - channel_id: Messaging API Channel ID (LineConfig.messaging_channel_id)
+  # - channel_secret: Messaging API Channel Secret (LineConfig.messaging_channel_secret)
+  # - access_token: Messaging API Access Token (LineConfig.access_token)
+  #
+  # @param channel_id [String, nil] Messaging API Channel ID
+  # @param channel_secret [String, nil] Messaging API Channel Secret
+  # @param access_token [String, nil] Messaging API Channel Access Token
   def initialize(channel_id: nil, channel_secret: nil, access_token: nil)
-    @channel_id = channel_id || LineConfig.channel_id
-    @channel_secret = channel_secret || LineConfig.channel_secret
+    @channel_id = channel_id || LineConfig.messaging_channel_id
+    @channel_secret = channel_secret || LineConfig.messaging_channel_secret
     @access_token = access_token || LineConfig.access_token
     validate_credentials!
   end

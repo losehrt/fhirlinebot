@@ -28,8 +28,8 @@ RSpec.describe LineMessagingService do
     end
 
     it 'uses LineConfig when no credentials provided' do
-      allow(LineConfig).to receive(:channel_id).and_return(channel_id)
-      allow(LineConfig).to receive(:channel_secret).and_return(channel_secret)
+      allow(LineConfig).to receive(:messaging_channel_id).and_return(channel_id)
+      allow(LineConfig).to receive(:messaging_channel_secret).and_return(channel_secret)
       allow(LineConfig).to receive(:access_token).and_return(access_token)
 
       service = LineMessagingService.new
