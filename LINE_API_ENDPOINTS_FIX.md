@@ -10,23 +10,32 @@
 
 ### 旧的（错误的）Endpoints：
 ```
-TOKEN_ENDPOINT: https://api.line.biz/v2.0/token     ❌
-AUTH_ENDPOINT:  https://web.line.biz/web/login      ❌
+TOKEN_ENDPOINT: https://api.line.biz/v2.0/token           ❌
+AUTH_ENDPOINT:  https://web.line.biz/web/login            ❌
 ```
 
-### 新的（正确的）Endpoints：
+### 第一次修复（部分正确）：
 ```
-TOKEN_ENDPOINT: https://api.line.me/oauth2/v2.1/token  ✓
-AUTH_ENDPOINT:  https://web.line.me/web/login          ✓
+TOKEN_ENDPOINT: https://api.line.me/oauth2/v2.1/token     ✓
+AUTH_ENDPOINT:  https://web.line.me/web/login             ⚠️ (DNS 解析失败)
+```
+
+### 最终（完全正确）的 Endpoints：
+```
+TOKEN_ENDPOINT: https://api.line.me/oauth2/v2.1/token              ✓
+AUTH_ENDPOINT:  https://access.line.me/oauth2/v2.1/authorize       ✓
 ```
 
 ## 解决方案
 
-### Commit: `c5792ae`
-更新 `app/services/line_auth_service.rb`：
-- 使用 LINE Login v2.1 官方 OAuth2 endpoints
-- TOKEN_ENDPOINT 从 `api.line.biz` 改为 `api.line.me/oauth2/v2.1`
-- AUTH_ENDPOINT 从 `web.line.biz` 改为 `web.line.me`
+### Commit 1: `c5792ae`
+使用 LINE Login v2.1 官方 OAuth2 endpoints（初始修复）
+
+### Commit 2: `e9cf6f7`
+修正授权端点到标准 OAuth2 spec：
+- AUTH_ENDPOINT 从 `https://web.line.me/web/login` 改为 `https://access.line.me/oauth2/v2.1/authorize`
+
+这是关键修复，因为 `web.line.me` 导致 DNS 解析错误。标准的 OAuth2 授权端点应该使用 `access.line.me`。
 
 ## 验证
 
