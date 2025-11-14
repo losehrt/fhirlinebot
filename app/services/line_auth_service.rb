@@ -7,7 +7,7 @@ class LineAuthService
   TOKEN_ENDPOINT = 'https://api.line.me/oauth2/v2.1/token'
   PROFILE_ENDPOINT = 'https://api.line.me/v2/profile'
   # Authorization endpoint for user consent
-  AUTH_ENDPOINT = 'https://web.line.me/web/login'
+  AUTH_ENDPOINT = 'https://access.line.me/oauth2/v2.1/authorize'
 
   def initialize(channel_id = nil, channel_secret = nil)
     # Priority: explicit params > environment variables > database settings
