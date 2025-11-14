@@ -1,0 +1,72 @@
+<% content_for :title, "LINE Login - FHIR Healthcare Platform" %>
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo and Title -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">FHIR Healthcare</h1>
+      <p class="text-gray-600">醫療數據平台</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+        LINE Login
+      </h2>
+
+      <p class="text-gray-600 text-center mb-8">
+        使用你的 LINE 帳號登入
+      </p>
+
+      <!-- LINE Login Button -->
+      <button
+        id="line-login-button"
+        data-action="click->auth-login#requestLogin"
+        data-controller="auth-login"
+        class="w-full bg-[#00B900] hover:bg-[#009900] text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 4.06 0 9.09c0 3.14 2.23 5.87 5.35 7.48v4.96c0 .59.6.95 1.13.65l3.1-1.96c.5.08 1.02.12 1.57.12 6.63 0 12-4.06 12-9.09S18.63 0 12 0m1.28 11.07H9.49v2.33H7.78v-2.33H6.07v-1.71h1.71V8.05h1.71v1.31h3.79v1.71m2.82 0h-4.96v-4.04h4.96v4.04z"/>
+        </svg>
+        使用 LINE 登入
+      </button>
+
+      <!-- Divider -->
+      <div class="relative my-8">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">或</span>
+        </div>
+      </div>
+
+      <!-- Additional Login Options -->
+      <div class="text-center text-sm text-gray-600 mb-6">
+        <p>其他登入選項即將推出</p>
+      </div>
+
+      <!-- Info Text -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-gray-700 text-center">
+        <p>這是一個醫療數據平台。需要使用 LINE 登入以確保安全訪問。</p>
+      </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div class="mt-8 text-center text-sm text-gray-600">
+      <p>
+        <a href="<%= root_path %>" class="text-blue-600 hover:text-blue-800 font-medium">
+          返回首頁
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hide sidebar and navbar for login page */
+  [data-controller="sidebar"],
+  [data-controller="navbar"] {
+    display: none;
+  }
+</style>
