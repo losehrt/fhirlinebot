@@ -6,7 +6,7 @@ class LineConfiguration < ApplicationRecord
   # encrypts :channel_secret, deterministic: true
 
   # 驗證
-  validates :channel_id, :channel_secret, :redirect_uri, presence: true
+  validates :channel_id, :channel_secret, :redirect_uri, :access_token, presence: true
   validates :name, presence: true
   validates :channel_id, uniqueness: true
   validates :is_default, :is_active, inclusion: { in: [true, false] }

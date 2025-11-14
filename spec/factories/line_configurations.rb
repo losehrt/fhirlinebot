@@ -4,6 +4,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Channel #{n}" }
     sequence(:channel_id) { |n| "CHANNEL_#{n}" }
     sequence(:channel_secret) { |n| "SECRET_#{n}" }
+    sequence(:access_token) { |n| "ACCESS_TOKEN_#{n}" }
     sequence(:redirect_uri) { |n| "https://example.com/callback#{n}" }
     is_default { false }
     is_active { true }

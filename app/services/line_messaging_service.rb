@@ -25,9 +25,11 @@ class LineMessagingService
   #
   # @param channel_id [String, nil] LINE Channel ID
   # @param channel_secret [String, nil] LINE Channel Secret
-  def initialize(channel_id: nil, channel_secret: nil)
+  # @param access_token [String, nil] LINE Channel Access Token for Messaging API
+  def initialize(channel_id: nil, channel_secret: nil, access_token: nil)
     @channel_id = channel_id || LineConfig.channel_id
     @channel_secret = channel_secret || LineConfig.channel_secret
+    @access_token = access_token || LineConfig.access_token
     validate_credentials!
   end
 
@@ -243,18 +245,19 @@ class LineMessagingService
                 raise "Unsupported method: #{method}"
               end
 
-    request['Authorization'] = "Bearer #{@channel_secret}"
+    request['Authorization'] = "Bearer #{@access_token}"
     request['Content-Type'] = 'application/json'
 
     if body
       request.body = body
     end
 
-    Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      # Disable SSL verification - CA certificates not available in deployment
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.request(request)
-    end
+    # Create HTTP connection and disable SSL verification before connecting
+    # CA certificates not available in deployment environment
+    http = Net::HTTP.new(uri.hostname, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.request(request)
   end
 
   # Process a single event from webhook

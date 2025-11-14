@@ -17,21 +17,25 @@ RSpec.describe LineMessagingService do
 
   let(:channel_id) { '2008492815' }
   let(:channel_secret) { 'f6909227204f50c8f43e78f9393315ae' }
-  let(:service) { LineMessagingService.new(channel_id:, channel_secret:) }
+  let(:access_token) { 'test_access_token_1234567890' }
+  let(:service) { LineMessagingService.new(channel_id:, channel_secret:, access_token:) }
 
   describe 'initialization' do
-    it 'initializes with channel_id and channel_secret' do
+    it 'initializes with channel_id, channel_secret, and access_token' do
       expect(service.instance_variable_get(:@channel_id)).to eq(channel_id)
       expect(service.instance_variable_get(:@channel_secret)).to eq(channel_secret)
+      expect(service.instance_variable_get(:@access_token)).to eq(access_token)
     end
 
     it 'uses LineConfig when no credentials provided' do
       allow(LineConfig).to receive(:channel_id).and_return(channel_id)
       allow(LineConfig).to receive(:channel_secret).and_return(channel_secret)
+      allow(LineConfig).to receive(:access_token).and_return(access_token)
 
       service = LineMessagingService.new
       expect(service.instance_variable_get(:@channel_id)).to eq(channel_id)
       expect(service.instance_variable_get(:@channel_secret)).to eq(channel_secret)
+      expect(service.instance_variable_get(:@access_token)).to eq(access_token)
     end
   end
 
@@ -43,7 +47,7 @@ RSpec.describe LineMessagingService do
       stub_request(:post, 'https://api.line.me/v2/bot/message/push')
         .with(
           headers: {
-            'Authorization' => "Bearer #{channel_secret}",
+            'Authorization' => "Bearer #{access_token}",
             'Content-Type' => 'application/json'
           }
         )

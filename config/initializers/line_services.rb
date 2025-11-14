@@ -1,5 +1,5 @@
-# Load LINE event handlers to ensure they're available in production
+# 讓 Zeitwerk 追蹤 LINE handler，避免 superclass mismatch
 Rails.application.config.to_prepare do
-  load File.expand_path('../../app/services/line_event_handler.rb', __dir__)
-  load File.expand_path('../../app/services/line_event_handlers.rb', __dir__)
+  ActiveSupport::Dependencies.require_dependency(Rails.root.join('app/services/line_event_handler'))
+  ActiveSupport::Dependencies.require_dependency(Rails.root.join('app/services/line_event_handlers'))
 end

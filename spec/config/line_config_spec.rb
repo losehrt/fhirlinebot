@@ -110,6 +110,64 @@ RSpec.describe LineConfig, type: :model do
     end
   end
 
+  describe '.access_token' do
+    context 'when environment variable is set' do
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('LINE_CHANNEL_ACCESS_TOKEN').and_return('ENV_ACCESS_TOKEN')
+      end
+
+      it 'returns environment variable value' do
+        LineConfig.refresh!
+        expect(LineConfig.access_token).to eq('ENV_ACCESS_TOKEN')
+      end
+    end
+
+    context 'when database config exists' do
+      let!(:config) { create(:line_configuration, organization: nil, access_token: 'DB_ACCESS_TOKEN', is_default: true) }
+
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_CHANNEL_ID').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_CHANNEL_SECRET').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_CHANNEL_ACCESS_TOKEN').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_REDIRECT_URI').and_return(nil)
+      end
+
+      it 'returns database configuration' do
+        LineConfig.refresh!
+        result = LineConfig.access_token
+        expect(result).to eq('DB_ACCESS_TOKEN')
+      end
+
+      context 'with organization_id parameter' do
+        let(:org) { create(:organization) }
+        let!(:org_config) { create(:line_configuration, organization: org, access_token: 'ORG_ACCESS_TOKEN', is_default: true) }
+
+        it 'returns organization-specific configuration' do
+          LineConfig.refresh!
+          result = LineConfig.access_token(organization_id: org.id)
+          expect(result).to eq('ORG_ACCESS_TOKEN')
+        end
+      end
+    end
+
+    context 'when neither environment nor database config exists' do
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('LINE_CHANNEL_ACCESS_TOKEN').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_CHANNEL_ID').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_CHANNEL_SECRET').and_return(nil)
+        allow(ENV).to receive(:[]).with('LINE_LOGIN_REDIRECT_URI').and_return(nil)
+      end
+
+      it 'returns nil' do
+        LineConfig.refresh!
+        expect(LineConfig.access_token).to be_nil
+      end
+    end
+  end
+
   describe '.redirect_uri' do
     context 'when environment variable is set' do
       before do

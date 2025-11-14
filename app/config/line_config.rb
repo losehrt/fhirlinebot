@@ -85,6 +85,36 @@ class LineConfig
         default_redirect_uri
     end
 
+    # Get LINE Channel Access Token for Messaging API
+    # Priority: Credentials > ENV > Database (org-specific) > Database (global)
+    #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
+    # @return [String, nil] Channel Access Token or nil if not configured
+    def access_token(organization_id: nil)
+      @config_cache ||= {}
+      cache_key = "line_config_access_token_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
+
+      # Priority 1: Rails Credentials
+      cred_token = credentials_access_token
+      if cred_token.present?
+        return @config_cache[cache_key] = cred_token
+      end
+
+      # Priority 2: Environment variable (global default)
+      if ENV['LINE_CHANNEL_ACCESS_TOKEN'].present?
+        return @config_cache[cache_key] = ENV['LINE_CHANNEL_ACCESS_TOKEN']
+      end
+
+      # Priority 3: Database configuration (organization-specific or global)
+      db_config = database_config(organization_id)
+      if db_config&.access_token.present?
+        return @config_cache[cache_key] = db_config.access_token
+      end
+
+      nil
+    end
+
     # Get all configuration as a hash
     #
     # @param organization_id [Integer, nil] Organization ID for multi-tenant support
@@ -156,6 +186,23 @@ class LineConfig
       result
     rescue => e
       Rails.logger.debug("Could not load LINE channel_secret from credentials: #{e.message}")
+      nil
+    end
+
+    # Get LINE Channel Access Token from Rails credentials
+    # Supports both 'line_login' and 'line' keys for compatibility
+    # Only reads if credentials are fully loaded and available
+    #
+    # @return [String, nil] Channel Access Token from credentials or nil
+    def credentials_access_token
+      return nil unless credentials_available?
+
+      # Try 'line_login' first, then fallback to 'line'
+      result = Rails.application.credentials&.dig(:line_login, :access_token)
+      result ||= Rails.application.credentials&.dig(:line, :access_token)
+      result
+    rescue => e
+      Rails.logger.debug("Could not load LINE access_token from credentials: #{e.message}")
       nil
     end
 

@@ -14,7 +14,8 @@ RSpec.describe 'LINE Event Handlers' do
 
   let(:channel_id) { '2008492815' }
   let(:channel_secret) { 'f6909227204f50c8f43e78f9393315ae' }
-  let(:messaging_service) { LineMessagingService.new(channel_id:, channel_secret:) }
+  let(:access_token) { 'test_access_token_1234567890' }
+  let(:messaging_service) { LineMessagingService.new(channel_id:, channel_secret:, access_token:) }
   let(:user_id) { 'U206d25c2ea6bd87c17655609a1c37cb8' }
 
   describe MessageHandler do
