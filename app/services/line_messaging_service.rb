@@ -171,8 +171,17 @@ class LineMessagingService
   # @param signature [String] X-Line-Signature header value
   # @return [Boolean] true if signature is valid
   def validate_webhook_signature(body, signature)
-    calculated_signature = calculate_signature(body)
+    calculated_signature = calculate_webhook_signature(body)
     calculated_signature == signature
+  end
+
+  # Calculate webhook signature for debugging/logging
+  # LINE uses HMAC SHA256 of the request body
+  #
+  # @param body [String] Raw request body
+  # @return [String] Base64-encoded HMAC SHA256 signature
+  def calculate_webhook_signature(body)
+    calculate_signature(body)
   end
 
   private

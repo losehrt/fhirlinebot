@@ -47,7 +47,8 @@ RSpec.describe 'LINE Webhook', type: :request do
         allow(LineMessagingService).to receive(:new).and_return(
           instance_double('LineMessagingService',
                          handle_webhook: true,
-                         validate_webhook_signature: true)
+                         validate_webhook_signature: true,
+                         calculate_webhook_signature: signature)
         )
 
         post webhook_path,
@@ -66,7 +67,8 @@ RSpec.describe 'LINE Webhook', type: :request do
       it 'rejects webhook' do
         allow(LineMessagingService).to receive(:new).and_return(
           instance_double('LineMessagingService',
-                         validate_webhook_signature: false)
+                         validate_webhook_signature: false,
+                         calculate_webhook_signature: 'different_signature')
         )
 
         post webhook_path,
@@ -131,7 +133,8 @@ RSpec.describe 'LINE Webhook', type: :request do
         allow(LineMessagingService).to receive(:new).and_return(
           instance_double('LineMessagingService',
                          handle_webhook: true,
-                         validate_webhook_signature: true)
+                         validate_webhook_signature: true,
+                         calculate_webhook_signature: signature_multi)
         )
 
         post webhook_path,

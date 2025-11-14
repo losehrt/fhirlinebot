@@ -3,13 +3,14 @@ module Webhooks
     skip_before_action :require_setup_completion
     skip_before_action :verify_authenticity_token
 
+    before_action :cache_raw_body, only: [:create]
     before_action :ensure_event_handlers_loaded
 
     # POST /webhooks/line
     # Receive and process LINE webhook events
     def create
-      # Get the raw request body for signature validation
-      body = request.raw_post
+      # Get the cached raw request body for signature validation
+      body = @raw_body
 
       # Get the signature from headers
       signature = request.headers['X-Line-Signature']
@@ -48,6 +49,12 @@ module Webhooks
 
     private
 
+    def cache_raw_body
+      # Cache the raw request body before Rails parses it
+      # This ensures we have the exact bytes that LINE used to create the signature
+      @raw_body = request.raw_post
+    end
+
     def ensure_event_handlers_loaded
       # Trigger Rails autoloader by referencing the handler classes
       # This ensures they're loaded before webhook processing
@@ -71,7 +78,17 @@ module Webhooks
 
       begin
         service = LineMessagingService.new
-        service.validate_webhook_signature(body, signature)
+        calculated_signature = service.calculate_webhook_signature(body)
+
+        Rails.logger.debug("Signature comparison:")
+        Rails.logger.debug("  Received: #{signature[0..20]}...")
+        Rails.logger.debug("  Calculated: #{calculated_signature[0..20]}...")
+        Rails.logger.debug("  Body length: #{body.bytesize} bytes")
+
+        result = calculated_signature == signature
+        Rails.logger.info("Webhook signature validation: #{result ? 'VALID' : 'INVALID'}")
+
+        result
       rescue StandardError => e
         Rails.logger.error("Webhook signature validation error: #{e.class} - #{e.message}")
         false
