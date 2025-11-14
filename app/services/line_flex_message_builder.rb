@@ -70,7 +70,7 @@ class LineFlexMessageBuilder
         }
       ],
       margin: 'md',
-      padding: 'md',
+      paddingAll: 'md',
       backgroundColor: '#F5F5F5'
     }
 
