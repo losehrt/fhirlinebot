@@ -15,11 +15,8 @@ module Webhooks
       # Get the signature from headers
       signature = request.headers['X-Line-Signature']
 
-      Rails.logger.info("Webhook received: signature=#{signature&.first(10)}..., body_length=#{body.bytesize}")
-
       # Validate the webhook signature
       unless signature_valid?(body, signature)
-        Rails.logger.warn("Webhook signature validation failed for body: #{body[0..100]}")
         render json: { error: 'Invalid signature' }, status: :unauthorized
         return
       end
@@ -32,12 +29,11 @@ module Webhooks
         service = LineMessagingService.new
       rescue StandardError => e
         Rails.logger.error("Failed to initialize LineMessagingService: #{e.class} - #{e.message}")
-        Rails.logger.error("Webhook payload received but LineMessagingService initialization failed")
         render json: { success: true }, status: :ok
         return
       end
 
-      result = service.handle_webhook(payload)
+      service.handle_webhook(payload)
 
       # Always return 200 OK to LINE, regardless of processing result
       # Async jobs handle actual message processing and error handling
@@ -47,8 +43,6 @@ module Webhooks
       render json: { error: 'Invalid JSON' }, status: :bad_request
     rescue StandardError => e
       Rails.logger.error("Webhook processing error: #{e.class} - #{e.message}")
-      Rails.logger.error("Backtrace:")
-      Rails.logger.error(e.backtrace.join("\n"))
       # Still return 200 to LINE so they don't retry
       render json: { success: true }, status: :ok
     end
@@ -65,7 +59,6 @@ module Webhooks
       # Cache the raw request body before Rails parses it
       # This ensures we have the exact bytes that LINE used to create the signature
       @raw_body = request.raw_post
-      Rails.logger.debug("Raw body cached: #{@raw_body[0..100]}... (#{@raw_body.bytesize} bytes)")
     end
 
     def ensure_event_handlers_loaded
@@ -92,16 +85,7 @@ module Webhooks
       begin
         service = LineMessagingService.new
         calculated_signature = service.calculate_webhook_signature(body)
-
-        Rails.logger.debug("Signature comparison:")
-        Rails.logger.debug("  Received: #{signature[0..20]}...")
-        Rails.logger.debug("  Calculated: #{calculated_signature[0..20]}...")
-        Rails.logger.debug("  Body length: #{body.bytesize} bytes")
-
-        result = calculated_signature == signature
-        Rails.logger.info("Webhook signature validation: #{result ? 'VALID' : 'INVALID'}")
-
-        result
+        calculated_signature == signature
       rescue StandardError => e
         Rails.logger.error("Webhook signature validation error: #{e.class} - #{e.message}")
         false
