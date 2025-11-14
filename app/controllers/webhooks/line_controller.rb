@@ -14,8 +14,11 @@ module Webhooks
       # Get the signature from headers
       signature = request.headers['X-Line-Signature']
 
+      Rails.logger.info("Webhook received: signature=#{signature&.first(10)}..., body_length=#{body.bytesize}")
+
       # Validate the webhook signature
       unless signature_valid?(body, signature)
+        Rails.logger.warn("Webhook signature validation failed for body: #{body[0..100]}")
         render json: { error: 'Invalid signature' }, status: :unauthorized
         return
       end
@@ -66,8 +69,13 @@ module Webhooks
     def signature_valid?(body, signature)
       return false if signature.blank?
 
-      service = LineMessagingService.new
-      service.validate_webhook_signature(body, signature)
+      begin
+        service = LineMessagingService.new
+        service.validate_webhook_signature(body, signature)
+      rescue StandardError => e
+        Rails.logger.error("Webhook signature validation error: #{e.class} - #{e.message}")
+        false
+      end
     end
   end
 end

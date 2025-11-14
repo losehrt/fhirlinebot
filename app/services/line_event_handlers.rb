@@ -1,3 +1,8 @@
+# LineEventHandlers - Namespace for all event handler classes
+# This module serves as a container for Zeitwerk autoloading
+module LineEventHandlers
+end
+
 # Message event handler for TEXT, IMAGE, LOCATION, etc.
 class MessageHandler < LineEventHandler
   def call
