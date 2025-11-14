@@ -67,9 +67,12 @@ class MessageHandler < LineEventHandler
     return false unless @user_id
 
     flex_message = LineFlexMessageBuilder.build_text_reply(text)
-    @messaging_service.send_flex_message(@user_id, flex_message)
+    result = @messaging_service.send_flex_message(@user_id, flex_message)
+    Rails.logger.info("[LINE Webhook] Flex message sent to #{@user_id}: #{result}")
+    result
   rescue StandardError => e
     Rails.logger.error("[LINE Webhook] Failed to send flex message: #{e.class} - #{e.message}")
+    Rails.logger.error(e.backtrace.join("\n"))
     false
   end
 

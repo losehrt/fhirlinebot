@@ -210,10 +210,17 @@ class LineMessagingService
     response = make_request(:post, PUSH_MESSAGE_URL, message_body.to_json)
 
     unless response.code.to_i == 200
-      error_data = JSON.parse(response.body)
-      raise MessageError, "Failed to send message: #{error_data['message']}"
+      error_body = response.body
+      Rails.logger.error("[LineMessagingService] Push API response: #{response.code} - #{error_body}")
+      begin
+        error_data = JSON.parse(error_body)
+        raise MessageError, "Failed to send message: #{error_data['message']}"
+      rescue JSON::ParserError
+        raise MessageError, "Failed to send message: #{error_body}"
+      end
     end
 
+    Rails.logger.debug("[LineMessagingService] Push message successful (200 OK)")
     true
   end
 

@@ -11,6 +11,8 @@ class LineFlexMessageBuilder
   # @param user_text [String] The text to display
   # @return [Hash] Flex message container structure
   def self.build_text_reply(user_text)
+    Rails.logger.debug("[LineFlexMessageBuilder] Building flex message for text: #{user_text.to_s[0..50]}")
+
     {
       type: 'box',
       layout: 'vertical',
