@@ -42,7 +42,13 @@ class ApplicationSetting < ApplicationRecord
         )
         true
       else
-        update(validation_error: 'Invalid LINE credentials')
+        # Provide more context about why validation failed
+        error_msg = if !validator.valid_format?
+          'Invalid LINE credentials format. Channel ID should be 8+ digits, Secret should be 20+ characters'
+        else
+          'Unable to connect to LINE API. Please check your network connection and verify your credentials are correct on the LINE Developer Console'
+        end
+        update(validation_error: error_msg)
         false
       end
     rescue StandardError => e

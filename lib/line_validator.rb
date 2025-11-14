@@ -33,13 +33,13 @@ class LineValidator
     end
   end
 
-  private
-
   # Check if credentials meet basic format requirements
   def valid_format?
     # Channel ID should be numeric and reasonable length
     # Channel Secret should be a string with reasonable length
-    @channel_id.to_s.length >= 8 && @channel_secret.to_s.length >= 20
+    channel_id_valid = @channel_id.to_s.match?(/^\d{8,}$/)
+    channel_secret_valid = @channel_secret.to_s.length >= 20
+    channel_id_valid && channel_secret_valid
   end
 
   # Check if we can reach LINE API
@@ -60,10 +60,17 @@ class LineValidator
         # If we get connection error, API is not reachable
         response.is_a?(Net::HTTPUnauthorized) || response.is_a?(Net::HTTPBadRequest)
       end
-    rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+    rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Socket::ResolutionError, SocketError => e
+      Rails.logger.warn("LINE API network error: #{e.class} - #{e.message}")
       false
-    rescue StandardError
-      # Even if there's an error, as long as we can reach the endpoint, consider it valid
+    rescue OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
+      # SSL certificate errors are expected when credentials are being tested
+      # If we can reach the API despite SSL errors, consider it reachable
+      Rails.logger.warn("LINE API SSL/connection error: #{e.class} - #{e.message}")
+      false
+    rescue StandardError => e
+      # Log the error for debugging
+      Rails.logger.warn("LINE API validation error: #{e.class} - #{e.message}")
       false
     end
   end
