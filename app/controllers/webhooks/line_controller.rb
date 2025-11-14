@@ -31,14 +31,17 @@ module Webhooks
       service = LineMessagingService.new
       result = service.handle_webhook(payload)
 
-      if result
-        render json: { success: true }, status: :ok
-      else
-        render json: { error: 'Failed to process webhook' }, status: :unprocessable_entity
-      end
+      # Always return 200 OK to LINE, regardless of processing result
+      # Async jobs handle actual message processing and error handling
+      render json: { success: true }, status: :ok
     rescue JSON::ParserError => e
       Rails.logger.error("Failed to parse webhook payload: #{e.message}")
       render json: { error: 'Invalid JSON' }, status: :bad_request
+    rescue StandardError => e
+      Rails.logger.error("Webhook processing error: #{e.class} - #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
+      # Still return 200 to LINE so they don't retry
+      render json: { success: true }, status: :ok
     end
 
     # GET /webhooks/line
