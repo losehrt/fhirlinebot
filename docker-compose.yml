@@ -32,9 +32,9 @@ services:
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/fhirlinebot_development
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-development}
-      LINE_LOGIN_CHANNEL_ID: ${LINE_LOGIN_CHANNEL_ID}
-      LINE_LOGIN_CHANNEL_SECRET: ${LINE_LOGIN_CHANNEL_SECRET}
-      LINE_LOGIN_REDIRECT_URI: http://localhost:3000/auth/line/callback
+      # LINE_LOGIN_CHANNEL_ID: ${LINE_LOGIN_CHANNEL_ID}
+      # LINE_LOGIN_CHANNEL_SECRET: ${LINE_LOGIN_CHANNEL_SECRET}
+      # LINE_LOGIN_REDIRECT_URI: http://localhost:3000/auth/line/callback
       APP_URL: http://localhost:3000
     volumes:
       - .:/rails

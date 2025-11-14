@@ -38,9 +38,6 @@ env:
     - RAILS_MASTER_KEY
     - POSTGRES_USER
     - POSTGRES_PASSWORD
-    - LINE_LOGIN_CHANNEL_ID
-    - LINE_LOGIN_CHANNEL_SECRET
-    - LINE_LOGIN_REDIRECT_URI
   clear:
     # Database Configuration
     RAILS_ENV: production

@@ -42,3 +42,7 @@
 claude-swarm.log
 
 /config/credentials/production.key
+
+/config/credentials/environment.key
+
+/config/credentials/development.key

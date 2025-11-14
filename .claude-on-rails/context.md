@@ -28,4 +28,4 @@ When working on this project:
 
 **Do not use EMOJI icons**
 
-## 每次都要使用 TDD 來開發
+## 每次都要使用 TDD 開發
