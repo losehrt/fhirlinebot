@@ -49,7 +49,7 @@ RSpec.describe 'LINE Event Handlers' do
         expect(LineMessage).to have_received(:create)
       end
 
-      it 'echoes back the text message' do
+      it 'queues echo job for text message' do
         text = 'Hello Bot'
         event = {
           'type' => 'message',
@@ -66,13 +66,16 @@ RSpec.describe 'LINE Event Handlers' do
           }
         }
 
-        allow(messaging_service).to receive(:send_text_message).and_return(true)
-
         handler = MessageHandler.new(event, messaging_service)
-        result = handler.call
 
-        expect(result).to be_truthy
-        expect(messaging_service).to have_received(:send_text_message).with(user_id, text)
+        expect {
+          handler.call
+        }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
+
+        # Verify the job is an EchoJob with correct parameters
+        job = ActiveJob::Base.queue_adapter.enqueued_jobs.last
+        expect(job[:job]).to eq(EchoJob)
+        expect(job[:args]).to eq([user_id, text])
       end
     end
 

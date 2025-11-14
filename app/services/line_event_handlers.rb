@@ -45,9 +45,10 @@ class MessageHandler < LineEventHandler
       timestamp: @timestamp
     )
 
-    # Echo the message back to the user
-    echo_service = EchoService.new(@messaging_service)
-    echo_service.echo(@user_id, text)
+    # Queue echo job to send message asynchronously
+    EchoJob.perform_later(@user_id, text)
+
+    true
   end
 
   def handle_image_message(message)
