@@ -53,7 +53,24 @@ class MessageHandler < LineEventHandler
     # Reply with echo message immediately
     send_reply(text)
 
+    # Also send a flex message for rich formatting
+    send_flex_reply(text)
+
     true
+  end
+
+  # Send a flex message to the user
+  #
+  # @param text [String] The text to display in flex message
+  # @return [Boolean] true if successful
+  def send_flex_reply(text)
+    return false unless @user_id
+
+    flex_message = LineFlexMessageBuilder.build_text_reply(text)
+    @messaging_service.send_flex_message(@user_id, flex_message)
+  rescue StandardError => e
+    Rails.logger.error("[LINE Webhook] Failed to send flex message: #{e.class} - #{e.message}")
+    false
   end
 
   def handle_image_message(message)

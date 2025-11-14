@@ -71,12 +71,47 @@ RSpec.describe 'LINE Event Handlers' do
         }
 
         allow(messaging_service).to receive(:reply_message).and_return(true)
+        allow(messaging_service).to receive(:send_flex_message).and_return(true)
 
         handler = MessageHandler.new(event, messaging_service)
         result = handler.call
 
         expect(result).to be_truthy
         expect(messaging_service).to have_received(:reply_message).with('nHuyWiB7yP5Zw52FIkcQT', 'Hello Bot')
+        expect(messaging_service).to have_received(:send_flex_message).with(user_id, anything)
+      end
+
+      it 'sends both text reply and flex message for text input' do
+        text = 'Test message'
+        event = {
+          'type' => 'message',
+          'message' => {
+            'type' => 'text',
+            'id' => '100001',
+            'text' => text
+          },
+          'timestamp' => 1462629479859,
+          'replyToken' => 'nHuyWiB7yP5Zw52FIkcQT',
+          'source' => {
+            'type' => 'user',
+            'userId' => user_id
+          }
+        }
+
+        allow(messaging_service).to receive(:reply_message).and_return(true)
+        allow(messaging_service).to receive(:send_flex_message).and_return(true)
+
+        handler = MessageHandler.new(event, messaging_service)
+        handler.call
+
+        # Verify both messages are sent
+        expect(messaging_service).to have_received(:reply_message).with('nHuyWiB7yP5Zw52FIkcQT', text)
+        expect(messaging_service).to have_received(:send_flex_message) do |uid, flex_msg|
+          expect(uid).to eq(user_id)
+          expect(flex_msg).to be_a(Hash)
+          expect(flex_msg[:type]).to eq('box')
+          expect(flex_msg[:layout]).to eq('vertical')
+        end
       end
     end
 
