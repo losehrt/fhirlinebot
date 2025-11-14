@@ -37,7 +37,7 @@ class SetupController < ApplicationController
 
     # Check if credentials are provided
     if params[:line_channel_id].blank? || params[:line_channel_secret].blank?
-      flash[:alert] = 'Please provide both Channel ID and Secret'
+      flash[:alert] = '請提供 Channel ID 和 Channel Secret'
       redirect_to setup_path and return
     end
 
@@ -45,14 +45,26 @@ class SetupController < ApplicationController
     @setting.line_channel_id = params[:line_channel_id]
     @setting.line_channel_secret = params[:line_channel_secret]
 
-    # Validate before saving
-    if @setting.validate_line_credentials!
+    # Validate and save
+    validation_result = @setting.validate_line_credentials!
+
+    if validation_result
+      # Validation successful
       flash[:notice] = 'LINE credentials configured successfully! Redirecting to application...'
       redirect_to root_path
     else
-      @setting.save # Save with configured = false
-      flash[:alert] = "Configuration failed: #{@setting.validation_error}"
-      redirect_to setup_path
+      # Validation failed but save anyway with unverified status
+      @setting.update(configured: false) # Mark as not fully configured
+
+      if @setting.validation_error&.include?("format")
+        # Format error - don't allow saving
+        flash[:alert] = "無法儲存：#{@setting.validation_error}"
+        redirect_to setup_path
+      else
+        # Network/connectivity error - allow saving but warn user
+        flash[:warning] = "憑證已儲存，但驗證失敗：#{@setting.validation_error}。您可以在登入頁面測試實際連線。"
+        redirect_to root_path
+      end
     end
   end
 

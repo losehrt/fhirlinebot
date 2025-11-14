@@ -194,11 +194,17 @@
               <button
                 type="submit"
                 data-setup-target="saveBtn"
-                class="flex-1 px-4 py-2.5 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
-                disabled
+                class="flex-1 px-4 py-2.5 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition text-sm"
               >
                 儲存並繼續
               </button>
+            </div>
+
+            <!-- Note about validation -->
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p class="text-xs text-blue-700">
+                提示：您可以先儲存憑證。如果驗證失敗可能是網路連線問題，儲存後可在登入頁面測試實際連線。
+              </p>
             </div>
 
             <% if @configured %>
