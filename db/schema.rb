@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_052839) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_123718) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_052839) do
     t.index ["organization_id", "is_active"], name: "index_line_configurations_on_organization_id_and_is_active"
     t.index ["organization_id", "is_default"], name: "index_line_configurations_on_organization_id_and_is_default", unique: true, where: "(is_default = true)"
     t.index ["organization_id"], name: "index_line_configurations_on_organization_id"
+  end
+
+  create_table "line_messages", force: :cascade do |t|
+    t.string "line_user_id"
+    t.string "message_type"
+    t.text "content"
+    t.string "line_message_id"
+    t.integer "timestamp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "line_postbacks", force: :cascade do |t|
+    t.string "line_user_id"
+    t.string "data"
+    t.json "params"
+    t.integer "timestamp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "organizations", force: :cascade do |t|

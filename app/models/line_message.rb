@@ -1,0 +1,2 @@
+class LineMessage < ApplicationRecord
+end
