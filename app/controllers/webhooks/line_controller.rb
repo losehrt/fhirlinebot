@@ -3,6 +3,10 @@ module Webhooks
     skip_before_action :require_setup_completion
     skip_before_action :verify_authenticity_token
 
+    # Ensure event handlers are loaded
+    require_relative '../../services/line_event_handler'
+    require_relative '../../services/line_event_handlers'
+
     # POST /webhooks/line
     # Receive and process LINE webhook events
     def create
