@@ -9,8 +9,9 @@ class LineAuthService
   AUTH_ENDPOINT = 'https://web.line.biz/web/login'
 
   def initialize(channel_id = nil, channel_secret = nil)
-    @channel_id = channel_id || ENV['LINE_LOGIN_CHANNEL_ID']
-    @channel_secret = channel_secret || ENV['LINE_LOGIN_CHANNEL_SECRET']
+    # Priority: explicit params > environment variables > database settings
+    @channel_id = channel_id || ENV['LINE_LOGIN_CHANNEL_ID'] || ApplicationSetting.current&.line_channel_id
+    @channel_secret = channel_secret || ENV['LINE_LOGIN_CHANNEL_SECRET'] || ApplicationSetting.current&.line_channel_secret
     validate_credentials!
   end
 
