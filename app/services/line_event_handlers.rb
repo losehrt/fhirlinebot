@@ -50,33 +50,17 @@ class MessageHandler < LineEventHandler
       @timestamp
     )
 
-    # Reply with echo message immediately
-    send_reply(text)
-
-    # Also send a flex message for rich formatting
-    send_flex_reply(text)
+    # Send response using strategy pattern
+    response_mode = LineConfig.response_mode || :flex
+    strategy = LineMessageResponseStrategy.for(response_mode)
+    strategy.execute(
+      messaging_service: @messaging_service,
+      user_id: @user_id,
+      reply_token: @reply_token,
+      text: text
+    )
 
     true
-  end
-
-  # Send a flex message to the user
-  #
-  # @param text [String] The text to display in flex message
-  # @return [Boolean] true if successful
-  def send_flex_reply(text)
-    return false unless @user_id
-
-    Rails.logger.info("[LINE Webhook] Attempting to send flex message to #{@user_id}")
-    flex_message = LineFlexMessageBuilder.build_text_reply(text)
-    Rails.logger.debug("[LINE Webhook] Flex message structure: #{flex_message.inspect}")
-
-    result = @messaging_service.send_flex_message(@user_id, flex_message)
-    Rails.logger.info("[LINE Webhook] Flex message sent to #{@user_id}: #{result}")
-    result
-  rescue StandardError => e
-    Rails.logger.error("[LINE Webhook] Failed to send flex message: #{e.class} - #{e.message}")
-    Rails.logger.error("[LINE Webhook] Backtrace: #{e.backtrace.join("\n")}")
-    false
   end
 
   def handle_image_message(message)

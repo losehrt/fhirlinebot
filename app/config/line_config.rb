@@ -115,6 +115,33 @@ class LineConfig
       nil
     end
 
+    # Get response mode for text message replies
+    # Priority: ENV > Database (org-specific) > Database (global) > Default (:flex)
+    #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
+    # @return [Symbol] Response mode (:flex, :text, etc.)
+    def response_mode(organization_id: nil)
+      @config_cache ||= {}
+      cache_key = "line_config_response_mode_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache.key?(cache_key)
+
+      # Priority 1: Environment variable
+      if ENV['LINE_RESPONSE_MODE'].present?
+        mode = ENV['LINE_RESPONSE_MODE'].downcase.to_sym
+        return @config_cache[cache_key] = mode
+      end
+
+      # Priority 2: Database configuration (organization-specific or global)
+      db_config = database_config(organization_id)
+      if db_config&.response_mode.present?
+        mode = db_config.response_mode.downcase.to_sym
+        return @config_cache[cache_key] = mode
+      end
+
+      # Default: flex mode (sends both text and styled flex message)
+      @config_cache[cache_key] = :flex
+    end
+
     # Get LINE Messaging API Channel ID
     # This is separate from LINE Login channel_id as they are independent channels
     # Priority: Credentials > ENV > Database (org-specific) > Database (global)

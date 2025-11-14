@@ -8,16 +8,18 @@ RSpec.describe LineFlexMessageBuilder do
       flex = LineFlexMessageBuilder.build_text_reply(text)
 
       expect(flex).to be_a(Hash)
-      expect(flex[:type]).to eq('box')
-      expect(flex[:layout]).to eq('vertical')
+      expect(flex[:type]).to eq('bubble')
+      expect(flex[:body]).to be_a(Hash)
+      expect(flex[:body][:type]).to eq('box')
+      expect(flex[:body][:layout]).to eq('vertical')
     end
 
     it 'includes the user text in the flex message' do
       flex = LineFlexMessageBuilder.build_text_reply(text)
 
       # Find the text box containing the user message
-      expect(flex[:contents]).to be_a(Array)
-      expect(flex[:contents]).not_to be_empty
+      expect(flex[:body][:contents]).to be_a(Array)
+      expect(flex[:body][:contents]).not_to be_empty
 
       # Find nested text containing the user message
       def find_text_recursive(obj, text)
@@ -38,9 +40,9 @@ RSpec.describe LineFlexMessageBuilder do
     it 'includes proper styling' do
       flex = LineFlexMessageBuilder.build_text_reply(text)
 
-      expect(flex[:contents]).not_to be_empty
+      expect(flex[:body][:contents]).not_to be_empty
       # First element should have styling
-      first_content = flex[:contents].first
+      first_content = flex[:body][:contents].first
       expect(first_content).to have_key(:type)
     end
 
@@ -49,7 +51,7 @@ RSpec.describe LineFlexMessageBuilder do
       flex = LineFlexMessageBuilder.build_text_reply(special_text)
 
       expect(flex).to be_present
-      expect(flex[:contents]).not_to be_empty
+      expect(flex[:body][:contents]).not_to be_empty
     end
 
     it 'handles long text' do
@@ -57,21 +59,21 @@ RSpec.describe LineFlexMessageBuilder do
       flex = LineFlexMessageBuilder.build_text_reply(long_text)
 
       expect(flex).to be_present
-      expect(flex[:contents]).not_to be_empty
+      expect(flex[:body][:contents]).not_to be_empty
     end
 
     it 'handles empty text' do
       flex = LineFlexMessageBuilder.build_text_reply('')
 
       expect(flex).to be_present
-      expect(flex[:contents]).not_to be_empty
+      expect(flex[:body][:contents]).not_to be_empty
     end
 
     it 'includes separator for visual distinction' do
       flex = LineFlexMessageBuilder.build_text_reply(text)
 
       # Should have visual structure with separators
-      expect(flex[:contents]).to be_a(Array)
+      expect(flex[:body][:contents]).to be_a(Array)
     end
   end
 end

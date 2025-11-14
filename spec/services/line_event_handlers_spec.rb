@@ -109,8 +109,9 @@ RSpec.describe 'LINE Event Handlers' do
         expect(messaging_service).to have_received(:send_flex_message) do |uid, flex_msg|
           expect(uid).to eq(user_id)
           expect(flex_msg).to be_a(Hash)
-          expect(flex_msg[:type]).to eq('box')
-          expect(flex_msg[:layout]).to eq('vertical')
+          expect(flex_msg[:type]).to eq('bubble')
+          expect(flex_msg[:body][:type]).to eq('box')
+          expect(flex_msg[:body][:layout]).to eq('vertical')
         end
       end
     end

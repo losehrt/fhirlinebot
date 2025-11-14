@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_134418) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_161039) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_134418) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "access_token"
+    t.string "response_mode", default: "flex", comment: "Response mode for text messages (flex, text, quickreply, etc.)"
     t.index ["channel_id"], name: "index_line_configurations_on_channel_id", unique: true
     t.index ["organization_id", "is_active"], name: "index_line_configurations_on_organization_id_and_is_active"
     t.index ["organization_id", "is_default"], name: "index_line_configurations_on_organization_id_and_is_default", unique: true, where: "(is_default = true)"
