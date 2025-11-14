@@ -8,6 +8,20 @@ describe 'LINE Login Integration Flow', type: :request do
     allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:[]).with('LINE_CHANNEL_ID').and_return(line_channel_id)
     allow(ENV).to receive(:[]).with('LINE_CHANNEL_SECRET').and_return(line_channel_secret)
+
+    # Create global LINE configuration
+    LineConfiguration.create!(
+      organization_id: nil,
+      name: 'Test Global LINE Config',
+      channel_id: line_channel_id,
+      channel_secret: line_channel_secret,
+      redirect_uri: 'https://example.com/auth/line/callback',
+      is_default: true,
+      is_active: true
+    )
+
+    # Initialize default roles
+    Role.default_roles
   end
 
   describe 'Complete LINE Login flow for new user' do

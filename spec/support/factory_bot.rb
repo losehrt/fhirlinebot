@@ -35,4 +35,38 @@ FactoryBot.define do
       expires_at { 1.hour.from_now }
     end
   end
+
+  factory :role do
+    name { Role::USER }
+
+    trait :admin do
+      name { Role::ADMIN }
+    end
+
+    trait :moderator do
+      name { Role::MODERATOR }
+    end
+
+    trait :user do
+      name { Role::USER }
+    end
+  end
+
+  factory :user_role do
+    user
+    organization
+    role
+
+    trait :admin do
+      association :role, factory: [:role, :admin]
+    end
+
+    trait :moderator do
+      association :role, factory: [:role, :moderator]
+    end
+
+    trait :user do
+      association :role, factory: [:role, :user]
+    end
+  end
 end

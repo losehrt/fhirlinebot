@@ -1,0 +1,287 @@
+#!/usr/bin/env ruby
+
+require 'date'
+require 'json'
+require 'optparse'
+
+# 顏色配置
+class Colors
+  def self.blue(text); "\e[34m#{text}\e[0m"; end
+  def self.green(text); "\e[32m#{text}\e[0m"; end
+  def self.yellow(text); "\e[33m#{text}\e[0m"; end
+  def self.red(text); "\e[31m#{text}\e[0m"; end
+  def self.bold(text); "\e[1m#{text}\e[0m"; end
+  def self.dim(text); "\e[2m#{text}\e[0m"; end
+end
+
+# 程式代碼統計
+class CodeStats
+  # 定義程式碼檔案類型
+  CODE_EXTENSIONS = {
+    'rb' => '🔴 Ruby',
+    'js' => '🟨 JavaScript',
+    'erb' => '🔴 ERB (Rails)',
+    'css' => '🟦 CSS',
+    'scss' => '🟦 SCSS',
+    'html' => '🟠 HTML',
+    'json' => '⚪ JSON',
+    'yml' => '⚪ YAML',
+    'yaml' => '⚪ YAML',
+    'coffee' => '☕ CoffeeScript',
+    'ts' => '🟦 TypeScript',
+    'tsx' => '🟦 TypeScript/React',
+    'jsx' => '🟨 JSX',
+    'go' => '🐹 Go',
+    'py' => '🐍 Python',
+    'java' => '☕ Java',
+    'cpp' => '⚙️ C++',
+    'c' => '⚙️ C',
+    'h' => '⚙️ Header',
+    'sh' => '🔧 Shell',
+    'sql' => '🗄️ SQL',
+  }
+
+  # 非程式碼檔案類型
+  NON_CODE_EXTENSIONS = {
+    'md' => 'Markdown',
+    'txt' => 'Text',
+    'lock' => 'Lock',
+    'gemfile' => 'Gemfile',
+    'dockerfile' => 'Docker',
+    'xml' => 'XML',
+    'svg' => 'SVG',
+    'png' => 'PNG',
+    'jpg' => 'JPG',
+    'gif' => 'GIF',
+  }
+
+  def initialize
+    @stats = {}
+    @code_stats = {}
+  end
+
+  def run_git_command(cmd)
+    `#{cmd}`.strip
+  end
+
+  def collect_daily_stats
+    # 使用 git log --numstat 更快速地取得統計
+    cmd = "git log --pretty=format:'%ai' --numstat"
+    output = run_git_command(cmd)
+
+    lines = output.split("\n")
+    current_date = nil
+
+    lines.each do |line|
+      # 識別日期行
+      if line.match?(/^\d{4}-\d{2}-\d{2}/)
+        current_date = line.split(' ')[0]
+        @stats[current_date] ||= { code: 0, non_code: 0, details: {} }
+      # 識別 numstat 行 (additions, deletions, filename)
+      elsif line.match?(/^\d+\s+\d+\s+/) && current_date
+        parts = line.split("\t")
+        next if parts.length < 3
+
+        additions = parts[0].to_i
+        filename = parts[2]
+
+        next if should_skip?(filename)
+
+        ext = get_file_extension(filename)
+        is_code = CODE_EXTENSIONS.key?(ext)
+
+        # 使用 additions 作為程式碼行數（更快更準確）
+        if is_code
+          @stats[current_date][:code] += additions
+          @stats[current_date][:details][ext] ||= 0
+          @stats[current_date][:details][ext] += additions
+        else
+          @stats[current_date][:non_code] += additions
+        end
+      end
+    end
+  end
+
+  def get_file_extension(filename)
+    ext = File.extname(filename).sub(/^\./, '').downcase
+    ext.empty? ? 'no-ext' : ext
+  end
+
+  def should_skip?(filename)
+    skip_patterns = [
+      /node_modules/,
+      /\.bundle/,
+      /vendor\/bundle/,
+      /\.lock$/,
+      /\.DS_Store/,
+      /\.log$/,
+      /^test\//,
+      /^spec\//,
+      /\.min\./,
+    ]
+
+    skip_patterns.any? { |pattern| filename.match?(pattern) }
+  end
+
+  def print_table
+    return puts "❌ 沒有找到 Git 統計資訊" if @stats.empty?
+
+    sorted_dates = @stats.keys.sort
+
+    # 計算總統計
+    total_code = @stats.values.sum { |v| v[:code] }
+    total_non_code = @stats.values.sum { |v| v[:non_code] }
+    total_all = total_code + total_non_code
+
+    # 表頭
+    puts "\n"
+    puts Colors.bold("💻 每日程式碼行數統計")
+    puts Colors.dim("=" * 100)
+
+    # 表格頭部
+    printf "%-12s | %12s | %12s | %12s | %10s | %20s\n",
+           Colors.bold("日期"),
+           Colors.bold("💻 程式碼"),
+           Colors.bold("📄 其他檔案"),
+           Colors.bold("📊 總計"),
+           Colors.bold("代碼佔比"),
+           Colors.bold("主要語言")
+
+    puts Colors.dim("-" * 100)
+
+    # 表格內容
+    sorted_dates.each do |date|
+      stats = @stats[date]
+      code = stats[:code]
+      non_code = stats[:non_code]
+      total = code + non_code
+      ratio = total > 0 ? ((code.to_f / total) * 100).round(1) : 0
+
+      # 取主要語言
+      top_lang = stats[:details]
+        .sort_by { |_, v| v }
+        .reverse
+        .first(2)
+        .map { |ext, lines| "#{CODE_EXTENSIONS[ext] || ext}(#{lines})" }
+        .join(", ")
+
+      printf "%-12s | %12s | %12s | %12s | %10s | %-20s\n",
+             Colors.blue(date),
+             Colors.green("#{code}"),
+             Colors.yellow("#{non_code}"),
+             "#{total}",
+             "#{ratio}%",
+             top_lang[0..19]
+    end
+
+    # 表尾
+    puts Colors.dim("-" * 100)
+
+    # 統計摘要
+    total_ratio = total_all > 0 ? ((total_code.to_f / total_all) * 100).round(1) : 0
+    printf "%-12s | %12s | %12s | %12s | %10s\n",
+           Colors.bold("總計"),
+           Colors.green("#{total_code}"),
+           Colors.yellow("#{total_non_code}"),
+           Colors.bold("#{total_all}"),
+           Colors.bold("#{total_ratio}%")
+
+    puts Colors.dim("=" * 100)
+
+    # 額外統計資訊
+    puts "\n📈 額外統計："
+    puts "  • 統計天數：#{sorted_dates.length} 天"
+    puts "  • 每日平均程式碼：#{(total_code / sorted_dates.length).round} 行"
+    puts "  • 總程式碼行數：#{Colors.green(total_code.to_s)} 行"
+    puts "  • 程式碼佔比：#{Colors.green("#{total_ratio}%")}"
+
+    # 語言類型統計
+    puts "\n🗣️ 按語言統計："
+    all_langs = {}
+    @stats.values.each do |stat|
+      stat[:details].each do |ext, lines|
+        all_langs[ext] ||= 0
+        all_langs[ext] += lines
+      end
+    end
+
+    all_langs
+      .sort_by { |_, v| v }
+      .reverse
+      .first(8)
+      .each do |ext, lines|
+        percentage = total_code > 0 ? ((lines.to_f / total_code) * 100).round(1) : 0
+        lang_name = CODE_EXTENSIONS[ext] || ext
+        bar = "▓" * (percentage / 2).round + "░" * ((100 - percentage) / 2).round
+        printf "  %s %-20s: %5d 行 (%.1f%%) %s\n",
+               lang_name[0..0],
+               lang_name,
+               lines,
+               percentage,
+               bar
+      end
+
+    puts ""
+  end
+
+  def print_chart
+    return puts "❌ 沒有找到 Git 統計資訊" if @stats.empty?
+
+    sorted_dates = @stats.keys.sort
+    max_code = @stats.values.map { |v| v[:code] }.max
+
+    puts "\n"
+    puts Colors.bold("📊 程式碼行數趨勢圖")
+    puts Colors.dim("=" * 80)
+
+    sorted_dates.each do |date|
+      code = @stats[date][:code]
+      ratio = max_code > 0 ? (code.to_f / max_code * 30).round : 0
+
+      bar = "█" * ratio + "░" * (30 - ratio)
+      printf "%s | %s | %6d 行\n",
+             Colors.blue(date),
+             Colors.green(bar),
+             code
+    end
+
+    puts Colors.dim("=" * 80)
+    puts "  █ = 程式碼行數  ░ = 空白"
+    puts ""
+  end
+end
+
+# 命令行選項
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "使用方式: bin/code-stats [選項]"
+
+  opts.on("-d", "--days N", Integer, "只統計過去 N 天") do |n|
+    options[:days] = n
+  end
+
+  opts.on("-c", "--chart", "顯示圖表") do
+    options[:chart] = true
+  end
+
+  opts.on("-h", "--help", "顯示幫助") do
+    puts opts
+    exit
+  end
+end.parse!
+
+# 執行
+stats = CodeStats.new
+stats.collect_daily_stats
+
+# 如果指定了天數，則篩選
+if options[:days]
+  cutoff_date = (Date.today - options[:days]).to_s
+  stats.instance_variable_get(:@stats).reject! { |date, _| date < cutoff_date }
+end
+
+stats.print_table
+
+if options[:chart]
+  stats.print_chart
+end

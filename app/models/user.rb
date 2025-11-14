@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   has_secure_password
   has_one :line_account, dependent: :destroy
+  has_many :user_roles, dependent: :destroy
+  has_many :organizations, through: :user_roles
+  has_many :roles, through: :user_roles
 
   validates :email, presence: true, uniqueness: true,
             format: { with: URI::MailTo::EMAIL_REGEXP, message: 'must be a valid email' }
@@ -19,6 +22,41 @@ class User < ApplicationRecord
   # 檢查是否已綁定 LINE 帳號
   def has_line_account?
     line_account.present?
+  end
+
+  # 取得使用者在特定組織中的角色
+  # @param organization_id [Integer] 組織 ID
+  # @return [Role, nil] 使用者在該組織中的角色
+  def role_in_organization(organization_id)
+    user_roles.find_by(organization_id: organization_id)&.role
+  end
+
+  # 取得使用者在特定組織中的角色名稱
+  # @param organization_id [Integer] 組織 ID
+  # @return [String, nil] 使用者在該組織中的角色名稱
+  def role_name_in_organization(organization_id)
+    role_in_organization(organization_id)&.name
+  end
+
+  # 檢查使用者是否為特定組織的管理員
+  # @param organization_id [Integer] 組織 ID
+  # @return [Boolean]
+  def admin_in_organization?(organization_id)
+    role_name_in_organization(organization_id) == Role::ADMIN
+  end
+
+  # 檢查使用者是否為特定組織的版主
+  # @param organization_id [Integer] 組織 ID
+  # @return [Boolean]
+  def moderator_in_organization?(organization_id)
+    role_name_in_organization(organization_id) == Role::MODERATOR
+  end
+
+  # 檢查使用者是否為特定組織的成員
+  # @param organization_id [Integer] 組織 ID
+  # @return [Boolean]
+  def member_of_organization?(organization_id)
+    organizations.exists?(organization_id)
   end
 
   # 從 LINE 使用者資料建立或更新使用者

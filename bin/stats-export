@@ -1,0 +1,135 @@
+#!/usr/bin/env ruby
+
+require 'date'
+require 'json'
+require 'csv'
+require 'optparse'
+
+# 取得 Git 統計資料（與 stats 相同）
+class GitStats
+  def initialize
+    @stats = {}
+  end
+
+  def run_git_command(cmd)
+    `#{cmd}`.strip
+  end
+
+  def collect_daily_stats
+    cmd = "git log --pretty=format:'%h %ai' --numstat"
+    output = run_git_command(cmd)
+
+    lines = output.split("\n")
+    current_date = nil
+
+    lines.each do |line|
+      if line.match?(/^\w{7} \d{4}-\d{2}-\d{2}/)
+        parts = line.split(' ')
+        current_date = parts[1]
+        @stats[current_date] ||= { additions: 0, deletions: 0, files: {} }
+      elsif line.match?(/^\d+\s+\d+\s+/)
+        next unless current_date
+        next if should_skip?(line.split("\t")[2])
+
+        parts = line.split("\t")
+        additions = parts[0].to_i
+        deletions = parts[1].to_i
+        filename = parts[2]
+
+        @stats[current_date][:additions] += additions
+        @stats[current_date][:deletions] += deletions
+
+        ext = File.extname(filename).sub(/^\./, '') || 'no-ext'
+        @stats[current_date][:files][ext] ||= { additions: 0, deletions: 0 }
+        @stats[current_date][:files][ext][:additions] += additions
+        @stats[current_date][:files][ext][:deletions] += deletions
+      end
+    end
+  end
+
+  def should_skip?(filename)
+    skip_patterns = [
+      /node_modules/,
+      /\.bundle/,
+      /vendor\/bundle/,
+      /\.lock$/,
+      /\.DS_Store/,
+      /\.log$/
+    ]
+
+    skip_patterns.any? { |pattern| filename.match?(pattern) }
+  end
+
+  def to_csv
+    sorted_dates = @stats.keys.sort
+
+    rows = [["日期", "新增", "刪除", "淨變化"]]
+
+    sorted_dates.each do |date|
+      stats = @stats[date]
+      additions = stats[:additions]
+      deletions = stats[:deletions]
+      net = additions - deletions
+
+      rows << [date, additions, deletions, net]
+    end
+
+    # 計算總計
+    total_additions = @stats.values.sum { |v| v[:additions] }
+    total_deletions = @stats.values.sum { |v| v[:deletions] }
+    total_net = total_additions - total_deletions
+
+    rows << ["總計", total_additions, total_deletions, total_net]
+
+    CSV.generate do |csv|
+      rows.each { |row| csv << row }
+    end
+  end
+
+  def to_json
+    JSON.pretty_generate(@stats)
+  end
+
+  def stats
+    @stats
+  end
+end
+
+# 命令行選項
+format = 'csv'
+OptionParser.new do |opts|
+  opts.banner = "使用方式: bin/stats-export [選項]"
+
+  opts.on("-f", "--format FORMAT", ["csv", "json"], "輸出格式 (csv, json)") do |f|
+    format = f
+  end
+
+  opts.on("-o", "--output FILE", "輸出檔案") do |f|
+    options[:output] = f
+  end
+
+  opts.on("-h", "--help", "顯示幫助") do
+    puts opts
+    exit
+  end
+end.parse!
+
+# 執行
+stats = GitStats.new
+stats.collect_daily_stats
+
+case format
+when 'csv'
+  output = stats.to_csv
+  filename = "stats_#{Date.today}.csv"
+when 'json'
+  output = stats.to_json
+  filename = "stats_#{Date.today}.json"
+end
+
+if ARGV.first
+  File.write(ARGV.first, output)
+  puts "✅ 已匯出到 #{ARGV.first}"
+else
+  puts output
+end

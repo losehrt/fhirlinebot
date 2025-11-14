@@ -11,8 +11,10 @@ class LineConfiguration < ApplicationRecord
   validates :channel_id, uniqueness: true
   validates :is_default, :is_active, inclusion: { in: [true, false] }
 
-  # 回調 - 確保每個組織只有一個預設配置
+  # 回調
   before_save :ensure_single_default_per_organization, if: :is_default_changed?
+  after_save :invalidate_line_config_cache
+  after_destroy :invalidate_line_config_cache
 
   # 作用域
   scope :active, -> { where(is_active: true) }
@@ -96,5 +98,10 @@ class LineConfiguration < ApplicationRecord
       .where(organization_id: organization_id)
       .where.not(id: id)
       .update_all(is_default: false)
+  end
+
+  # 使 LineConfig 快取失效
+  def invalidate_line_config_cache
+    LineConfig.refresh!
   end
 end

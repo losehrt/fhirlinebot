@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_045020) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_052839) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_045020) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_roles_on_name", unique: true
+  end
+
+  create_table "user_roles", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "organization_id", null: false
+    t.bigint "role_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_user_roles_on_organization_id"
+    t.index ["role_id"], name: "index_user_roles_on_role_id"
+    t.index ["user_id", "organization_id"], name: "index_user_roles_on_user_org", unique: true
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -76,4 +95,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_045020) do
 
   add_foreign_key "line_accounts", "users"
   add_foreign_key "line_configurations", "organizations"
+  add_foreign_key "user_roles", "organizations"
+  add_foreign_key "user_roles", "roles"
+  add_foreign_key "user_roles", "users"
 end

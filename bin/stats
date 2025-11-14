@@ -1,0 +1,213 @@
+#!/usr/bin/env ruby
+
+require 'date'
+require 'json'
+require 'optparse'
+
+# 顏色配置
+class Colors
+  def self.blue(text); "\e[34m#{text}\e[0m"; end
+  def self.green(text); "\e[32m#{text}\e[0m"; end
+  def self.yellow(text); "\e[33m#{text}\e[0m"; end
+  def self.red(text); "\e[31m#{text}\e[0m"; end
+  def self.bold(text); "\e[1m#{text}\e[0m"; end
+  def self.dim(text); "\e[2m#{text}\e[0m"; end
+end
+
+# 取得 Git 統計資料
+class GitStats
+  def initialize
+    @stats = {}
+  end
+
+  # 執行 git 命令
+  def run_git_command(cmd)
+    `#{cmd}`.strip
+  end
+
+  # 收集每日統計
+  def collect_daily_stats
+    # 使用 git log 和 numstat 來統計每個 commit 的變化
+    cmd = "git log --pretty=format:'%h %ai' --numstat"
+    output = run_git_command(cmd)
+
+    lines = output.split("\n")
+    current_date = nil
+    current_commit = nil
+
+    lines.each do |line|
+      if line.match?(/^\w{7} \d{4}-\d{2}-\d{2}/)
+        # 這是 commit 行
+        parts = line.split(' ')
+        current_commit = parts[0]
+        current_date = parts[1]
+
+        @stats[current_date] ||= { additions: 0, deletions: 0, files: {} }
+      elsif line.match?(/^\d+\s+\d+\s+/)
+        # 這是 numstat 行
+        next unless current_date
+
+        parts = line.split("\t")
+        additions = parts[0].to_i
+        deletions = parts[1].to_i
+        filename = parts[2]
+
+        # 跳過某些檔案
+        next if should_skip?(filename)
+
+        @stats[current_date][:additions] += additions
+        @stats[current_date][:deletions] += deletions
+
+        # 按檔案類型統計
+        ext = File.extname(filename).sub(/^\./, '') || 'no-ext'
+        @stats[current_date][:files][ext] ||= { additions: 0, deletions: 0 }
+        @stats[current_date][:files][ext][:additions] += additions
+        @stats[current_date][:files][ext][:deletions] += deletions
+      end
+    end
+  end
+
+  # 決定是否跳過該檔案
+  def should_skip?(filename)
+    skip_patterns = [
+      /node_modules/,
+      /\.bundle/,
+      /vendor\/bundle/,
+      /\.lock$/,
+      /\.DS_Store/,
+      /\.log$/
+    ]
+
+    skip_patterns.any? { |pattern| filename.match?(pattern) }
+  end
+
+  # 輸出表格
+  def print_table
+    return puts "❌ 沒有找到 Git 統計資訊" if @stats.empty?
+
+    sorted_dates = @stats.keys.sort
+
+    # 計算總統計
+    total_additions = @stats.values.sum { |v| v[:additions] }
+    total_deletions = @stats.values.sum { |v| v[:deletions] }
+    total_net = total_additions - total_deletions
+
+    # 表頭
+    puts "\n"
+    puts Colors.bold("📊 日程式行數統計")
+    puts Colors.dim("=" * 80)
+
+    # 表格頭部
+    printf "%-12s | %10s | %10s | %10s | %15s\n",
+           Colors.bold("日期"),
+           Colors.bold("➕ 新增"),
+           Colors.bold("➖ 刪除"),
+           Colors.bold("🔄 淨變化"),
+           Colors.bold("主要檔案類型")
+
+    puts Colors.dim("-" * 80)
+
+    # 表格內容
+    sorted_dates.each do |date|
+      stats = @stats[date]
+      additions = stats[:additions]
+      deletions = stats[:deletions]
+      net = additions - deletions
+
+      # 取主要檔案類型
+      top_files = stats[:files]
+        .sort_by { |_, v| v[:additions] + v[:deletions] }
+        .reverse
+        .first(2)
+        .map { |ext, v| "#{ext}(#{v[:additions]})" }
+        .join(", ")
+
+      # 顏色編碼
+      net_color = if net > 0
+                    Colors.green("+#{net}")
+                  elsif net < 0
+                    Colors.red("#{net}")
+                  else
+                    Colors.dim("±0")
+                  end
+
+      printf "%-12s | %10s | %10s | %10s | %15s\n",
+             Colors.blue(date),
+             Colors.green("+#{additions}"),
+             Colors.red("-#{deletions}"),
+             net_color,
+             top_files[0..29]  # 限制長度
+    end
+
+    # 表尾
+    puts Colors.dim("-" * 80)
+
+    # 統計摘要
+    printf "%-12s | %10s | %10s | %10s\n",
+           Colors.bold("總計"),
+           Colors.green("+#{total_additions}"),
+           Colors.red("-#{total_deletions}"),
+           total_net > 0 ? Colors.green("+#{total_net}") : Colors.red("#{total_net}")
+
+    puts Colors.dim("=" * 80)
+
+    # 額外統計資訊
+    puts "\n📈 額外統計："
+    puts "  • 統計天數：#{sorted_dates.length} 天"
+    puts "  • 每日平均新增：#{(total_additions / sorted_dates.length).round} 行"
+    puts "  • 淨增加：#{Colors.green("+#{total_net}")} 行"
+
+    # 檔案類型統計
+    puts "\n📁 按檔案類型統計："
+    all_files = {}
+    @stats.values.each do |stat|
+      stat[:files].each do |ext, file_stat|
+        all_files[ext] ||= { additions: 0, deletions: 0 }
+        all_files[ext][:additions] += file_stat[:additions]
+        all_files[ext][:deletions] += file_stat[:deletions]
+      end
+    end
+
+    all_files
+      .sort_by { |_, v| v[:additions] + v[:deletions] }
+      .reverse
+      .first(10)
+      .each do |ext, stat|
+        net = stat[:additions] - stat[:deletions]
+        printf "  • %-10s: +%-6d -%-6d (淨: %+6d)\n",
+               ext,
+               stat[:additions],
+               stat[:deletions],
+               net
+      end
+
+    puts ""
+  end
+end
+
+# 命令行選項
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "使用方式: bin/stats [選項]"
+
+  opts.on("-d", "--days N", Integer, "只統計過去 N 天") do |n|
+    options[:days] = n
+  end
+
+  opts.on("-h", "--help", "顯示幫助") do
+    puts opts
+    exit
+  end
+end.parse!
+
+# 執行
+stats = GitStats.new
+stats.collect_daily_stats
+
+# 如果指定了天數，則篩選
+if options[:days]
+  cutoff_date = (Date.today - options[:days]).to_s
+  stats.instance_variable_get(:@stats).reject! { |date, _| date < cutoff_date }
+end
+
+stats.print_table

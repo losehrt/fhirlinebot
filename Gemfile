@@ -19,12 +19,13 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-# Authentication
+# Authentication & Authorization
 gem "bcrypt", "~> 3.1.7"
 gem "devise"
 gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-google-oauth2"
+gem "pundit", "~> 2.4"
 
 # LINE integration & HTTP requests
 gem "line-bot-api"

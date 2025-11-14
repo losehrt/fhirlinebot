@@ -27,3 +27,5 @@ When working on this project:
 - Ensure proper database indexing for foreign keys and queries
 
 **Do not use EMOJI icons**
+
+## 每次都要使用 TDD 來開發

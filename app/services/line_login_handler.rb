@@ -1,9 +1,18 @@
 class LineLoginHandler
-  def initialize(channel_id = nil, channel_secret = nil)
-    @channel_id = channel_id || ENV['LINE_LOGIN_CHANNEL_ID']
-    @channel_secret = channel_secret || ENV['LINE_LOGIN_CHANNEL_SECRET']
+  # Initialize LINE login handler with credentials from multiple sources
+  # Priority: explicit params > LineConfig (ENV > Database)
+  #
+  # @param channel_id [String, nil] Optional explicit Channel ID
+  # @param channel_secret [String, nil] Optional explicit Channel Secret
+  # @param organization_id [Integer, nil] Optional organization ID for multi-tenant support
+  def initialize(channel_id = nil, channel_secret = nil, organization_id: nil)
+    # Priority: explicit params > LineConfig (ENV > DB > raise error)
+    @channel_id = channel_id || LineConfig.channel_id(organization_id: organization_id)
+    @channel_secret = channel_secret || LineConfig.channel_secret(organization_id: organization_id)
     @auth_service = LineAuthService.new(@channel_id, @channel_secret)
     validate_credentials!
+  rescue => e
+    raise "LineLoginHandler initialization failed: #{e.message}"
   end
 
   # Handle the complete LINE login callback flow
@@ -11,10 +20,11 @@ class LineLoginHandler
   # @param redirect_uri [String] Redirect URI used in authorization request
   # @param state [String] State parameter for CSRF validation (optional)
   # @param nonce [String] Nonce for ID token validation (optional)
+  # @param organization [Organization, nil] Organization to assign user to (optional)
   # @return [User] The authenticated user
   # @raise [LineAuthService::AuthenticationError] If authentication fails
   # @raise [LineAuthService::NetworkError] If network error occurs
-  def handle_callback(code, redirect_uri, state = nil, nonce = nil)
+  def handle_callback(code, redirect_uri, state = nil, nonce = nil, organization: nil)
     # Step 1: Exchange authorization code for tokens
     token_response = @auth_service.exchange_code!(code, redirect_uri)
     access_token = token_response[:access_token]
@@ -35,7 +45,14 @@ class LineLoginHandler
       expiresIn: expires_in
     }
 
-    User.find_or_create_from_line(line_user_id, line_data)
+    user = User.find_or_create_from_line(line_user_id, line_data)
+
+    # Step 4: Assign organization and role if provided
+    if organization.present?
+      LineLoginOrganizationHandler.handle_organization_assignment(user, organization)
+    end
+
+    user
   end
 
   # Create an authorization request with state and nonce for CSRF/token protection
