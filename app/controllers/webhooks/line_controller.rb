@@ -1,7 +1,7 @@
 module Webhooks
   class LineController < ApplicationController
     skip_before_action :require_setup_completion
-    protect_from_forgery with: :null_session
+    skip_before_action :verify_authenticity_token
 
     # POST /webhooks/line
     # Receive and process LINE webhook events
