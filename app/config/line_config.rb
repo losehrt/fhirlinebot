@@ -1,47 +1,71 @@
 # LineConfig - Centralized configuration for LINE Login
 # Supports multiple sources with priority: ENV > DB > Defaults
+# Now with multi-tenant support via organization_id parameter
 #
 # Usage:
-#   LineConfig.channel_id      # Get Channel ID
-#   LineConfig.channel_secret  # Get Channel Secret
-#   LineConfig.redirect_uri    # Get Redirect URI
-#   LineConfig.configured?     # Check if properly configured
+#   LineConfig.channel_id                        # Get default Channel ID
+#   LineConfig.channel_id(organization_id: 1)    # Get organization-specific Channel ID
+#   LineConfig.channel_secret                    # Get Channel Secret
+#   LineConfig.channel_secret(organization_id: 1) # Get organization-specific Channel Secret
+#   LineConfig.redirect_uri                      # Get Redirect URI
+#   LineConfig.configured?                       # Check if properly configured
 
 class LineConfig
   class << self
     # Get LINE Channel ID
-    # Priority: ENV > Database > Raise error
+    # Priority: ENV > Database (org-specific) > Database (global) > Raise error
     #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [String] Channel ID
     # @raise [StandardError] if no Channel ID configured
-    def channel_id
-      return @channel_id if defined?(@channel_id) && @channel_id
+    def channel_id(organization_id: nil)
+      cache_key = "line_config_channel_id_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache&.key?(cache_key)
 
-      @channel_id = ENV['LINE_LOGIN_CHANNEL_ID'] || database_channel_id
-      raise 'LINE_LOGIN_CHANNEL_ID not configured' if @channel_id.blank?
+      # Priority 1: Environment variable (global default)
+      if ENV['LINE_LOGIN_CHANNEL_ID'].present?
+        return @config_cache[cache_key] = ENV['LINE_LOGIN_CHANNEL_ID']
+      end
 
-      @channel_id
+      # Priority 2: Database configuration (organization-specific or global)
+      db_config = database_config(organization_id)
+      if db_config&.channel_id.present?
+        return @config_cache[cache_key] = db_config.channel_id
+      end
+
+      raise "LINE_LOGIN_CHANNEL_ID not configured for #{organization_id ? "organization #{organization_id}" : 'global'}"
     end
 
     # Get LINE Channel Secret
-    # Priority: ENV > Database > Raise error
+    # Priority: ENV > Database (org-specific) > Database (global) > Raise error
     #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [String] Channel Secret
     # @raise [StandardError] if no Channel Secret configured
-    def channel_secret
-      return @channel_secret if defined?(@channel_secret) && @channel_secret
+    def channel_secret(organization_id: nil)
+      cache_key = "line_config_channel_secret_#{organization_id}"
+      return @config_cache[cache_key] if @config_cache&.key?(cache_key)
 
-      @channel_secret = ENV['LINE_LOGIN_CHANNEL_SECRET'] || database_channel_secret
-      raise 'LINE_LOGIN_CHANNEL_SECRET not configured' if @channel_secret.blank?
+      # Priority 1: Environment variable (global default)
+      if ENV['LINE_LOGIN_CHANNEL_SECRET'].present?
+        return @config_cache[cache_key] = ENV['LINE_LOGIN_CHANNEL_SECRET']
+      end
 
-      @channel_secret
+      # Priority 2: Database configuration (organization-specific or global)
+      db_config = database_config(organization_id)
+      if db_config&.channel_secret.present?
+        return @config_cache[cache_key] = db_config.channel_secret
+      end
+
+      raise "LINE_LOGIN_CHANNEL_SECRET not configured for #{organization_id ? "organization #{organization_id}" : 'global'}"
     end
 
     # Get LINE Login Redirect URI
     # Priority: ENV > Rails config > Default
     #
+    # @param organization_id [Integer, nil] Organization ID (for consistency, not used for redirect)
     # @return [String] Redirect URI
-    def redirect_uri
+    def redirect_uri(organization_id: nil)
       ENV['LINE_LOGIN_REDIRECT_URI'] ||
         Rails.application.config.line_login_redirect_uri ||
         default_redirect_uri
@@ -49,12 +73,13 @@ class LineConfig
 
     # Get all configuration as a hash
     #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [Hash] Configuration hash with :channel_id, :channel_secret, :redirect_uri
-    def config
+    def config(organization_id: nil)
       {
-        channel_id: channel_id,
-        channel_secret: channel_secret,
-        redirect_uri: redirect_uri
+        channel_id: channel_id(organization_id: organization_id),
+        channel_secret: channel_secret(organization_id: organization_id),
+        redirect_uri: redirect_uri(organization_id: organization_id)
       }
     rescue StandardError => e
       Rails.logger.warn("LineConfig error: #{e.message}")
@@ -63,9 +88,11 @@ class LineConfig
 
     # Check if LINE is properly configured
     #
+    # @param organization_id [Integer, nil] Organization ID for multi-tenant support
     # @return [Boolean] true if Channel ID and Secret are configured
-    def configured?
-      channel_id.present? && channel_secret.present?
+    def configured?(organization_id: nil)
+      channel_id(organization_id: organization_id).present? &&
+        channel_secret(organization_id: organization_id).present?
     rescue StandardError
       false
     end
@@ -75,45 +102,32 @@ class LineConfig
     #
     # @return [void]
     def refresh!
-      @channel_id = nil
-      @channel_secret = nil
+      @config_cache = {}
       Rails.cache.delete('line_config_cache') if Rails.cache.respond_to?(:delete)
       Rails.logger.info 'LineConfig cache cleared'
     end
 
     private
 
-    # Get Channel ID from database
+    # Get configuration from database
+    # Supports both organization-specific and global defaults
     #
-    # @return [String, nil] Channel ID or nil if not configured
-    def database_channel_id
+    # @param organization_id [Integer, nil] Organization ID
+    # @return [LineConfiguration, nil] Configuration object or nil
+    def database_config(organization_id = nil)
       return nil unless table_exists?
 
-      setting = ApplicationSetting.current
-      setting&.line_channel_id
+      LineConfiguration.for_organization(organization_id)
     rescue => e
-      Rails.logger.debug("Could not load Channel ID from database: #{e.message}")
+      Rails.logger.debug("Could not load configuration from database: #{e.message}")
       nil
     end
 
-    # Get Channel Secret from database
-    #
-    # @return [String, nil] Channel Secret or nil if not configured
-    def database_channel_secret
-      return nil unless table_exists?
-
-      setting = ApplicationSetting.current
-      setting&.line_channel_secret
-    rescue => e
-      Rails.logger.debug("Could not load Channel Secret from database: #{e.message}")
-      nil
-    end
-
-    # Check if application_settings table exists in database
+    # Check if line_configurations table exists in database
     #
     # @return [Boolean] true if table exists and is accessible
     def table_exists?
-      return false unless ActiveRecord::Base.connection.data_source_exists?('application_settings')
+      return false unless ActiveRecord::Base.connection.data_source_exists?('line_configurations')
 
       true
     rescue => e
@@ -129,4 +143,7 @@ class LineConfig
       "#{app_url}/auth/line/callback"
     end
   end
+
+  # Initialize config cache
+  @config_cache = {}
 end

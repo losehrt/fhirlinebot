@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_12_042114) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_045020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -39,6 +39,32 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_042114) do
     t.index ["user_id"], name: "index_line_accounts_on_user_id"
   end
 
+  create_table "line_configurations", force: :cascade do |t|
+    t.bigint "organization_id"
+    t.string "name", null: false
+    t.string "channel_id", null: false
+    t.string "channel_secret", null: false
+    t.string "redirect_uri", null: false
+    t.boolean "is_default", default: false
+    t.boolean "is_active", default: true
+    t.datetime "last_used_at"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel_id"], name: "index_line_configurations_on_channel_id", unique: true
+    t.index ["organization_id", "is_active"], name: "index_line_configurations_on_organization_id_and_is_active"
+    t.index ["organization_id", "is_default"], name: "index_line_configurations_on_organization_id_and_is_default", unique: true, where: "(is_default = true)"
+    t.index ["organization_id"], name: "index_line_configurations_on_organization_id"
+  end
+
+  create_table "organizations", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -49,4 +75,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_042114) do
   end
 
   add_foreign_key "line_accounts", "users"
+  add_foreign_key "line_configurations", "organizations"
 end

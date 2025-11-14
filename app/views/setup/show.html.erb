@@ -71,7 +71,11 @@
                   </svg>
                   <div class="min-w-0">
                     <p class="font-medium text-gray-700 text-xs">已設定</p>
-                    <p class="text-xs text-gray-500">驗證時間：<%= @setting.last_validated_at.strftime("%m/%d %H:%M") %></p>
+                    <% if @setting.last_validated_at.present? %>
+                      <p class="text-xs text-gray-500">驗證時間：<%= @setting.last_validated_at.strftime("%m/%d %H:%M") %></p>
+                    <% else %>
+                      <p class="text-xs text-gray-500">驗證時間：尚未驗證</p>
+                    <% end %>
                   </div>
                 </div>
               <% else %>

@@ -6,7 +6,7 @@ This project uses ClaudeOnRails with a swarm of specialized agents for Rails dev
 - **Rails Version**: 8.0.4
 - **Ruby Version**: 3.4.2
 - **Project Type**: Full-stack Rails
-- **Test Framework**: Minitest
+- **Test Framework**: Rspec
 - **Turbo/Stimulus**: Enabled
 
 ## Swarm Configuration
