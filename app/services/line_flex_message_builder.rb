@@ -47,7 +47,7 @@ class LineFlexMessageBuilder
           color: '#1DB446'
         }
       ],
-      paddingBottom: 'md'
+      margin: 'md'
     }
 
     # Add separator
@@ -69,7 +69,8 @@ class LineFlexMessageBuilder
           color: '#666666'
         }
       ],
-      paddingAll: 'md',
+      margin: 'md',
+      padding: 'md',
       backgroundColor: '#F5F5F5'
     }
 
@@ -86,7 +87,7 @@ class LineFlexMessageBuilder
           align: 'center'
         }
       ],
-      marginTop: 'md'
+      margin: 'md'
     }
 
     contents
