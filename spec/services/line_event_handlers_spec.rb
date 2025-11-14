@@ -18,13 +18,46 @@ RSpec.describe 'LINE Event Handlers' do
   let(:user_id) { 'U206d25c2ea6bd87c17655609a1c37cb8' }
 
   describe MessageHandler do
-    before do
-      # Mock LineMessage creation
-      allow(LineMessage).to receive(:create).and_return(double)
-    end
-
     describe 'text message' do
-      it 'handles text message and stores it' do
+      it 'handles text message and queues storage and echo jobs' do
+        text = 'Hello Bot'
+        message_id = '100001'
+        timestamp = 1462629479859
+        event = {
+          'type' => 'message',
+          'message' => {
+            'type' => 'text',
+            'id' => message_id,
+            'text' => text
+          },
+          'timestamp' => timestamp,
+          'replyToken' => 'nHuyWiB7yP5Zw52FIkcQT',
+          'source' => {
+            'type' => 'user',
+            'userId' => user_id
+          }
+        }
+
+        handler = MessageHandler.new(event, messaging_service)
+
+        expect {
+          handler.call
+        }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(2)
+
+        jobs = ActiveJob::Base.queue_adapter.enqueued_jobs
+
+        # First job should be StoreMessageJob
+        store_job = jobs[-2]
+        expect(store_job[:job]).to eq(StoreMessageJob)
+        expect(store_job[:args]).to eq([user_id, 'text', text, message_id, timestamp])
+
+        # Second job should be EchoJob
+        echo_job = jobs[-1]
+        expect(echo_job[:job]).to eq(EchoJob)
+        expect(echo_job[:args]).to eq([user_id, text])
+      end
+
+      it 'returns true when processing text message' do
         event = {
           'type' => 'message',
           'message' => {
@@ -40,47 +73,17 @@ RSpec.describe 'LINE Event Handlers' do
           }
         }
 
-        allow(messaging_service).to receive(:send_text_message).and_return(true)
-
         handler = MessageHandler.new(event, messaging_service)
         result = handler.call
 
         expect(result).to be_truthy
-        expect(LineMessage).to have_received(:create)
-      end
-
-      it 'queues echo job for text message' do
-        text = 'Hello Bot'
-        event = {
-          'type' => 'message',
-          'message' => {
-            'type' => 'text',
-            'id' => '100001',
-            'text' => text
-          },
-          'timestamp' => 1462629479859,
-          'replyToken' => 'nHuyWiB7yP5Zw52FIkcQT',
-          'source' => {
-            'type' => 'user',
-            'userId' => user_id
-          }
-        }
-
-        handler = MessageHandler.new(event, messaging_service)
-
-        expect {
-          handler.call
-        }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
-
-        # Verify the job is an EchoJob with correct parameters
-        job = ActiveJob::Base.queue_adapter.enqueued_jobs.last
-        expect(job[:job]).to eq(EchoJob)
-        expect(job[:args]).to eq([user_id, text])
       end
     end
 
     describe 'image message' do
       it 'handles image message' do
+        allow(LineMessage).to receive(:create).and_return(double)
+
         event = {
           'type' => 'message',
           'message' => {
@@ -104,6 +107,8 @@ RSpec.describe 'LINE Event Handlers' do
 
     describe 'location message' do
       it 'handles location message' do
+        allow(LineMessage).to receive(:create).and_return(double)
+
         event = {
           'type' => 'message',
           'message' => {
@@ -130,6 +135,8 @@ RSpec.describe 'LINE Event Handlers' do
 
     describe 'sticker message' do
       it 'handles sticker message' do
+        allow(LineMessage).to receive(:create).and_return(double)
+
         event = {
           'type' => 'message',
           'message' => {
