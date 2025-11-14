@@ -1,17 +1,21 @@
-# FHIR LINE Bot - Kamal 部署文檔
+# FHIR LINE Bot
+
+FHIRLineBot 是一個連接 LINE 通訊平台與 FHIR 醫療數據標準的整合應用，為用戶提供便利的移動醫療數據查詢體驗。
 
 歡迎來到 FHIR LINE Bot 的 Kamal + DigitalOcean 部署指南。本文檔目錄包含部署應用所需的所有資訊。
+
+> **更多文檔請查看** [docs/INDEX.md](./docs/INDEX.md) - 完整文檔索引及導航
 
 ## 📚 文檔結構
 
 ### 🚀 快速開始
-- **[QUICK_START.md](./QUICK_START.md)** - 5 分鐘快速部署指南
+- **[QUICK_START.md](./docs/guides/QUICK_START.md)** - 5 分鐘快速部署指南
   - 最小可行部署步驟
   - 常用命令速查表
   - 快速驗證方法
 
 ### 📖 完整指南
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 完整部署指南（詳細版）
+- **[DEPLOYMENT.md](./docs/deployment/DEPLOYMENT_GUIDE.md)** - 完整部署指南（詳細版）
   - 部署前準備清單
   - 分步部署過程
   - 常見操作命令
@@ -20,7 +24,7 @@
   - 監控和維護
 
 ### ✅ 檢查清單
-- **[PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md)** - 部署前完整檢查清單
+- **[PRE_DEPLOYMENT_CHECKLIST.md](./docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md)** - 部署前完整檢查清單
   - DigitalOcean 準備（10 分鐘）
   - 本地環境準備（5 分鐘）
   - 環境變數配置（3 分鐘）
@@ -28,7 +32,7 @@
   - 安全檢查（3 分鐘）
   - 部署前測試
 
-- **[POST_DEPLOYMENT.md](./POST_DEPLOYMENT.md)** - 部署後檢查清單
+- **[POST_DEPLOYMENT.md](./docs/deployment/POST_DEPLOYMENT.md)** - 部署後檢查清單
   - 部署後驗證（5 分鐘）
   - 初始配置（10 分鐘）
   - 安全配置（15 分鐘）
@@ -38,7 +42,7 @@
   - 上線清單
 
 ### 📋 總結
-- **[KAMAL_SETUP_SUMMARY.md](./KAMAL_SETUP_SUMMARY.md)** - 配置準備工作總結
+- **[KAMAL_SETUP_SUMMARY.md](./docs/deployment/KAMAL_SETUP_SUMMARY.md)** - 配置準備工作總結
   - 已完成的配置
   - 部署架構
   - 配置摘要
@@ -58,7 +62,7 @@
 3. **[DEPLOYMENT.md](./DEPLOYMENT.md)** (參考)
    - 按需查閱詳細說明
 
-4. **[POST_DEPLOYMENT.md](./POST_DEPLOYMENT.md)** (20 分鐘)
+4. **[POST_DEPLOYMENT.md](./docs/deployment/POST_DEPLOYMENT.md)** (20 分鐘)
    - 部署完成後進行驗證和配置
 
 ### 後續部署（更新應用時）
@@ -71,7 +75,7 @@
 ### 遇到問題時
 
 1. 查看 `kamal logs -f` 中的錯誤信息
-2. 翻閱 [DEPLOYMENT.md - 故障排除](./DEPLOYMENT.md#故障排除)
+2. 翻閱 [DEPLOYMENT.md - 故障排除](./DEPLOYMENT.md#故障排除-troubleshooting)
 3. 使用 `kamal console` 或 `kamal shell` 進行調試
 
 ## 🔧 必要的配置文件
@@ -211,13 +215,13 @@ A: 執行 `kamal deploy` 即可。無需停機。
 A: 執行 `kamal logs -f` 即時查看日誌。
 
 ### Q: 如何備份資料庫？
-A: 查看 [POST_DEPLOYMENT.md - 備份配置](./POST_DEPLOYMENT.md#備份和恢復)
+A: 查看 [POST_DEPLOYMENT.md - 備份配置](./docs/deployment/POST_DEPLOYMENT.md#備份和恢復-backup-and-recovery)
 
 ### Q: 磁碟空間不足怎麼辦？
 A: 執行 `kamal exec "docker system prune -a"` 清理 Docker。
 
 ### Q: 如何擴展應用？
-A: 查看 [DEPLOYMENT.md - 監控和維護](./DEPLOYMENT.md#後續步驟)
+A: 查看 [DEPLOYMENT.md - 監控和維護](./DEPLOYMENT.md#後續步驟-next-steps)
 
 ## 📞 需要幫助？
 
@@ -235,7 +239,7 @@ A: 查看 [DEPLOYMENT.md - 監控和維護](./DEPLOYMENT.md#後續步驟)
 2. 完成 [PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md)
 3. 執行 `./bin/pre-deploy-check.sh`
 4. 運行 `kamal setup`
-5. 按照 [POST_DEPLOYMENT.md](./POST_DEPLOYMENT.md) 進行配置
+5. 按照 [POST_DEPLOYMENT.md](./docs/deployment/POST_DEPLOYMENT.md) 進行配置
 
 ---
 
