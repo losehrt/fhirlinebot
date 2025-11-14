@@ -46,7 +46,11 @@ class LineMessageResponseStrategy
     # @param text [String] Message text
     # @return [Boolean] true if successful
     def send_text_reply(messaging_service, reply_token, text)
-      messaging_service.reply_message(reply_token, text)
+      return false unless reply_token
+
+      result = messaging_service.reply_message(reply_token, text)
+      Rails.logger.info("[LineMessageResponseStrategy] Text reply sent: #{result}")
+      result
     rescue StandardError => e
       Rails.logger.error("[LineMessageResponseStrategy] Failed to send text reply: #{e.class} - #{e.message}")
       false
@@ -59,8 +63,12 @@ class LineMessageResponseStrategy
     # @param text [String] Message text to display
     # @return [Boolean] true if successful
     def send_flex_message_reply(messaging_service, user_id, text)
+      return false unless user_id
+
       flex_message = LineFlexMessageBuilder.build_text_reply(text)
-      messaging_service.send_flex_message(user_id, flex_message)
+      result = messaging_service.send_flex_message(user_id, flex_message)
+      Rails.logger.info("[LineMessageResponseStrategy] Flex message sent: #{result}")
+      result
     rescue StandardError => e
       Rails.logger.error("[LineMessageResponseStrategy] Failed to send flex message: #{e.class} - #{e.message}")
       false
@@ -70,13 +78,19 @@ class LineMessageResponseStrategy
   # Flex message response strategy - sends both text and styled flex message
   class FlexMessageStrategy < BaseStrategy
     def execute(messaging_service:, user_id:, reply_token:, text:)
+      Rails.logger.info("[LineMessageResponseStrategy] FlexMessageStrategy executing with user_id=#{user_id}, reply_token=#{reply_token}")
+
       # Send text reply
       text_result = send_text_reply(messaging_service, reply_token, text)
+      Rails.logger.info("[LineMessageResponseStrategy] Text reply result: #{text_result}")
 
       # Send flex message
       flex_result = send_flex_message_reply(messaging_service, user_id, text)
+      Rails.logger.info("[LineMessageResponseStrategy] Flex message result: #{flex_result}")
 
-      text_result && flex_result
+      result = text_result && flex_result
+      Rails.logger.info("[LineMessageResponseStrategy] Overall strategy result: #{result}")
+      result
     end
   end
 

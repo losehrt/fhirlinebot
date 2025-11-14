@@ -52,13 +52,15 @@ class MessageHandler < LineEventHandler
 
     # Send response using strategy pattern
     response_mode = LineConfig.response_mode || :flex
+    log_event(:info, "Using response mode: #{response_mode}")
     strategy = LineMessageResponseStrategy.for(response_mode)
-    strategy.execute(
+    result = strategy.execute(
       messaging_service: @messaging_service,
       user_id: @user_id,
       reply_token: @reply_token,
       text: text
     )
+    log_event(:info, "Response strategy result: #{result}")
 
     true
   end
