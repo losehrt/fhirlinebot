@@ -10,10 +10,12 @@ class LineAuthService
   AUTH_ENDPOINT = 'https://access.line.me/oauth2/v2.1/authorize'
 
   def initialize(channel_id = nil, channel_secret = nil)
-    # Priority: explicit params > environment variables > database settings
-    @channel_id = channel_id || ENV['LINE_LOGIN_CHANNEL_ID'] || ApplicationSetting.current&.line_channel_id
-    @channel_secret = channel_secret || ENV['LINE_LOGIN_CHANNEL_SECRET'] || ApplicationSetting.current&.line_channel_secret
+    # Priority: explicit params > LineConfig (ENV > DB) > raise error
+    @channel_id = channel_id || LineConfig.channel_id
+    @channel_secret = channel_secret || LineConfig.channel_secret
     validate_credentials!
+  rescue => e
+    raise "LineAuthService initialization failed: #{e.message}"
   end
 
   # Exchange authorization code for access token
