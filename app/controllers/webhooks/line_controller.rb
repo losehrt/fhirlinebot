@@ -53,6 +53,7 @@ module Webhooks
       # Cache the raw request body before Rails parses it
       # This ensures we have the exact bytes that LINE used to create the signature
       @raw_body = request.raw_post
+      Rails.logger.debug("Raw body cached: #{@raw_body[0..100]}... (#{@raw_body.bytesize} bytes)")
     end
 
     def ensure_event_handlers_loaded
