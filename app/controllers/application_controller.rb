@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   # Routes that don't require setup to be complete
   def skip_setup_check?
-    %w[setup auth rails/health].include?(controller_name) ||
+    %w[setup auth rails/health webhooks].include?(controller_name) ||
       %w[health_check login request_login callback logout].include?(action_name)
   end
 

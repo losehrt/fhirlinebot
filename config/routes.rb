@@ -35,6 +35,12 @@ Rails.application.routes.draw do
   get 'user/link-line-account', to: 'users#link_line_account', as: 'link_line_account'
   post 'user/request-line-link', to: 'users#request_line_link', as: 'request_line_link'
 
+  # LINE Webhooks
+  namespace :webhooks do
+    get 'line', to: 'line#index'
+    post 'line', to: 'line#create'
+  end
+
   # PWA support (commented out for now)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
