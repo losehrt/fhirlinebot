@@ -40,11 +40,39 @@ RSpec.describe 'LINE Event Handlers' do
           }
         }
 
+        allow(messaging_service).to receive(:send_text_message).and_return(true)
+
         handler = MessageHandler.new(event, messaging_service)
         result = handler.call
 
         expect(result).to be_truthy
         expect(LineMessage).to have_received(:create)
+      end
+
+      it 'echoes back the text message' do
+        text = 'Hello Bot'
+        event = {
+          'type' => 'message',
+          'message' => {
+            'type' => 'text',
+            'id' => '100001',
+            'text' => text
+          },
+          'timestamp' => 1462629479859,
+          'replyToken' => 'nHuyWiB7yP5Zw52FIkcQT',
+          'source' => {
+            'type' => 'user',
+            'userId' => user_id
+          }
+        }
+
+        allow(messaging_service).to receive(:send_text_message).and_return(true)
+
+        handler = MessageHandler.new(event, messaging_service)
+        result = handler.call
+
+        expect(result).to be_truthy
+        expect(messaging_service).to have_received(:send_text_message).with(user_id, text)
       end
     end
 

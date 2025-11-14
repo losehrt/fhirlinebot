@@ -45,7 +45,9 @@ class MessageHandler < LineEventHandler
       timestamp: @timestamp
     )
 
-    true
+    # Echo the message back to the user
+    echo_service = EchoService.new(@messaging_service)
+    echo_service.echo(@user_id, text)
   end
 
   def handle_image_message(message)
