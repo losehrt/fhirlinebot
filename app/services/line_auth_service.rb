@@ -3,10 +3,11 @@ class LineAuthService
   class AuthenticationError < StandardError; end
   class NetworkError < StandardError; end
 
-  BASE_URL = 'https://api.line.biz'
-  TOKEN_ENDPOINT = "#{BASE_URL}/v2.0/token"
+  # LINE Login OAuth2 Endpoints (v2.1)
+  TOKEN_ENDPOINT = 'https://api.line.me/oauth2/v2.1/token'
   PROFILE_ENDPOINT = 'https://api.line.me/v2/profile'
-  AUTH_ENDPOINT = 'https://web.line.biz/web/login'
+  # Authorization endpoint for user consent
+  AUTH_ENDPOINT = 'https://web.line.me/web/login'
 
   def initialize(channel_id = nil, channel_secret = nil)
     # Priority: explicit params > environment variables > database settings
