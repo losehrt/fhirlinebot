@@ -24,20 +24,24 @@
   <div class="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg min-w-[200px] z-[1000] hidden"
        data-dropdown-target="menu">
     <% if logged_in? %>
+      <%= link_to dashboard_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+        <span>儀表板</span>
+      <% end %>
+      <%= link_to user_settings_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
+        <span>帳號設定</span>
+      <% end %>
       <%= link_to profile_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
         <span>個人檔案</span>
-      <% end %>
-      <%= link_to "#", class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
-        <span>設定</span>
       <% end %>
       <div class="h-px bg-gray-200 my-2"></div>
       <%= button_to auth_logout_path, method: :post, class: "block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
         <span>登出</span>
       <% end %>
     <% else %>
-      <%= link_to "#", class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors", data: { action: "click->auth#requestLogin" } do %>
+      <%= link_to auth_login_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" do %>
         <span>使用 LINE 登入</span>
       <% end %>
+      <%= link_to "帳號設定", setup_path, class: "block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors" %>
     <% end %>
   </div>
 </div>

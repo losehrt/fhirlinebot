@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title><%= content_for(:title) || "FHIR LINE Bot - Healthcare Platform" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Google Fonts - DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="font-sans bg-gray-50 text-gray-900 m-0 p-0 min-h-screen">
+    <!-- Page Content (No sidebar or navbar for auth pages) -->
+    <main class="min-h-screen flex flex-col">
+      <!-- Flash Messages -->
+      <%= render 'shared/flash' %>
+
+      <!-- Dynamic Page Content -->
+      <%= yield %>
+    </main>
+  </body>
+</html>

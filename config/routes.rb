@@ -23,10 +23,17 @@ Rails.application.routes.draw do
 
   # Authentication
   namespace :auth do
+    get "login", action: :login
     post "request_login"
     get "line/callback", action: :callback
     post "logout"
   end
+
+  # User Management
+  resource :user_settings, only: [:show], controller: 'user_settings', as: 'user_settings'
+  delete 'user/disconnect-line-account', to: 'users#disconnect_line_account', as: 'disconnect_line_account'
+  get 'user/link-line-account', to: 'users#link_line_account', as: 'link_line_account'
+  post 'user/request-line-link', to: 'users#request_line_link', as: 'request_line_link'
 
   # PWA support (commented out for now)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

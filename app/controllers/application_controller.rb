@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   # Routes that don't require setup to be complete
   def skip_setup_check?
     %w[setup auth rails/health].include?(controller_name) ||
-      %w[health_check request_login callback].include?(action_name)
+      %w[health_check login request_login callback logout].include?(action_name)
   end
 
   # Get the currently logged in user
@@ -50,5 +50,13 @@ class ApplicationController < ActionController::Base
   def logout_user
     session.delete(:user_id)
     @current_user = nil
+  end
+
+  # Require user to be logged in
+  # Redirects to home if user is not logged in
+  def require_login
+    unless logged_in?
+      redirect_to root_path, alert: 'You must be logged in to access this page'
+    end
   end
 end

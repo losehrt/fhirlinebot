@@ -1,0 +1,98 @@
+<% content_for :title, "Settings - FHIR Healthcare Platform" %>
+
+<div class="container mx-auto max-w-4xl p-4">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Account Settings</h1>
+    <p class="text-gray-600">Manage your account information and connected services</p>
+  </div>
+
+  <!-- User Information Card -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">User Information</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+        <p class="text-gray-900 bg-gray-50 px-4 py-2 rounded-lg"><%= @user.name %></p>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+        <p class="text-gray-900 bg-gray-50 px-4 py-2 rounded-lg"><%= @user.email %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE Account Card -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">LINE Account</h2>
+
+    <% if @user.has_line_account? %>
+      <!-- Connected LINE Account -->
+      <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-green-700 font-medium">Connected</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- LINE Display Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">LINE Display Name</label>
+            <p class="text-gray-900"><%= @user.line_account.display_name || 'N/A' %></p>
+          </div>
+
+          <!-- LINE User ID -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">LINE User ID</label>
+            <p class="text-gray-900 text-sm font-mono bg-gray-50 px-4 py-2 rounded-lg break-all">
+              <%= @user.line_account.line_user_id %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Profile Picture -->
+        <% if @user.line_account.picture_url.present? %>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+            <img src="<%= @user.line_account.picture_url %>" alt="LINE Profile" class="w-16 h-16 rounded-full border border-gray-300">
+          </div>
+        <% end %>
+
+        <!-- Disconnect Button -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <%= button_to 'Disconnect LINE Account', disconnect_line_account_path, method: :delete,
+              class: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200',
+              data: { confirm: 'Are you sure you want to disconnect your LINE account?' } %>
+        </div>
+      </div>
+    <% else %>
+      <!-- Not Connected -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-blue-700 font-medium">Not Connected</span>
+        </div>
+
+        <p class="text-gray-700 mb-4">
+          You haven't connected a LINE account yet. Connect your LINE account to enable quick login and access all features.
+        </p>
+
+        <%= link_to 'Connect LINE Account', link_line_account_path,
+            class: 'inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200' %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Back Button -->
+  <div class="mt-8">
+    <%= link_to 'Back to Dashboard', dashboard_path, class: 'text-blue-600 hover:text-blue-800 font-medium' %>
+  </div>
+</div>

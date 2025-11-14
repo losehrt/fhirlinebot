@@ -16,6 +16,13 @@ module RequestHelpers
     }
   end
 
+  def sign_in_as(user)
+    # Set user_id in session by making a dummy request that establishes the session
+    post auth_logout_path  # Make a request to establish session first
+    # Now set the user_id in the session
+    session[:user_id] = user.id
+  end
+
   def expect_success
     expect(response).to have_http_status(:success)
   end

@@ -1,5 +1,6 @@
 class DashboardController < ApplicationController
   skip_before_action :require_setup_completion  # Allow access without setup
+  before_action :require_login
   # Flexy layout is inherited from ApplicationController
 
   def show

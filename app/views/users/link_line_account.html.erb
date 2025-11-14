@@ -1,0 +1,68 @@
+<% content_for :title, "Link LINE Account - FHIR Healthcare Platform" %>
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Link LINE Account</h1>
+      <p class="text-gray-600">Connect your LINE account to your healthcare profile</p>
+    </div>
+
+    <!-- Link Card -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <div class="text-center mb-8">
+        <svg class="w-16 h-16 mx-auto text-green-600 mb-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0C5.37 0 0 4.06 0 9.09c0 3.14 2.23 5.87 5.35 7.48v4.96c0 .59.6.95 1.13.65l3.1-1.96c.5.08 1.02.12 1.57.12 6.63 0 12-4.06 12-9.09S18.63 0 12 0m1.28 11.07H9.49v2.33H7.78v-2.33H6.07v-1.71h1.71V8.05h1.71v1.31h3.79v1.71m2.82 0h-4.96v-4.04h4.96v4.04z"/>
+        </svg>
+        <h2 class="text-2xl font-bold text-gray-900">Ready to Connect?</h2>
+      </div>
+
+      <p class="text-gray-700 text-center mb-8">
+        Click the button below to authenticate with LINE and link your account.
+      </p>
+
+      <!-- LINE Login Button -->
+      <button
+        id="line-login-button"
+        data-action="click->line-link#requestLink"
+        data-controller="line-link"
+        class="w-full bg-[#00B900] hover:bg-[#009900] text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2 mb-6"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 4.06 0 9.09c0 3.14 2.23 5.87 5.35 7.48v4.96c0 .59.6.95 1.13.65l3.1-1.96c.5.08 1.02.12 1.57.12 6.63 0 12-4.06 12-9.09S18.63 0 12 0m1.28 11.07H9.49v2.33H7.78v-2.33H6.07v-1.71h1.71V8.05h1.71v1.31h3.79v1.71m2.82 0h-4.96v-4.04h4.96v4.04z"/>
+        </svg>
+        Link with LINE
+      </button>
+
+      <!-- Back Link -->
+      <div class="text-center">
+        <%= link_to 'Back to Settings', user_settings_path, class: 'text-blue-600 hover:text-blue-800 font-medium' %>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+      <h3 class="font-bold text-gray-900 mb-3">Why connect LINE?</h3>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex items-start gap-2">
+          <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Quick and easy login</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Secure authentication</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Access exclusive features</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

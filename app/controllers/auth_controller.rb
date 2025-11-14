@@ -1,5 +1,11 @@
 class AuthController < ApplicationController
-  before_action :redirect_if_logged_in, only: [:request_login]
+  before_action :redirect_if_logged_in, only: [:login, :request_login]
+  layout 'auth'
+
+  # Display login page
+  def login
+    # Page will show LINE login button and options
+  end
 
   # Initiate LINE login request
   # Generates authorization URL with state and nonce for CSRF protection
@@ -11,7 +17,8 @@ class AuthController < ApplicationController
     session[:line_login_state] = auth_request[:state]
     session[:line_login_nonce] = auth_request[:nonce]
 
-    if request.format.json?
+    # Check for JSON request (either format.json? or Accept header)
+    if request.format.json? || request.headers['Accept']&.include?('application/json')
       render json: { authorization_url: auth_request[:authorization_url] }
     else
       redirect_to auth_request[:authorization_url], allow_other_host: true
@@ -50,7 +57,7 @@ class AuthController < ApplicationController
       session.delete(:line_login_nonce)
 
       flash[:notice] = "Welcome, #{user.name}!"
-      redirect_to '/'
+      redirect_to dashboard_path
     rescue LineAuthService::AuthenticationError => e
       flash[:alert] = 'Failed to authenticate with LINE. Please try again.'
       Rails.logger.warn("LINE authentication error: #{e.message}")
@@ -69,8 +76,8 @@ class AuthController < ApplicationController
   # Logout user
   def logout
     logout_user
-    flash[:notice] = 'You have been logged out.'
-    redirect_to '/'
+    flash[:notice] = 'You have been successfully logged out.'
+    redirect_to root_path
   end
 
   private
@@ -83,6 +90,6 @@ class AuthController < ApplicationController
 
   # Check if user is already logged in and redirect if so
   def redirect_if_logged_in
-    redirect_to '/' if logged_in?
+    redirect_to dashboard_path if logged_in?
   end
 end
