@@ -9,6 +9,7 @@
 | **平台名稱** | 臺灣醫療資訊標準大平台 |
 | **官方網站** | https://medstandard.mohw.gov.tw |
 | **FHIR Server URL** | https://emr-smart.appx.com.tw/v/r4/fhir |
+| **SMART Launch Sandbox** | https://ng.turbos.tw/smart/launch |
 | **OAuth2 授權端點** | https://emr-smart.appx.com.tw/v/r4/auth/authorize |
 | **OAuth2 Token 端點** | https://emr-smart.appx.com.tw/v/r4/auth/token |
 | **OAuth2 Introspect 端點** | https://emr-smart.appx.com.tw/v/r4/auth/introspect |
@@ -17,6 +18,166 @@
 | **測試資料** | Synthea 合成資料 |
 | **存取方式** | OAuth2 (SMART on FHIR) / 直接訪問 (無認證) |
 | **技術支援** | medstandard@itri.org.tw |
+
+---
+
+## 0. SMART Sandbox 啟動介面說明
+
+### 0.1 Sandbox 用途
+
+截圖中的 **SAND-BOX** 介面是台灣 SMART on FHIR 沙箱的**應用啟動入口**。
+
+**主要功能：**
+- 🔧 配置 FHIR Server URL
+- 🌐 配置應用的 Launch URL
+- ▶️ 啟動 SMART App 進行測試
+
+### 0.2 Sandbox 介面說明
+
+```
+┌─────────────────────────────────────────┐
+│           SAND-BOX (沙箱)               │
+├─────────────────────────────────────────┤
+│                                         │
+│  說明：使用 Postman 或其他工具測試     │
+│                                         │
+│  FHIR Server URL:                       │
+│  https://emr-smart.appx.com.tw/v/r4/fhir
+│                                         │
+│  [輸入框] 請輸入網址                    │
+│  https://ng.turbos.tw/smart/launch      │
+│                                         │
+│           [送出] 按鈕                   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### 0.3 使用步驟
+
+#### 步驟 1：準備應用啟動 URL
+
+你的應用需要提供一個啟動端點，例如：
+```
+https://yourdomain.com/smart/launch
+```
+
+這個端點應該：
+1. 接收 SMART 啟動參數（`iss`, `launch`, `patient`）
+2. 根據這些參數初始化應用
+3. 執行 OAuth2 認證流程
+
+#### 步驟 2：在 Sandbox 中輸入 Launch URL
+
+```
+FHIR Server URL: https://emr-smart.appx.com.tw/v/r4/fhir
+Launch URL:      https://yourdomain.com/smart/launch
+```
+
+#### 步驟 3：點擊「送出」啟動應用
+
+Sandbox 會：
+1. 生成啟動參數（包含患者 ID、機構 URL 等）
+2. 重定向到你的應用 Launch URL
+3. 傳遞必要的 SMART 上下文參數
+
+### 0.4 應用接收的參數示例
+
+當 Sandbox 啟動你的應用時，會附帶以下參數：
+
+```url
+https://yourdomain.com/smart/launch?
+  iss=https://emr-smart.appx.com.tw/v/r4/fhir&
+  launch=abc123&
+  patient=patient-456&
+  encounter=encounter-789
+```
+
+| 參數 | 說明 | 例子 |
+|------|------|------|
+| **iss** | FHIR Server URL（Identity Server） | `https://emr-smart.appx.com.tw/v/r4/fhir` |
+| **launch** | Launch Context ID，用於查詢詳細信息 | `abc123` |
+| **patient** | 患者 ID | `patient-456` |
+| **encounter** | 就診 ID（可選） | `encounter-789` |
+
+### 0.5 應用需要實現的功能
+
+你的應用需要：
+
+1. **接收這些參數**
+   ```ruby
+   GET /smart/launch?iss=...&launch=...&patient=...
+   ```
+
+2. **解析和驗證參數**
+   ```ruby
+   iss = params[:iss]        # FHIR Server
+   launch = params[:launch]  # Launch Context
+   patient = params[:patient] # Patient ID
+   ```
+
+3. **使用 FHIR Server 進行認證**
+   ```ruby
+   # 向 https://emr-smart.appx.com.tw/v/r4/auth/authorize 請求授權
+   redirect_to oauth_authorize_url(iss, launch, patient)
+   ```
+
+4. **處理 OAuth2 回調**
+   ```ruby
+   # 接收 Authorization Code
+   code = params[:code]
+   # 交換為 Access Token
+   # 使用 Token 訪問患者資料
+   ```
+
+### 0.6 對應的 FHIR LineBot 實施
+
+根據 SMART_ON_FHIR_COMPLIANCE_PLAN.md，你需要在應用中實現：
+
+**Route（路由）：**
+```ruby
+# config/routes.rb
+get 'smart/launch', action: :smart_launch
+get 'auth/fhir/callback', action: :fhir_callback
+```
+
+**Controller（控制器）：**
+```ruby
+# app/controllers/auth_controller.rb
+def smart_launch
+  # 接收 Sandbox 傳來的參數
+  launch_context = {
+    iss: params[:iss],
+    launch: params[:launch],
+    patient: params[:patient]
+  }
+
+  # 儲存到 session
+  session[:fhir_launch] = launch_context
+
+  # 重定向到 FHIR OAuth 認證
+  # ... (詳見 SMART_ON_FHIR_COMPLIANCE_PLAN.md 第 4 部分)
+end
+```
+
+### 0.7 測試流程
+
+```
+1. 準備你的應用
+   ↓
+2. 部署到可公開存取的 URL (例如 https://yourdomain.com)
+   ↓
+3. 訪問 Sandbox: https://ng.turbos.tw/smart/launch
+   ↓
+4. 輸入:
+   - FHIR Server: https://emr-smart.appx.com.tw/v/r4/fhir
+   - Launch URL: https://yourdomain.com/smart/launch
+   ↓
+5. 點擊「送出」啟動應用
+   ↓
+6. 應用接收參數，執行認證，獲取患者資料
+   ↓
+7. 驗證成功！✅
+```
 
 ---
 
