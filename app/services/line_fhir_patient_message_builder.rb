@@ -5,16 +5,20 @@ class LineFhirPatientMessageBuilder
   # Build a flex message to display patient information
   #
   # @param patient_data [Hash] Formatted patient data from FhirPatientService
+  # @param fhir_server_url [String] Optional FHIR server URL to display
   # @return [Hash] Flex message container structure
-  def self.build_patient_card(patient_data)
+  def self.build_patient_card(patient_data, fhir_server_url = nil)
     Rails.logger.debug("[LineFhirPatientMessageBuilder] Building patient card for: #{patient_data[:id]}")
+
+    # Get FHIR server URL if not provided
+    fhir_server_url ||= get_fhir_server_url
 
     {
       type: 'bubble',
       body: {
         type: 'box',
         layout: 'vertical',
-        contents: build_patient_contents(patient_data),
+        contents: build_patient_contents(patient_data, fhir_server_url),
         spacing: 'md',
         margin: 'md'
       }
@@ -23,29 +27,43 @@ class LineFhirPatientMessageBuilder
 
   private
 
-  def self.build_patient_contents(patient_data)
+  def self.build_patient_contents(patient_data, fhir_server_url = nil)
     contents = []
 
-    # Header with patient ID
+    # Header with patient ID and FHIR server URL
+    header_contents = [
+      {
+        type: 'text',
+        text: 'FHIR 患者資訊',
+        weight: 'bold',
+        size: 'lg',
+        color: '#1DB446'
+      },
+      {
+        type: 'text',
+        text: "ID: #{patient_data[:id]}",
+        size: 'xs',
+        color: '#999999',
+        margin: 'md'
+      }
+    ]
+
+    # Add FHIR server URL if available
+    if fhir_server_url.present?
+      header_contents << {
+        type: 'text',
+        text: "Server: #{fhir_server_url}",
+        size: 'xs',
+        color: '#999999',
+        margin: 'sm',
+        wrap: true
+      }
+    end
+
     contents << {
       type: 'box',
       layout: 'vertical',
-      contents: [
-        {
-          type: 'text',
-          text: 'FHIR 患者資訊',
-          weight: 'bold',
-          size: 'lg',
-          color: '#1DB446'
-        },
-        {
-          type: 'text',
-          text: "ID: #{patient_data[:id]}",
-          size: 'xs',
-          color: '#999999',
-          margin: 'md'
-        }
-      ],
+      contents: header_contents,
       margin: 'md'
     }
 
@@ -80,7 +98,7 @@ class LineFhirPatientMessageBuilder
       }
     end
 
-    # Footer
+    # Footer with update time and disclaimer
     contents << {
       type: 'separator',
       margin: 'md'
@@ -96,6 +114,34 @@ class LineFhirPatientMessageBuilder
           size: 'xs',
           color: '#999999',
           align: 'center'
+        },
+        {
+          type: 'separator',
+          margin: 'md'
+        },
+        {
+          type: 'text',
+          text: '資料來源聲明',
+          size: 'xs',
+          color: '#666666',
+          weight: 'bold',
+          margin: 'md'
+        },
+        {
+          type: 'text',
+          text: '本資訊來自 FHIR 標準醫療資料伺服器，採隨機方式抽取示例患者資料進行展示。',
+          size: 'xs',
+          color: '#999999',
+          wrap: true,
+          margin: 'sm'
+        },
+        {
+          type: 'text',
+          text: '此為演示用途，不代表真實患者資訊。如需實際醫療資訊，請聯絡醫療服務提供者。',
+          size: 'xs',
+          color: '#999999',
+          wrap: true,
+          margin: 'sm'
         }
       ],
       margin: 'md'
@@ -152,6 +198,15 @@ class LineFhirPatientMessageBuilder
         }
       ]
     }
+  end
+
+  def self.get_fhir_server_url
+    # Get FHIR server URL from configuration
+    if Rails.configuration.respond_to?(:fhir_server_url) && Rails.configuration.fhir_server_url.present?
+      Rails.configuration.fhir_server_url
+    else
+      ENV['FHIR_SERVER_URL'] || 'https://hapi.fhir.tw/fhir'
+    end
   end
 
   def self.format_value_for_display(value)
