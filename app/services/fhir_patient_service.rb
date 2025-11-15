@@ -26,8 +26,8 @@ class FhirPatientService
     Rails.logger.info('[FhirPatientService] Fetching random patient with name')
 
     # Fetch all available patients and randomly select from those with names
-    # (Server-side offset may not work effectively)
-    search_params = { _count: 200 }
+    # (Server-side offset may not work effectively, so we fetch a larger batch)
+    search_params = { _count: 500 }
     Rails.logger.info("[FhirPatientService] Search params: #{search_params}")
     patients = @service.search_patients(search_params)
     Rails.logger.info("[FhirPatientService] Found #{patients.length} patients total")
@@ -61,8 +61,8 @@ class FhirPatientService
   def get_complete_patient
     # Search for all patients and select complete ones at application layer
     # FHIR server may not support _offset/_count parameters effectively,
-    # so we fetch all available and randomly select
-    search_params = { _count: 200 }
+    # so we fetch a larger batch and randomly select
+    search_params = { _count: 500 }
     Rails.logger.info("[FhirPatientService] Complete patient search params: #{search_params}")
     patients = @service.search_patients(search_params)
     Rails.logger.info("[FhirPatientService] Found #{patients.length} total patients, filtering for complete data...")
@@ -92,7 +92,7 @@ class FhirPatientService
     return nil if attempt >= MAX_RETRIES
 
     Rails.logger.info("[FhirPatientService] Retry attempt #{attempt + 1}/#{MAX_RETRIES} for complete patient")
-    search_params = { _count: 200 }
+    search_params = { _count: 500 }
     patients = @service.search_patients(search_params)
     return nil if patients.empty?
 
@@ -129,7 +129,7 @@ class FhirPatientService
     return nil if attempt >= MAX_RETRIES
 
     Rails.logger.info("[FhirPatientService] Retry attempt #{attempt + 1}/#{MAX_RETRIES}")
-    search_params = { _count: 200 }
+    search_params = { _count: 500 }
     patients = @service.search_patients(search_params)
     return nil if patients.empty?
 
