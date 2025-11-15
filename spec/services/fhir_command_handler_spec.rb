@@ -109,10 +109,36 @@ RSpec.describe FhirCommandHandler do
       end
     end
 
+    context 'with /fhir patient -a flag' do
+      it 'returns complete patient data' do
+        allow_any_instance_of(FhirPatientService).to receive(:get_random_patient).with(complete_data: true).and_return(
+          FHIR::R4::Patient.new(id: 'p1', gender: 'male')
+        )
+
+        allow_any_instance_of(FhirPatientService).to receive(:format_patient_data).and_return(
+          { id: 'p1', name: '完整患者', gender: '男性', birth_date: '2000-01-01', phone: '0912-345-678', address: '台北市', identifiers: [] }
+        )
+
+        result = described_class.handle('/fhir patient -a')
+
+        expect(result[:success]).to be true
+        expect(result[:type]).to eq('flex')
+      end
+
+      it 'returns error when no complete patient found' do
+        allow_any_instance_of(FhirPatientService).to receive(:get_random_patient).with(complete_data: true).and_return(nil)
+
+        result = described_class.handle('/fhir patient -a')
+
+        expect(result[:success]).to be false
+        expect(result[:message]).to include('完整資料')
+      end
+    end
+
     context 'with unknown /fhir subcommand' do
       it 'returns error' do
         result = described_class.handle('/fhir unknown')
-        
+
         expect(result[:error]).to include('未知的 FHIR 命令')
       end
     end
@@ -120,7 +146,7 @@ RSpec.describe FhirCommandHandler do
     context 'with non-FHIR command' do
       it 'returns nil' do
         result = described_class.handle('hello')
-        
+
         expect(result).to be_nil
       end
     end
@@ -130,13 +156,13 @@ RSpec.describe FhirCommandHandler do
         allow_any_instance_of(FhirPatientService).to receive(:get_random_patient).and_return(
           FHIR::R4::Patient.new(id: 'p1')
         )
-        
+
         allow_any_instance_of(FhirPatientService).to receive(:format_patient_data).and_return(
           { id: 'p1', name: '測試', gender: '男性', birth_date: '2000-01-01', phone: '未提供', address: '未提供', identifiers: [] }
         )
-        
+
         result = described_class.handle('  /fhir   patient  ')
-        
+
         expect(result[:success]).to be true
       end
     end

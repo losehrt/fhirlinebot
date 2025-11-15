@@ -1,26 +1,29 @@
 # FhirCommandHandler - Handle /fhir commands with various subcommands
-# 
+#
 # Supported commands:
-#   /fhir patient  - Get a random patient from FHIR server
-#   /fhir encounter - Get a random encounter (future)
-#   /fhir help - Show available FHIR commands
+#   /fhir patient      - Get a random patient from FHIR server
+#   /fhir patient -a   - Get a random patient with complete data
+#   /fhir encounter    - Get a random encounter (future)
+#   /fhir help         - Show available FHIR commands
 
 class FhirCommandHandler
   def self.handle(text)
     command_line = text.to_s.strip.downcase
-    
+
     # Check if it's a /fhir command
     return nil unless command_line.start_with?('/fhir')
-    
+
     # Parse the command
     parts = command_line.split(/\s+/)
-    
+
     # parts[0] = '/fhir'
     subcommand = parts[1]&.downcase
-    
+    # parts[2] = optional flag like '-a'
+    flag = parts[2]&.downcase
+
     case subcommand
     when 'patient'
-      handle_patient_command
+      handle_patient_command(flag)
     when 'encounter'
       handle_encounter_command
     when 'help', nil
@@ -32,27 +35,30 @@ class FhirCommandHandler
 
   private
 
-  def self.handle_patient_command
-    Rails.logger.info('[FhirCommandHandler] Handling /fhir patient command')
-    
+  def self.handle_patient_command(flag = nil)
+    complete_data = flag == '-a'
+
+    Rails.logger.info("[FhirCommandHandler] Handling /fhir patient command (complete_data: #{complete_data})")
+
     begin
       fhir_service = FhirPatientService.new
-      patient = fhir_service.get_random_patient
-      
+      patient = fhir_service.get_random_patient(complete_data: complete_data)
+
       if patient
         patient_data = fhir_service.format_patient_data(patient)
         flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data)
-        
+
         {
           success: true,
           type: 'flex',
           message: flex_message
         }
       else
+        error_msg = complete_data ? '未能找到完整資料的患者' : '未能找到患者資料'
         {
           success: false,
           type: 'text',
-          message: '未能找到患者資料'
+          message: error_msg
         }
       end
     rescue Fhir::FhirServiceError => e

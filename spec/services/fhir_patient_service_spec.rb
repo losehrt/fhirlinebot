@@ -76,6 +76,43 @@ RSpec.describe FhirPatientService do
         service.get_random_patient
       }.to raise_error(Fhir::FhirServiceError)
     end
+
+    it 'returns complete patient with -a flag' do
+      complete_patient = FHIR::R4::Patient.new(
+        id: 'p1',
+        name: [FHIR::R4::HumanName.new(given: ['John'], family: 'Doe')],
+        gender: 'male',
+        birthDate: '1980-01-01',
+        telecom: [FHIR::R4::ContactPoint.new(system: 'phone', value: '0912-345-678')],
+        address: [FHIR::R4::Address.new(country: 'TW', city: 'Taipei')]
+      )
+      incomplete_patient = FHIR::R4::Patient.new(
+        id: 'p2',
+        name: [FHIR::R4::HumanName.new(given: ['Jane'], family: 'Smith')]
+      )
+
+      allow_any_instance_of(Fhir::ClientService).to receive(:search_patients).and_return([
+        incomplete_patient,
+        complete_patient
+      ])
+
+      result = service.get_random_patient(complete_data: true)
+
+      expect(result).to eq(complete_patient)
+    end
+
+    it 'filters out incomplete patients with -a flag' do
+      incomplete_patients = [
+        FHIR::R4::Patient.new(id: 'p1', name: [FHIR::R4::HumanName.new(family: 'Doe')]),
+        FHIR::R4::Patient.new(id: 'p2')
+      ]
+
+      allow_any_instance_of(Fhir::ClientService).to receive(:search_patients).and_return(incomplete_patients)
+
+      result = service.get_random_patient(complete_data: true)
+
+      expect(result).to be_nil
+    end
   end
 
   describe '#format_patient_data' do
