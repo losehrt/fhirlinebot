@@ -127,6 +127,11 @@ module Fhir
 
     # Load FHIR server URL from configuration
     #
+    # Priority:
+    # 1. Organization-specific FhirConfiguration
+    # 2. Environment variable FHIR_SERVER_URL
+    # 3. Rails.configuration.fhir_server_url (if defined)
+    #
     # @param organization_id [Integer, nil] Organization ID
     # @return [String] FHIR server URL
     def load_server_url(organization_id)
@@ -135,7 +140,8 @@ module Fhir
         return config.server_url if config&.server_url.present?
       end
 
-      Rails.configuration.fhir_server_url || ENV['FHIR_SERVER_URL']
+      ENV['FHIR_SERVER_URL'] ||
+        (Rails.configuration.respond_to?(:fhir_server_url) && Rails.configuration.fhir_server_url)
     end
 
     # Validate service configuration

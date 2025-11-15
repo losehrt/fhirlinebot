@@ -87,4 +87,8 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # FHIR Server Configuration
+  # Default to Taiwan HAPI FHIR server, can be overridden with FHIR_SERVER_URL environment variable
+  config.fhir_server_url = ENV['FHIR_SERVER_URL'] || 'https://hapi.fhir.tw/fhir'
 end
