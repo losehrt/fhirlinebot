@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_161039) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_002036) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_161039) do
     t.text "validation_error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "fhir_configurations", force: :cascade do |t|
+    t.bigint "organization_id", null: false
+    t.string "server_url", null: false, comment: "FHIR server base URL"
+    t.text "description", comment: "Configuration description"
+    t.boolean "is_active", default: true, null: false, comment: "Whether this configuration is active"
+    t.datetime "last_validated_at", comment: "Last successful validation timestamp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id", "is_active"], name: "index_fhir_configurations_on_organization_id_and_is_active"
+    t.index ["organization_id"], name: "index_fhir_configurations_on_organization_id"
   end
 
   create_table "line_accounts", force: :cascade do |t|
@@ -114,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_161039) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "fhir_configurations", "organizations"
   add_foreign_key "line_accounts", "users"
   add_foreign_key "line_configurations", "organizations"
   add_foreign_key "user_roles", "organizations"
