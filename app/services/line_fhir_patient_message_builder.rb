@@ -126,6 +126,9 @@ class LineFhirPatientMessageBuilder
   end
 
   def self.build_detail_item(label, value)
+    # Ensure value is non-empty for LINE Flex Message API
+    display_value = format_value_for_display(value)
+
     {
       type: 'box',
       layout: 'baseline',
@@ -141,7 +144,7 @@ class LineFhirPatientMessageBuilder
         },
         {
           type: 'text',
-          text: value.to_s,
+          text: display_value,
           wrap: true,
           color: '#666666',
           size: 'sm',
@@ -149,6 +152,14 @@ class LineFhirPatientMessageBuilder
         }
       ]
     }
+  end
+
+  def self.format_value_for_display(value)
+    # Convert to string and strip whitespace
+    str_value = value.to_s.strip
+
+    # Return value if non-empty, otherwise return placeholder
+    str_value.present? ? str_value : '未提供'
   end
 
   def self.build_identifier_items(identifiers)
@@ -160,7 +171,7 @@ class LineFhirPatientMessageBuilder
         contents: [
           {
             type: 'text',
-            text: identifier[:type],
+            text: format_value_for_display(identifier[:type]),
             color: '#aaaaaa',
             size: 'xs',
             flex: 2,
@@ -168,7 +179,7 @@ class LineFhirPatientMessageBuilder
           },
           {
             type: 'text',
-            text: identifier[:value],
+            text: format_value_for_display(identifier[:value]),
             wrap: true,
             color: '#666666',
             size: 'xs',
