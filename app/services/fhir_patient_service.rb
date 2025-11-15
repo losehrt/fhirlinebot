@@ -25,11 +25,17 @@ class FhirPatientService
 
     Rails.logger.info('[FhirPatientService] Fetching random patient with name')
 
-    patients = @service.search_patients({})
+    # Fetch all available patients and randomly select from those with names
+    # (Server-side offset may not work effectively)
+    search_params = { _count: 200 }
+    Rails.logger.info("[FhirPatientService] Search params: #{search_params}")
+    patients = @service.search_patients(search_params)
+    Rails.logger.info("[FhirPatientService] Found #{patients.length} patients total")
     return nil if patients.empty?
 
     # Filter patients that have a name
     patients_with_name = patients.select { |p| has_valid_name?(p) }
+    Rails.logger.info("[FhirPatientService] Found #{patients_with_name.length} patients with names")
 
     if patients_with_name.empty?
       Rails.logger.warn('[FhirPatientService] No patients with name found in first batch, retrying')
@@ -53,19 +59,27 @@ class FhirPatientService
   # @return [FHIR::R4::Patient, nil] Random patient with complete data or nil
   # @raise [Fhir::FhirServiceError] on FHIR service errors
   def get_complete_patient
-    patients = @service.search_patients({})
+    # Search for all patients and select complete ones at application layer
+    # FHIR server may not support _offset/_count parameters effectively,
+    # so we fetch all available and randomly select
+    search_params = { _count: 200 }
+    Rails.logger.info("[FhirPatientService] Complete patient search params: #{search_params}")
+    patients = @service.search_patients(search_params)
+    Rails.logger.info("[FhirPatientService] Found #{patients.length} total patients, filtering for complete data...")
     return nil if patients.empty?
 
     # Filter patients that have complete data
     complete_patients = patients.select { |p| has_complete_data?(p) }
+    Rails.logger.info("[FhirPatientService] Filtered to #{complete_patients.length} complete patients")
 
     if complete_patients.empty?
       Rails.logger.warn('[FhirPatientService] No complete patients found in first batch, retrying')
       return retry_get_complete_patient(complete_patients)
     end
 
+    # Randomly select from complete patients
     random_patient = complete_patients.sample
-    Rails.logger.info("[FhirPatientService] Got complete patient: #{random_patient.id}")
+    Rails.logger.info("[FhirPatientService] Got complete patient: #{random_patient.id}, name: #{format_name(random_patient.name)}")
     random_patient
   end
 
@@ -78,7 +92,8 @@ class FhirPatientService
     return nil if attempt >= MAX_RETRIES
 
     Rails.logger.info("[FhirPatientService] Retry attempt #{attempt + 1}/#{MAX_RETRIES} for complete patient")
-    patients = @service.search_patients({})
+    search_params = { _count: 200 }
+    patients = @service.search_patients(search_params)
     return nil if patients.empty?
 
     complete_patients = patients.select { |p| has_complete_data?(p) }
@@ -101,26 +116,21 @@ class FhirPatientService
   end
 
   def has_complete_data?(patient)
-    # Check all required fields are present and non-empty
+    # Check required fields: name, gender, birthDate (reduced from 5 to 3 fields)
+    # Phone and address are optional for "complete data"
     has_name = has_valid_name?(patient)
     has_gender = patient.gender.present? && patient.gender.to_s.strip != ''
     has_birth_date = patient.birthDate.present?
-    has_phone = patient.telecom.present? && patient.telecom.any? { |t| t.system == 'phone' && t.value.present? }
-    has_address = patient.address.present? && patient.address.any? do |addr|
-      (addr.country.present? && addr.country.to_s.strip != '') ||
-      (addr.state.present? && addr.state.to_s.strip != '') ||
-      (addr.city.present? && addr.city.to_s.strip != '') ||
-      (addr.district.present? && addr.district.to_s.strip != '')
-    end
 
-    has_name && has_gender && has_birth_date && has_phone && has_address
+    has_name && has_gender && has_birth_date
   end
 
   def retry_get_random_patient(patients_with_name, attempt = 0)
     return nil if attempt >= MAX_RETRIES
 
     Rails.logger.info("[FhirPatientService] Retry attempt #{attempt + 1}/#{MAX_RETRIES}")
-    patients = @service.search_patients({})
+    search_params = { _count: 200 }
+    patients = @service.search_patients(search_params)
     return nil if patients.empty?
 
     patients_with_name = patients.select { |p| has_valid_name?(p) }

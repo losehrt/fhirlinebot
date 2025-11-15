@@ -35,7 +35,7 @@ RSpec.describe LineFhirCommandMessageBuilder do
 
       expect(json_str).to include('/fhir patient -a')
       expect(json_str).to include('取得完整患者資訊')
-      expect(json_str).to include('包含姓名、性別、生日、電話、地址')
+      expect(json_str).to include('姓名、性別、生日')
     end
 
     it '包含尚未推出的命令' do
@@ -108,7 +108,7 @@ RSpec.describe LineFhirCommandMessageBuilder do
 
       expect(patient_complete_cmd).to be_present
       expect(patient_complete_cmd[:name]).to eq('取得完整患者資訊')
-      expect(patient_complete_cmd[:description]).to include('姓名、性別、生日、電話、地址')
+      expect(patient_complete_cmd[:description]).to include('姓名、性別、生日')
     end
 
     it '定義了 encounter 命令' do

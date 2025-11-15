@@ -12,7 +12,7 @@ class LineFhirCommandMessageBuilder
     {
       command: 'patient -a',
       name: '取得完整患者資訊',
-      description: '取得包含姓名、性別、生日、電話、地址的完整患者資訊'
+      description: '取得包含姓名、性別、生日的患者資訊'
     },
     {
       command: 'encounter',

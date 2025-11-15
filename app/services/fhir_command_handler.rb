@@ -37,8 +37,10 @@ class FhirCommandHandler
 
   def self.handle_patient_command(flag = nil)
     complete_data = flag == '-a'
+    request_id = SecureRandom.hex(8)
+    timestamp = Time.now.in_time_zone('Asia/Taipei').strftime('%Y-%m-%d %H:%M:%S')
 
-    Rails.logger.info("[FhirCommandHandler] Handling /fhir patient command (complete_data: #{complete_data})")
+    Rails.logger.info("[FhirCommandHandler][#{request_id}] Handling /fhir patient command at #{timestamp} (complete_data: #{complete_data})")
 
     begin
       fhir_service = FhirPatientService.new
@@ -46,6 +48,8 @@ class FhirCommandHandler
 
       if patient
         patient_data = fhir_service.format_patient_data(patient)
+        Rails.logger.info("[FhirCommandHandler][#{request_id}] Got patient: #{patient.id} - #{patient_data[:name]}")
+
         flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data)
 
         {
@@ -55,6 +59,7 @@ class FhirCommandHandler
         }
       else
         error_msg = complete_data ? '未能找到完整資料的患者' : '未能找到患者資料'
+        Rails.logger.warn("[FhirCommandHandler][#{request_id}] No patient found: #{error_msg}")
         {
           success: false,
           type: 'text',
@@ -62,14 +67,14 @@ class FhirCommandHandler
         }
       end
     rescue Fhir::FhirServiceError => e
-      Rails.logger.error("[FhirCommandHandler] FHIR error: #{e.message}")
+      Rails.logger.error("[FhirCommandHandler][#{request_id}] FHIR error: #{e.message}")
       {
         success: false,
         type: 'text',
         message: "FHIR 服務錯誤: #{e.message}"
       }
     rescue StandardError => e
-      Rails.logger.error("[FhirCommandHandler] Error: #{e.class} - #{e.message}")
+      Rails.logger.error("[FhirCommandHandler][#{request_id}] Error: #{e.class} - #{e.message}")
       {
         success: false,
         type: 'text',

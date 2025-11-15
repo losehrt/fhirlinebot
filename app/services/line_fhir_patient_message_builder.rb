@@ -8,7 +8,8 @@ class LineFhirPatientMessageBuilder
   # @param fhir_server_url [String] Optional FHIR server URL to display
   # @return [Hash] Flex message container structure
   def self.build_patient_card(patient_data, fhir_server_url = nil)
-    Rails.logger.debug("[LineFhirPatientMessageBuilder] Building patient card for: #{patient_data[:id]}")
+    request_id = SecureRandom.hex(8)
+    Rails.logger.debug("[LineFhirPatientMessageBuilder][#{request_id}] Building patient card for: #{patient_data[:id]} - #{patient_data[:name]}")
 
     # Get FHIR server URL if not provided
     fhir_server_url ||= get_fhir_server_url
