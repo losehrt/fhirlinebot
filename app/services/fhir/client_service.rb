@@ -32,11 +32,12 @@ module Fhir
     def find_patient(patient_id)
       Rails.logger.info("[FHIR] Finding patient: #{patient_id}")
 
-      response = @client.read(FHIR::Patient, patient_id)
-      validate_resource(response, FHIR::Patient)
+      reply = @client.read(FHIR::Patient, patient_id)
+      resource = extract_resource_from_reply(reply)
+      validate_resource(resource, FHIR::Patient)
 
       Rails.logger.debug("[FHIR] Patient found: #{patient_id}")
-      response
+      resource
     rescue StandardError => e
       Rails.logger.error("[FHIR] Error finding patient: #{e.class} - #{e.message}")
       raise FhirServiceError, "Failed to find patient: #{e.message}"
@@ -50,8 +51,9 @@ module Fhir
     def search_patients(criteria)
       Rails.logger.info("[FHIR] Searching patients with criteria: #{criteria}")
 
-      response = @client.search(FHIR::Patient, search: criteria)
-      patients = extract_resources(response, FHIR::Patient)
+      reply = @client.search(FHIR::Patient, search: criteria)
+      bundle = extract_resource_from_reply(reply)
+      patients = extract_resources(bundle, FHIR::Patient)
 
       Rails.logger.info("[FHIR] Found #{patients.count} patients")
       patients
@@ -72,8 +74,9 @@ module Fhir
       criteria = { patient: patient_id }
       criteria[:code] = code if code.present?
 
-      response = @client.search(FHIR::Observation, search: criteria)
-      observations = extract_resources(response, FHIR::Observation)
+      reply = @client.search(FHIR::Observation, search: criteria)
+      bundle = extract_resource_from_reply(reply)
+      observations = extract_resources(bundle, FHIR::Observation)
 
       Rails.logger.info("[FHIR] Found #{observations.count} observations")
       observations
@@ -90,8 +93,9 @@ module Fhir
     def find_conditions(patient_id)
       Rails.logger.info("[FHIR] Finding conditions for patient: #{patient_id}")
 
-      response = @client.search(FHIR::Condition, search: { patient: patient_id })
-      conditions = extract_resources(response, FHIR::Condition)
+      reply = @client.search(FHIR::Condition, search: { patient: patient_id })
+      bundle = extract_resource_from_reply(reply)
+      conditions = extract_resources(bundle, FHIR::Condition)
 
       Rails.logger.info("[FHIR] Found #{conditions.count} conditions")
       conditions
@@ -108,8 +112,9 @@ module Fhir
     def find_medications(patient_id)
       Rails.logger.info("[FHIR] Finding medications for patient: #{patient_id}")
 
-      response = @client.search(FHIR::MedicationStatement, search: { patient: patient_id })
-      medications = extract_resources(response, FHIR::MedicationStatement)
+      reply = @client.search(FHIR::MedicationStatement, search: { patient: patient_id })
+      bundle = extract_resource_from_reply(reply)
+      medications = extract_resources(bundle, FHIR::MedicationStatement)
 
       Rails.logger.info("[FHIR] Found #{medications.count} medications")
       medications
@@ -142,6 +147,18 @@ module Fhir
       raise FhirServiceError, 'FHIR server URL not configured. Set FHIR_SERVER_URL environment variable or configure in Rails.configuration.fhir_server_url'
     end
 
+    # Extract resource from FHIR ClientReply wrapper
+    #
+    # FHIR client library wraps all responses in ClientReply objects.
+    # This method extracts the actual resource from the wrapper.
+    #
+    # @param reply [FHIR::ClientReply] The client reply
+    # @return [Object] The actual FHIR resource or bundle
+    def extract_resource_from_reply(reply)
+      return reply.resource if reply.is_a?(FHIR::ClientReply) || reply.respond_to?(:resource)
+      reply
+    end
+
     # Validate FHIR resource
     #
     # @param resource [FHIR resource] Resource to validate
@@ -149,7 +166,13 @@ module Fhir
     # @return [Boolean] true if valid
     # @raise [FhirValidationError] if resource is invalid
     def validate_resource(resource, expected_type)
+      # Check both FHIR::R4::* and FHIR::* class names
+      resource_class_name = resource.class.name
+      expected_base_name = expected_type.name.split('::').last
+      actual_base_name = resource_class_name.split('::').last
+
       return true if resource.is_a?(expected_type)
+      return true if actual_base_name == expected_base_name
 
       Rails.logger.warn("[FHIR] Invalid resource type. Expected #{expected_type}, got #{resource.class}")
       raise FhirValidationError, "Invalid FHIR resource type: expected #{expected_type}, got #{resource.class}"
@@ -161,10 +184,13 @@ module Fhir
     # @param resource_type [Class] Type of resources to extract
     # @return [Array] Array of resources
     def extract_resources(response, resource_type)
-      return [] unless response.is_a?(FHIR::Bundle)
+      return [] unless response.is_a?(FHIR::Bundle) || response.class.name.include?('Bundle')
       return [] unless response.entry.present?
 
-      response.entry.map(&:resource).compact.select { |r| r.is_a?(resource_type) }
+      expected_base_name = resource_type.name.split('::').last
+      response.entry.map(&:resource).compact.select do |r|
+        r.is_a?(resource_type) || r.class.name.split('::').last == expected_base_name
+      end
     end
 
   end
