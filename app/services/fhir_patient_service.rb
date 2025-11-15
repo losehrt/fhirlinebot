@@ -6,18 +6,32 @@ class FhirPatientService
     @service = Fhir::ClientService.new(organization_id: organization_id)
   end
 
-  # Fetch a random patient from FHIR server
+  # Fetch a random patient from FHIR server with a name
   #
-  # @return [FHIR::R4::Patient, nil] Random patient or nil if not found
+  # Ensures the returned patient has a valid name value.
+  # If a random patient doesn't have a name, will retry up to MAX_RETRIES times.
+  #
+  # @return [FHIR::R4::Patient, nil] Random patient with name or nil if not found
   # @raise [Fhir::FhirServiceError] on FHIR service errors
+  MAX_RETRIES = 10
+
   def get_random_patient
-    Rails.logger.info('[FhirPatientService] Fetching random patient')
+    Rails.logger.info('[FhirPatientService] Fetching random patient with name')
 
     patients = @service.search_patients({})
     return nil if patients.empty?
 
-    random_patient = patients.sample
-    Rails.logger.info("[FhirPatientService] Got random patient: #{random_patient.id}")
+    # Filter patients that have a name
+    patients_with_name = patients.select { |p| has_valid_name?(p) }
+
+    if patients_with_name.empty?
+      Rails.logger.warn('[FhirPatientService] No patients with name found in first batch, retrying')
+      # If no patients with name found, try again (retry logic)
+      return retry_get_random_patient(patients_with_name)
+    end
+
+    random_patient = patients_with_name.sample
+    Rails.logger.info("[FhirPatientService] Got random patient with name: #{random_patient.id}")
     random_patient
   rescue Fhir::FhirServiceError => e
     Rails.logger.error("[FhirPatientService] FHIR error: #{e.message}")
@@ -25,6 +39,32 @@ class FhirPatientService
   rescue StandardError => e
     Rails.logger.error("[FhirPatientService] Error fetching random patient: #{e.message}")
     raise Fhir::FhirServiceError, "Failed to fetch random patient: #{e.message}"
+  end
+
+  def has_valid_name?(patient)
+    patient.name.present? && patient.name.any? do |n|
+      (n.family.present? || n.given.present?) &&
+      (n.family.to_s.strip != '' || n.given&.any? { |g| g.to_s.strip != '' })
+    end
+  end
+
+  def retry_get_random_patient(patients_with_name, attempt = 0)
+    return nil if attempt >= MAX_RETRIES
+
+    Rails.logger.info("[FhirPatientService] Retry attempt #{attempt + 1}/#{MAX_RETRIES}")
+    patients = @service.search_patients({})
+    return nil if patients.empty?
+
+    patients_with_name = patients.select { |p| has_valid_name?(p) }
+
+    if patients_with_name.any?
+      random_patient = patients_with_name.sample
+      Rails.logger.info("[FhirPatientService] Got random patient with name on retry #{attempt + 1}: #{random_patient.id}")
+      return random_patient
+    end
+
+      # Recursively retry
+    retry_get_random_patient(patients_with_name, attempt + 1)
   end
 
   # Format patient data for display
@@ -43,6 +83,7 @@ class FhirPatientService
     }
   end
 
+  # Helper methods - private
   private
 
   def format_name(name_array)

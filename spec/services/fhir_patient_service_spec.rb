@@ -29,6 +29,39 @@ RSpec.describe FhirPatientService do
       expect([patient1.id, patient2.id]).to include(random_patient.id)
     end
 
+    it 'filters out patients without names' do
+      patient_with_name = FHIR::R4::Patient.new(id: 'p1', name: [FHIR::R4::HumanName.new(given: ['John'], family: 'Doe')])
+      patient_without_name = FHIR::R4::Patient.new(id: 'p2')
+      patient_with_empty_name = FHIR::R4::Patient.new(id: 'p3', name: [FHIR::R4::HumanName.new(given: [], family: '')])
+
+      allow_any_instance_of(Fhir::ClientService).to receive(:search_patients).and_return([
+        patient_with_name,
+        patient_without_name,
+        patient_with_empty_name
+      ])
+
+      random_patient = service.get_random_patient
+
+      expect(random_patient).not_to be_nil
+      expect(random_patient.id).to eq('p1')
+    end
+
+    it 'retries when first batch has no patients with names' do
+      patient_without_name1 = FHIR::R4::Patient.new(id: 'p1')
+      patient_without_name2 = FHIR::R4::Patient.new(id: 'p2')
+      patient_with_name = FHIR::R4::Patient.new(id: 'p3', name: [FHIR::R4::HumanName.new(given: ['John'], family: 'Doe')])
+
+      allow_any_instance_of(Fhir::ClientService).to receive(:search_patients).and_return(
+        [patient_without_name1, patient_without_name2],
+        [patient_with_name]
+      )
+
+      random_patient = service.get_random_patient
+
+      expect(random_patient).not_to be_nil
+      expect(random_patient.id).to eq('p3')
+    end
+
     it 'returns nil when no patients found' do
       allow_any_instance_of(Fhir::ClientService).to receive(:search_patients).and_return([])
 
