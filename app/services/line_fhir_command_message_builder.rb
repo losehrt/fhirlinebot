@@ -10,6 +10,11 @@ class LineFhirCommandMessageBuilder
       description: '從 FHIR 伺服器隨機取得一位患者的詳細資訊'
     },
     {
+      command: 'patient -a',
+      name: '取得完整患者資訊',
+      description: '取得包含姓名、性別、生日、電話、地址的完整患者資訊'
+    },
+    {
       command: 'encounter',
       name: '取得就診記錄',
       description: '從 FHIR 伺服器隨機取得一筆就診記錄 (即將推出)'
