@@ -50,11 +50,13 @@ class MessageHandler < LineEventHandler
       @timestamp
     )
 
-    # Check for special commands
-    if text.downcase == 'fhir patient'
-      handle_fhir_patient_command
+    # Check for FHIR commands
+    fhir_result = FhirCommandHandler.handle(text)
+
+    if fhir_result
+      handle_fhir_command_result(fhir_result)
     else
-      # Send response using strategy pattern
+      # Send response using strategy pattern for regular messages
       response_mode = LineConfig.response_mode || :flex
       log_event(:info, "Using response mode: #{response_mode}")
       strategy = LineMessageResponseStrategy.for(response_mode)
@@ -70,37 +72,31 @@ class MessageHandler < LineEventHandler
     true
   end
 
-  def handle_fhir_patient_command
-    log_event(:info, 'Handling fhir patient command')
+  def handle_fhir_command_result(result)
+    if result[:error]
+      send_reply(result[:error])
+      return
+    end
 
-    begin
-      # Fetch random patient
-      fhir_service = FhirPatientService.new
-      patient = fhir_service.get_random_patient
-
-      if patient
-        # Format patient data
-        patient_data = fhir_service.format_patient_data(patient)
-
-        # Build and send flex message
-        flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data)
-        result = @messaging_service.send_flex_message(@user_id, flex_message)
-        log_event(:info, "FHIR patient flex message sent: #{result}")
+    case result[:type]
+    when 'flex'
+      if result[:success]
+        flex_message = result[:message]
+        send_flex_message(flex_message)
       else
-        # No patients found
-        send_reply('未能找到患者資料')
+        send_reply(result[:message])
       end
-    rescue Fhir::FhirServiceError => e
-      log_event(:error, "FHIR error: #{e.message}")
-      send_reply("FHIR 服務錯誤: #{e.message}")
-    rescue StandardError => e
-      log_event(:error, "Error fetching FHIR patient: #{e.class} - #{e.message}")
-      send_reply('發生錯誤，無法取得患者資料')
+    when 'text'
+      send_reply(result[:message])
     end
   end
 
   def send_reply(text)
     @messaging_service.reply_message(@reply_token, text)
+  end
+
+  def send_flex_message(flex_message)
+    @messaging_service.send_flex_message(@user_id, flex_message)
   end
 
   def handle_image_message(message)
