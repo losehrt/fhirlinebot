@@ -62,7 +62,10 @@ class FhirCommandHandler
         patient_data = fhir_service.format_patient_data(patient)
         Rails.logger.info("[FhirCommandHandler][#{request_id}] Got patient: #{patient.id} - #{patient_data[:name]}")
 
-        flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data)
+        # Get the actual FHIR server URL for display
+        fhir_server_url = FhirServerRegistry.url_for(server)
+
+        flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data, fhir_server_url)
 
         {
           success: true,
