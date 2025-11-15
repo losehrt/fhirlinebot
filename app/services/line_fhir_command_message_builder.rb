@@ -15,6 +15,11 @@ class LineFhirCommandMessageBuilder
       description: '取得包含姓名、性別、生日的患者資訊'
     },
     {
+      command: 'patient -s [伺服器]',
+      name: '指定伺服器查詢',
+      description: '從指定的 FHIR 伺服器查詢患者 (sandbox, hapi, local)'
+    },
+    {
       command: 'encounter',
       name: '取得就診記錄',
       description: '從 FHIR 伺服器隨機取得一筆就診記錄 (即將推出)'
@@ -115,6 +120,26 @@ class LineFhirCommandMessageBuilder
           color: '#999999',
           wrap: true,
           margin: 'sm'
+        },
+        {
+          type: 'separator',
+          margin: 'md'
+        },
+        {
+          type: 'text',
+          text: '可用的伺服器',
+          size: 'xs',
+          color: '#666666',
+          weight: 'bold',
+          margin: 'md'
+        },
+        {
+          type: 'text',
+          text: build_server_list,
+          size: 'xs',
+          color: '#999999',
+          wrap: true,
+          margin: 'sm'
         }
       ],
       margin: 'md'
@@ -173,5 +198,22 @@ class LineFhirCommandMessageBuilder
       paddingAll: 'md',
       backgroundColor: '#fafafa'
     }
+  end
+
+  # Build a formatted list of available FHIR servers
+  #
+  # @return [String] Formatted server list
+  def self.build_server_list
+    servers = FhirServerRegistry.aliases
+    default_server = FhirServerRegistry.default_server
+
+    server_lines = servers.map do |alias_name|
+      info = FhirServerRegistry.server_info(alias_name)
+      is_default = alias_name == default_server
+      prefix = is_default ? '⭐ ' : '  '
+      "#{prefix}#{info[:alias]}: #{info[:name]}"
+    end
+
+    server_lines.join("\n")
   end
 end

@@ -1,10 +1,12 @@
 # FhirCommandHandler - Handle /fhir commands with various subcommands
 #
 # Supported commands:
-#   /fhir patient      - Get a random patient from FHIR server
-#   /fhir patient -a   - Get a random patient with complete data
-#   /fhir encounter    - Get a random encounter (future)
-#   /fhir help         - Show available FHIR commands
+#   /fhir patient              - Get a random patient from FHIR server
+#   /fhir patient -a           - Get a random patient with complete data
+#   /fhir patient -s sandbox   - Get patient from specific FHIR server (sandbox, hapi, local)
+#   /fhir patient -s hapi -a   - Combine server selection with complete data flag
+#   /fhir encounter            - Get a random encounter (future)
+#   /fhir help                 - Show available FHIR commands
 
 class FhirCommandHandler
   def self.handle(text)
@@ -18,12 +20,10 @@ class FhirCommandHandler
 
     # parts[0] = '/fhir'
     subcommand = parts[1]&.downcase
-    # parts[2] = optional flag like '-a'
-    flag = parts[2]&.downcase
 
     case subcommand
     when 'patient'
-      handle_patient_command(flag)
+      handle_patient_command(parts)
     when 'encounter'
       handle_encounter_command
     when 'help', nil
@@ -35,16 +35,28 @@ class FhirCommandHandler
 
   private
 
-  def self.handle_patient_command(flag = nil)
-    complete_data = flag == '-a'
+  def self.handle_patient_command(parts)
     request_id = SecureRandom.hex(8)
     timestamp = Time.now.in_time_zone('Asia/Taipei').strftime('%Y-%m-%d %H:%M:%S')
 
-    Rails.logger.info("[FhirCommandHandler][#{request_id}] Handling /fhir patient command at #{timestamp} (complete_data: #{complete_data})")
+    # Parse flags from command parts
+    server = extract_server_alias(parts)
+    complete_data = parts.include?('-a')
+
+    Rails.logger.info("[FhirCommandHandler][#{request_id}] Handling /fhir patient command at #{timestamp} (server: #{server}, complete_data: #{complete_data})")
 
     begin
+      # Validate server alias
+      unless FhirServerRegistry.valid_alias?(server)
+        return {
+          success: false,
+          type: 'text',
+          message: "無效的伺服器別名: #{server}。可用的伺服器: #{FhirServerRegistry.aliases.join(', ')}"
+        }
+      end
+
       fhir_service = FhirPatientService.new
-      patient = fhir_service.get_random_patient(complete_data: complete_data)
+      patient = fhir_service.get_random_patient(server: server, complete_data: complete_data)
 
       if patient
         patient_data = fhir_service.format_patient_data(patient)
@@ -80,6 +92,24 @@ class FhirCommandHandler
         type: 'text',
         message: '發生錯誤，無法取得患者資料'
       }
+    end
+  end
+
+  # Extract server alias from command parts
+  #
+  # @param parts [Array<String>] Command parts split by whitespace
+  # @return [String] Server alias (defaults to 'sandbox')
+  def self.extract_server_alias(parts)
+    # Look for -s or --server flag
+    short_index = parts.find_index('-s')
+    long_index = parts.find_index('--server')
+
+    if short_index && parts[short_index + 1]
+      parts[short_index + 1]
+    elsif long_index && parts[long_index + 1]
+      parts[long_index + 1]
+    else
+      FhirServerRegistry.default_server
     end
   end
 

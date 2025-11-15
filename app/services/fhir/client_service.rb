@@ -16,9 +16,10 @@ module Fhir
     # Initialize FHIR client service
     #
     # @param organization_id [Integer, nil] Organization ID for multi-tenant support
+    # @param server_url [String, nil] FHIR server URL. If nil, loads from config or org settings
     # @raise [FhirServiceError] if no FHIR server URL is configured
-    def initialize(organization_id: nil)
-      @server_url = load_server_url(organization_id)
+    def initialize(organization_id: nil, server_url: nil)
+      @server_url = server_url || load_server_url(organization_id)
       @client = FHIR::Client.new(@server_url)
       validate_configuration!
     end

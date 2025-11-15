@@ -2,12 +2,15 @@
 # Provides higher-level operations like fetching random patients
 
 class FhirPatientService
-  def initialize(organization_id: nil)
-    @service = Fhir::ClientService.new(organization_id: organization_id)
+  def initialize(organization_id: nil, server: nil)
+    @organization_id = organization_id
+    @server_alias = server&.downcase&.strip || FhirServerRegistry.default_server
+    @service = Fhir::ClientService.new(organization_id: organization_id, server_url: FhirServerRegistry.url_for(@server_alias))
   end
 
   # Fetch a random patient from FHIR server
   #
+  # @param server [String, nil] Server alias (sandbox, hapi, local). If nil, uses default.
   # @param complete_data [Boolean] If true, only return patients with complete data
   #                                (name, gender, birthDate). Otherwise just requires name.
   # @return [FHIR::R4::Patient, nil] Random patient or nil if not found
@@ -15,11 +18,17 @@ class FhirPatientService
   MAX_RETRIES = 10
   SEARCH_BATCH_SIZE = 500
 
-  def get_random_patient(complete_data: false)
+  def get_random_patient(server: nil, complete_data: false)
+    # If server is explicitly passed, reinitialize with that server
+    if server.present?
+      @server_alias = server.downcase.strip
+      @service = Fhir::ClientService.new(organization_id: @organization_id, server_url: FhirServerRegistry.url_for(@server_alias))
+    end
+
     request_id = SecureRandom.hex(8)
     data_type = complete_data ? 'complete data' : 'name'
 
-    Rails.logger.info("[FhirPatientService][#{request_id}] Fetching random patient with #{data_type}")
+    Rails.logger.info("[FhirPatientService][#{request_id}] Fetching random patient from #{@server_alias} with #{data_type}")
 
     begin
       # Use unified search logic

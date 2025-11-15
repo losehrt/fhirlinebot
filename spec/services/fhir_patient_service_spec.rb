@@ -2,12 +2,15 @@ require 'rails_helper'
 
 RSpec.describe FhirPatientService do
   let(:fhir_server_url) { 'http://localhost:8080/fhir' }
+  let(:sandbox_url) { 'https://emr-smart.appx.com.tw/v/r4/fhir' }
+  let(:hapi_url) { 'https://hapi.fhir.tw/fhir' }
   let(:client_double) { double('FHIR::Client') }
   let(:service) { described_class.new }
 
   before do
     allow(Rails.configuration).to receive(:fhir_server_url).and_return(fhir_server_url)
-    allow(FHIR::Client).to receive(:new).with(fhir_server_url).and_return(client_double)
+    # Allow FHIR::Client to be instantiated with any URL
+    allow(FHIR::Client).to receive(:new).and_return(client_double)
   end
 
   describe '#get_random_patient' do
