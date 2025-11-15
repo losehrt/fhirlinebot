@@ -98,7 +98,7 @@ class LineFhirPatientMessageBuilder
       }
     end
 
-    # Footer with update time and disclaimer
+    # Footer with response time and disclaimer
     contents << {
       type: 'separator',
       margin: 'md'
@@ -110,7 +110,7 @@ class LineFhirPatientMessageBuilder
       contents: [
         {
           type: 'text',
-          text: "更新時間: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}",
+          text: "回應時間: #{get_taipei_time.strftime('%Y-%m-%d %H:%M:%S')}",
           size: 'xs',
           color: '#999999',
           align: 'center'
@@ -207,6 +207,11 @@ class LineFhirPatientMessageBuilder
     else
       ENV['FHIR_SERVER_URL'] || 'https://hapi.fhir.tw/fhir'
     end
+  end
+
+  def self.get_taipei_time
+    # Get current time in Asia/Taipei timezone
+    Time.now.in_time_zone('Asia/Taipei')
   end
 
   def self.format_value_for_display(value)

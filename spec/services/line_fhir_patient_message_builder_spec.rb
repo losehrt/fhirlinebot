@@ -87,12 +87,19 @@ RSpec.describe LineFhirPatientMessageBuilder do
       expect(json_str).to include('演示用途')
     end
 
-    it '包含更新時間' do
+    it '包含回應時間且使用 Asia/Taipei 時區' do
       result = described_class.build_patient_card(patient_data)
       contents = result[:body][:contents]
 
       json_str = JSON.generate(result)
-      expect(json_str).to match(/更新時間: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
+      expect(json_str).to match(/回應時間: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
+    end
+
+    it '回應時間使用台北時區' do
+      # Verify that get_taipei_time returns Asia/Taipei timezone
+      taipei_time = described_class.send(:get_taipei_time)
+
+      expect(taipei_time.time_zone.name).to eq('Asia/Taipei')
     end
 
     it '不包含空文本欄位' do
