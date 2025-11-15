@@ -50,19 +50,57 @@ class MessageHandler < LineEventHandler
       @timestamp
     )
 
-    # Send response using strategy pattern
-    response_mode = LineConfig.response_mode || :flex
-    log_event(:info, "Using response mode: #{response_mode}")
-    strategy = LineMessageResponseStrategy.for(response_mode)
-    result = strategy.execute(
-      messaging_service: @messaging_service,
-      user_id: @user_id,
-      reply_token: @reply_token,
-      text: text
-    )
-    log_event(:info, "Response strategy result: #{result}")
+    # Check for special commands
+    if text.downcase == 'fhir patient'
+      handle_fhir_patient_command
+    else
+      # Send response using strategy pattern
+      response_mode = LineConfig.response_mode || :flex
+      log_event(:info, "Using response mode: #{response_mode}")
+      strategy = LineMessageResponseStrategy.for(response_mode)
+      result = strategy.execute(
+        messaging_service: @messaging_service,
+        user_id: @user_id,
+        reply_token: @reply_token,
+        text: text
+      )
+      log_event(:info, "Response strategy result: #{result}")
+    end
 
     true
+  end
+
+  def handle_fhir_patient_command
+    log_event(:info, 'Handling fhir patient command')
+
+    begin
+      # Fetch random patient
+      fhir_service = FhirPatientService.new
+      patient = fhir_service.get_random_patient
+
+      if patient
+        # Format patient data
+        patient_data = fhir_service.format_patient_data(patient)
+
+        # Build and send flex message
+        flex_message = LineFhirPatientMessageBuilder.build_patient_card(patient_data)
+        result = @messaging_service.send_flex_message(@user_id, flex_message)
+        log_event(:info, "FHIR patient flex message sent: #{result}")
+      else
+        # No patients found
+        send_reply('未能找到患者資料')
+      end
+    rescue Fhir::FhirServiceError => e
+      log_event(:error, "FHIR error: #{e.message}")
+      send_reply("FHIR 服務錯誤: #{e.message}")
+    rescue StandardError => e
+      log_event(:error, "Error fetching FHIR patient: #{e.class} - #{e.message}")
+      send_reply('發生錯誤，無法取得患者資料')
+    end
+  end
+
+  def send_reply(text)
+    @messaging_service.reply_message(@reply_token, text)
   end
 
   def handle_image_message(message)
