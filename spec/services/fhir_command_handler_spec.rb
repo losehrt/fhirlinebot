@@ -73,23 +73,39 @@ RSpec.describe FhirCommandHandler do
     end
 
     context 'with /fhir help command' do
-      it 'returns help message' do
+      it 'returns command menu as flex message' do
         result = described_class.handle('/fhir help')
-        
+
         expect(result[:success]).to be true
-        expect(result[:type]).to eq('text')
-        expect(result[:message]).to include('FHIR 命令幫助')
-        expect(result[:message]).to include('/fhir patient')
+        expect(result[:type]).to eq('flex')
+        expect(result[:message][:type]).to eq('bubble')
+      end
+
+      it 'includes available commands in menu' do
+        result = described_class.handle('/fhir help')
+        json_str = JSON.generate(result[:message])
+
+        expect(json_str).to include('FHIR 功能選單')
+        expect(json_str).to include('/fhir patient')
+        expect(json_str).to include('取得患者資訊')
       end
     end
 
     context 'with /fhir only' do
-      it 'returns help message' do
+      it 'returns command menu as flex message' do
         result = described_class.handle('/fhir')
-        
+
         expect(result[:success]).to be true
-        expect(result[:type]).to eq('text')
-        expect(result[:message]).to include('FHIR 命令幫助')
+        expect(result[:type]).to eq('flex')
+        expect(result[:message][:type]).to eq('bubble')
+      end
+
+      it 'includes usage instructions' do
+        result = described_class.handle('/fhir')
+        json_str = JSON.generate(result[:message])
+
+        expect(json_str).to include('使用方式')
+        expect(json_str).to include('請輸入 /fhir [功能] 來使用功能')
       end
     end
 

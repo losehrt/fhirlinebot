@@ -84,20 +84,13 @@ class FhirCommandHandler
 
   def self.handle_help_command
     Rails.logger.info('[FhirCommandHandler] Handling /fhir help command')
-    
-    help_text = <<~TEXT
-      FHIR 命令幫助
-      
-      可用的命令:
-      • /fhir patient - 取得隨機患者資訊
-      • /fhir encounter - 取得隨機就診記錄 (尚未實現)
-      • /fhir help - 顯示此幫助信息
-    TEXT
-    
+
+    flex_message = LineFhirCommandMessageBuilder.build_command_menu
+
     {
       success: true,
-      type: 'text',
-      message: help_text.strip
+      type: 'flex',
+      message: flex_message
     }
   end
 end
